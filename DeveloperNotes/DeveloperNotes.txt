@@ -1,0 +1,55 @@
+_______________________________________________________________________
+Changes As on 25/Apr/ 2022
+Dr.Parimlam Cases Updated Reception and OT Template Report
+
+Changes As on 07/May/2022
+
+Patient Name Updation - Claim Shanmuga Priya
+
+Changes As on 14 / May 2022
+
+StockDetailDateWise.Vb - Changes
+
+Added Try Catch for  MessageBox.Show("Sales Return Value Skipped - Might be wrong ")
+
+
+
+_________________________________________________________________________
+This  Alert is for developer reference 
+
+25/Apr/2021
+CaseType='LUMPBREAST'
+
+CaseType='LABIAL CYST' or
+CaseType='THYROID' or
+CaseType='BARTHOLIN ABCESS' or
+CaseType='BARTHOLIN CYST' or
+CaseType='LAMINECTOMY'
+If dt.Rows(i).Item("CaseType") = "ABD HYS" Or dt.Rows(i).Item("CaseType") = "ABH HYS" Or dt.Rows(i).Item("CaseType") = "GS" Or dt.Rows(i).Item("CaseType") = "DIA LAP" Or dt.Rows(i).Item("CaseType") = "HYS LAP" Or dt.Rows(i).Item("CaseType") = "LAP" Or dt.Rows(i).Item("CaseType") = "LAP HYS" Or dt.Rows(i).Item("CaseType") = "LSCS" Or dt.Rows(i).Item("CaseType") = "PS" Or dt.Rows(i).Item("CaseType") = "VAG HYS" Or dt.Rows(i).Item("CaseType") = "NORMAL DELIVERY" Or dt.Rows(i).Item("CaseType") = "NEW BORN" Or dt.Rows(i).Item("CaseType") = "BIOPSY" Or dt.Rows(i).Item("CaseType") = "CERVICAL STICH" Or dt.Rows(i).Item("CaseType") = "DNC" Or dt.Rows(i).Item("CaseType") = "I&D" Or dt.Rows(i).Item("CaseType") = "LAP ECTOPIC" Or dt.Rows(i).Item("CaseType") = "LS" Or dt.Rows(i).Item("CaseType") = "MYOMECTOMY" Or dt.Rows(i).Item("CaseType") = "BABY CASE" Or dt.Rows(i).Item("CaseType") = "HERNIA" or dt.Rows(i).Item("CaseType") = "BREAST I&D" or dt.Rows(i).Item("CaseType") = "HERNIA" or dt.Rows(i).Item("CaseType") = "THYROID" or dt.Rows(i).Item("CaseType") = "PILES" or  dt.Rows(i).Item("CaseType") = "MASTECTOM" or dt.Rows(i).Item("CaseType") = "LUMPBREAST" or dt.Rows(i).Item("CaseType") = "FISTULA" or  dt.Rows(i).Item("CaseType") = "SABEACIANCYST" or dt.Rows(i).Item("CaseType") = "BREAST ABSCEES" or  dt.Rows(i).Item("CaseType") = "UMB. HERNIA" Then
+
+For update this to 
+this 
+
+If dt.Rows(i).Item("CaseType") = "ABD HYS" Or dt.Rows(i).Item("CaseType") = "ABH HYS" Or dt.Rows(i).Item("CaseType") = "GS" Or dt.Rows(i).Item("CaseType") = "DIA LAP" Or dt.Rows(i).Item("CaseType") = "HYS LAP" Or dt.Rows(i).Item("CaseType") = "LAP" Or dt.Rows(i).Item("CaseType") = "LAP HYS" Or dt.Rows(i).Item("CaseType") = "LSCS" Or dt.Rows(i).Item("CaseType") = "PS" Or dt.Rows(i).Item("CaseType") = "VAG HYS" Or dt.Rows(i).Item("CaseType") = "NORMAL DELIVERY" Or dt.Rows(i).Item("CaseType") = "NEW BORN" Or dt.Rows(i).Item("CaseType") = "BIOPSY" Or dt.Rows(i).Item("CaseType") = "CERVICAL STICH" Or dt.Rows(i).Item("CaseType") = "DNC" Or dt.Rows(i).Item("CaseType") = "I&D" Or dt.Rows(i).Item("CaseType") = "LAP ECTOPIC" Or dt.Rows(i).Item("CaseType") = "LS" Or dt.Rows(i).Item("CaseType") = "MYOMECTOMY" Or dt.Rows(i).Item("CaseType") = "BABY CASE" Or dt.Rows(i).Item("CaseType") = "HERNIA" or dt.Rows(i).Item("CaseType") = "BREAST I&D" or dt.Rows(i).Item("CaseType") = "HERNIA" or dt.Rows(i).Item("CaseType") = "THYROID" or dt.Rows(i).Item("CaseType") = "PILES" or  dt.Rows(i).Item("CaseType") = "MASTECTOM" or dt.Rows(i).Item("CaseType") = "LUMPBREAST" or dt.Rows(i).Item("CaseType") = "FISTULA" or  dt.Rows(i).Item("CaseType") = "SABEACIANCYST" or dt.Rows(i).Item("CaseType") = "BREAST ABSCEES" or  dt.Rows(i).Item("CaseType") = "UMB. HERNIA" or dt.Rows(i).Item("CaseType") = "PERINAL ABSCEES" or dt.Rows(i).Item("CaseType") = "LABIAL CYST" Then
+
+____________________________________________
+
+Latest Code availble here  : D:\Pharmacy\Pharmacy\
+__________________________________________________________
+
+Changes : Till 05 /Sep / 2021
+
+Drug Slip  Total stock 
+Low stock warning removed
+drug slip old Invoice not display on top 
+Schedule H alighnment changes
+
+
+Changes As on 01/Oct/2021
+Below details added in ot report (fillby3 and fill by 6)
+CaseType='DIAGNOSTIC LAP'  or
+CaseType='FIBROADENOMA BREAST'  or
+CaseType='LAPOVARINCYST'  or
+CaseType='OPENOVARINCYST'  
+
+

@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2005/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <DataSources>
+    <DataSource Name="PharmacyConnectionString">
+      <ConnectionProperties>
+        <ConnectString>Data Source=.;Initial Catalog=Pharmacy;User ID=sa</ConnectString>
+        <DataProvider>SQL</DataProvider>
+      </ConnectionProperties>
+      <rd:DataSourceID>d99842c4-5345-4c1d-a5a6-3baeddc92c31</rd:DataSourceID>
+    </DataSource>
+  </DataSources>
+  <BottomMargin>1in</BottomMargin>
+  <RightMargin>0.5in</RightMargin>
+  <PageWidth>11.69in</PageWidth>
+  <rd:DrawGrid>true</rd:DrawGrid>
+  <InteractiveWidth>11.69in</InteractiveWidth>
+  <rd:SnapToGrid>true</rd:SnapToGrid>
+  <Body>
+    <ReportItems>
+      <List Name="list1">
+        <ReportItems>
+          <Line Name="line1">
+            <Left>1in</Left>
+            <Top>1.25in</Top>
+            <ZIndex>12</ZIndex>
+            <Width>3in</Width>
+            <Style>
+              <BorderStyle>
+                <Default>Dashed</Default>
+              </BorderStyle>
+            </Style>
+          </Line>
+          <Textbox Name="MinimumStock">
+            <Left>1.25in</Left>
+            <Top>0.875in</Top>
+            <rd:DefaultName>MinimumStock</rd:DefaultName>
+            <ZIndex>11</ZIndex>
+            <Width>2.5in</Width>
+            <Style>
+              <TextAlign>Left</TextAlign>
+              <PaddingLeft>2pt</PaddingLeft>
+              <PaddingBottom>2pt</PaddingBottom>
+              <PaddingRight>2pt</PaddingRight>
+              <PaddingTop>2pt</PaddingTop>
+            </Style>
+            <CanGrow>true</CanGrow>
+            <Height>0.25in</Height>
+            <Value>=Fields!MinimumStock.Value</Value>
+          </Textbox>
+          <Textbox Name="RackNo">
+            <Left>1.25in</Left>
+            <Top>0.54167in</Top>
+            <rd:DefaultName>RackNo</rd:DefaultName>
+            <ZIndex>10</ZIndex>
+            <Width>2.5in</Width>
+            <Style>
+              <TextAlign>Left</TextAlign>
+              <PaddingLeft>2pt</PaddingLeft>
+              <PaddingBottom>2pt</PaddingBottom>
+              <PaddingRight>2pt</PaddingRight>
+              <PaddingTop>2pt</PaddingTop>
+            </Style>
+            <CanGrow>true</CanGrow>
+            <Height>0.25in</Height>
+            <Value>=Fields!RackNo.Value</Value>
+          </Textbox>
+          <Textbox Name="ProductGroup">
+            <Left>1.25in</Left>
+            <Top>0.29167in</Top>
+            <rd:DefaultName>ProductGroup</rd:DefaultName>
+            <ZIndex>9</ZIndex>
+            <Style>
+              <TextAlign>Left</TextAlign>
+              <PaddingLeft>2pt</PaddingLeft>
+              <PaddingBottom>2pt</PaddingBottom>
+              <PaddingRight>2pt</PaddingRight>
+              <PaddingTop>2pt</PaddingTop>
+            </Style>
+            <CanGrow>true</CanGrow>
+            <Height>0.25in</Height>
+            <Value>=Fields!ProductGroup.Value</Value>
+          </Textbox>
+          <Textbox Name="ProductName">
+            <Left>1.25in</Left>
+            <Top>0.04167in</Top>
+            <rd:DefaultName>ProductName</rd:DefaultName>
+            <ZIndex>8</ZIndex>
+            <Style>
+              <TextAlign>Left</TextAlign>
+              <PaddingLeft>2pt</PaddingLeft>
+              <PaddingBottom>2pt</PaddingBottom>
+              <PaddingRight>2pt</PaddingRight>
+              <PaddingTop>2pt</PaddingTop>
+            </Style>
+            <CanGrow>true</CanGrow>
+            <Height>0.25in</Height>
+            <Value>=Fields!ProductName.Value</Value>
+          </Textbox>
+          <Textbox Name="textbox8">
+            <Left>1.125in</Left>
+            <Top>0.875in</Top>
+            <ZIndex>7</ZIndex>
+            <Width>0.125in</Width>
+            <Style>
+              <PaddingLeft>2pt</PaddingLeft>
+              <PaddingBottom>2pt</PaddingBottom>
+              <FontWeight>700</FontWeight>
+              <PaddingRight>2pt</PaddingRight>
+              <PaddingTop>2pt</PaddingTop>
+            </Style>
+            <CanGrow>true</CanGrow>
+            <Height>0.25in</Height>
+            <Value>:</Value>
+          </Textbox>
+          <Textbox Name="textbox7">
+            <Left>1.125in</Left>
+            <Top>0.54167in</Top>
+            <ZIndex>6</ZIndex>
+            <Width>0.125in</Width>
+            <Style>
+              <PaddingLeft>2pt</PaddingLeft>
+              <PaddingBottom>2pt</PaddingBottom>
+              <FontWeight>700</FontWeight>
+              <PaddingRight>2pt</PaddingRight>
+              <PaddingTop>2pt</PaddingTop>
+            </Style>
+            <CanGrow>true</CanGrow>
+            <Height>0.25in</Height>
+            <Value>:</Value>
+          </Textbox>
+          <Textbox Name="textbox6">
+            <Left>1.125in</Left>
+            <Top>0.29167in</Top>
+            <ZIndex>5</ZIndex>
+            <Width>0.125in</Width>
+            <Style>
+              <PaddingLeft>2pt</PaddingLeft>
+              <PaddingBottom>2pt</PaddingBottom>
+              <FontWeight>700</FontWeight>
+              <PaddingRight>2pt</PaddingRight>
+              <PaddingTop>2pt</PaddingTop>
+            </Style>
+            <CanGrow>true</CanGrow>
+            <Height>0.25in</Height>
+            <Value>:</Value>
+          </Textbox>
+          <Textbox Name="textbox5">
+            <Left>1.125in</Left>
+            <Top>0.04167in</Top>
+            <rd:DefaultName>textbox5</rd:DefaultName>
+            <ZIndex>4</ZIndex>
+            <Width>0.125in</Width>
+            <Style>
+              <PaddingLeft>2pt</PaddingLeft>
+              <PaddingBottom>2pt</PaddingBottom>
+              <FontWeight>700</FontWeight>
+              <PaddingRight>2pt</PaddingRight>
+              <PaddingTop>2pt</PaddingTop>
+            </Style>
+            <CanGrow>true</CanGrow>
+            <Height>0.25in</Height>
+            <Value>:</Value>
+          </Textbox>
+          <Textbox Name="textbox4">
+            <Top>0.79167in</Top>
+            <rd:DefaultName>textbox4</rd:DefaultName>
+            <ZIndex>3</ZIndex>
+            <Width>1.125in</Width>
+            <Style>
+              <PaddingLeft>2pt</PaddingLeft>
+              <PaddingBottom>2pt</PaddingBottom>
+              <FontWeight>700</FontWeight>
+              <PaddingRight>2pt</PaddingRight>
+              <PaddingTop>2pt</PaddingTop>
+            </Style>
+            <CanGrow>true</CanGrow>
+            <Height>0.375in</Height>
+            <Value>Minimum Stock To Maintain</Value>
+          </Textbox>
+          <Textbox Name="textbox3">
+            <Top>0.54167in</Top>
+            <rd:DefaultName>textbox3</rd:DefaultName>
+            <ZIndex>2</ZIndex>
+            <Width>1.125in</Width>
+            <Style>
+              <PaddingLeft>2pt</PaddingLeft>
+              <PaddingBottom>2pt</PaddingBottom>
+              <FontWeight>700</FontWeight>
+              <PaddingRight>2pt</PaddingRight>
+              <PaddingTop>2pt</PaddingTop>
+            </Style>
+            <CanGrow>true</CanGrow>
+            <Height>0.25in</Height>
+            <Value>RackNo</Value>
+          </Textbox>
+          <Textbox Name="textbox2">
+            <Top>0.29167in</Top>
+            <rd:DefaultName>textbox2</rd:DefaultName>
+            <ZIndex>1</ZIndex>
+            <Width>1.125in</Width>
+            <Style>
+              <PaddingLeft>2pt</PaddingLeft>
+              <PaddingBottom>2pt</PaddingBottom>
+              <FontWeight>700</FontWeight>
+              <PaddingRight>2pt</PaddingRight>
+              <PaddingTop>2pt</PaddingTop>
+            </Style>
+            <CanGrow>true</CanGrow>
+            <Height>0.25in</Height>
+            <Value>Product Group</Value>
+          </Textbox>
+          <Textbox Name="textbox1">
+            <Top>0.04167in</Top>
+            <rd:DefaultName>textbox1</rd:DefaultName>
+            <Width>1.125in</Width>
+            <Style>
+              <PaddingLeft>2pt</PaddingLeft>
+              <PaddingBottom>2pt</PaddingBottom>
+              <FontWeight>700</FontWeight>
+              <PaddingRight>2pt</PaddingRight>
+              <PaddingTop>2pt</PaddingTop>
+            </Style>
+            <CanGrow>true</CanGrow>
+            <Height>0.25in</Height>
+            <Value>Product Name</Value>
+          </Textbox>
+        </ReportItems>
+        <DataSetName>dsProducts_ProductMaster</DataSetName>
+        <Grouping Name="list1_Details_Group">
+          <GroupExpressions>
+            <GroupExpression>=Fields!ProductName.Value</GroupExpression>
+          </GroupExpressions>
+        </Grouping>
+      </List>
+    </ReportItems>
+    <Height>1.25in</Height>
+  </Body>
+  <PageHeader>
+    <ReportItems>
+      <Textbox Name="textbox13">
+        <Left>1.625in</Left>
+        <rd:DefaultName>textbox13</rd:DefaultName>
+        <Width>1.5in</Width>
+        <Style>
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingBottom>2pt</PaddingBottom>
+          <FontWeight>700</FontWeight>
+          <FontSize>13pt</FontSize>
+          <TextDecoration>Underline</TextDecoration>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+        </Style>
+        <CanGrow>true</CanGrow>
+        <Height>0.25in</Height>
+        <Value>Product Details</Value>
+      </Textbox>
+    </ReportItems>
+    <Height>0.375in</Height>
+    <PrintOnLastPage>true</PrintOnLastPage>
+    <PrintOnFirstPage>true</PrintOnFirstPage>
+  </PageHeader>
+  <rd:ReportID>9b6daeb0-7519-4ffb-8262-40c1e7861b40</rd:ReportID>
+  <LeftMargin>0.5in</LeftMargin>
+  <DataSets>
+    <DataSet Name="dsProducts_ProductMaster">
+      <rd:DataSetInfo>
+        <rd:TableAdapterGetDataMethod>GetData</rd:TableAdapterGetDataMethod>
+        <rd:DataSetName>dsProducts</rd:DataSetName>
+        <rd:TableAdapterFillMethod>Fill</rd:TableAdapterFillMethod>
+        <rd:TableAdapterName>ProductMasterTableAdapter</rd:TableAdapterName>
+        <rd:TableName>ProductMaster</rd:TableName>
+      </rd:DataSetInfo>
+      <Query>
+        <rd:UseGenericDesigner>true</rd:UseGenericDesigner>
+        <CommandText>SELECT ProductName, ProductGroup, RackNo, MinimumStock FROM dbo.ProductMaster order by ProductName</CommandText>
+        <DataSourceName>PharmacyConnectionString</DataSourceName>
+      </Query>
+      <Fields>
+        <Field Name="ProductName">
+          <rd:TypeName>System.String</rd:TypeName>
+          <DataField>ProductName</DataField>
+        </Field>
+        <Field Name="ProductGroup">
+          <rd:TypeName>System.String</rd:TypeName>
+          <DataField>ProductGroup</DataField>
+        </Field>
+        <Field Name="RackNo">
+          <rd:TypeName>System.Decimal</rd:TypeName>
+          <DataField>RackNo</DataField>
+        </Field>
+        <Field Name="MinimumStock">
+          <rd:TypeName>System.Decimal</rd:TypeName>
+          <DataField>MinimumStock</DataField>
+        </Field>
+      </Fields>
+    </DataSet>
+  </DataSets>
+  <Code />
+  <Width>5.375in</Width>
+  <InteractiveHeight>8.27in</InteractiveHeight>
+  <Language>en-US</Language>
+  <PageFooter>
+    <ReportItems>
+      <Textbox Name="textbox9">
+        <rd:DefaultName>textbox9</rd:DefaultName>
+        <Width>4.5in</Width>
+        <Style>
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingBottom>2pt</PaddingBottom>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+        </Style>
+        <CanGrow>true</CanGrow>
+        <Value>="Page: " &amp; Globals!PageNumber &amp; " of " &amp; Globals!TotalPages</Value>
+      </Textbox>
+    </ReportItems>
+    <Height>0.25in</Height>
+    <PrintOnLastPage>true</PrintOnLastPage>
+    <PrintOnFirstPage>true</PrintOnFirstPage>
+  </PageFooter>
+  <TopMargin>1in</TopMargin>
+  <PageHeight>8.27in</PageHeight>
+</Report>

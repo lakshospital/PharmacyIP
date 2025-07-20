@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2005/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <DataSources>
+    <DataSource Name="PharmacyConnectionString">
+      <ConnectionProperties>
+        <ConnectString>Data Source=.;Initial Catalog=Pharmacy;User ID=sa</ConnectString>
+        <DataProvider>SQL</DataProvider>
+      </ConnectionProperties>
+      <rd:DataSourceID>f04a098f-6437-43ba-8db1-85394ab476dc</rd:DataSourceID>
+    </DataSource>
+  </DataSources>
+  <BottomMargin>1in</BottomMargin>
+  <RightMargin>1in</RightMargin>
+  <ReportParameters>
+    <ReportParameter Name="BillNo">
+      <DataType>Float</DataType>
+      <AllowBlank>true</AllowBlank>
+      <Prompt>BillNo</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="BillDate">
+      <DataType>DateTime</DataType>
+      <AllowBlank>true</AllowBlank>
+      <Prompt>BillDate</Prompt>
+    </ReportParameter>
+  </ReportParameters>
+  <rd:DrawGrid>true</rd:DrawGrid>
+  <InteractiveWidth>8.5in</InteractiveWidth>
+  <rd:SnapToGrid>true</rd:SnapToGrid>
+  <Body>
+    <Height>0.75in</Height>
+  </Body>
+  <rd:ReportID>18cd7c5f-2d3d-4d9b-8e45-73d3e0dc0e35</rd:ReportID>
+  <LeftMargin>1in</LeftMargin>
+  <DataSets>
+    <DataSet Name="DataSet1_DrugSlipDetails">
+      <rd:DataSetInfo>
+        <rd:TableAdapterGetDataMethod>GetData</rd:TableAdapterGetDataMethod>
+        <rd:DataSetName>DataSet1</rd:DataSetName>
+        <rd:TableAdapterFillMethod>Fill</rd:TableAdapterFillMethod>
+        <rd:TableAdapterName>DrugSlipDetailsTableAdapter</rd:TableAdapterName>
+        <rd:TableName>DrugSlipDetails</rd:TableName>
+      </rd:DataSetInfo>
+      <Query>
+        <rd:UseGenericDesigner>true</rd:UseGenericDesigner>
+        <CommandText>SELECT     d.BillNo, d.BillDate, d.DrName, d.PatientID, d.PatientName, d.CaseType, d.SNo, d.ProductName, d.Qty, d.BatchNo, d.ExpDate, 
+                      d.VAT, d.MRP, d.InvoiceNo, d.Total, d.Status, d.BillDateTime, d.LastPrint, d.Cash, p.DueNo, p.DueDate,p.Amount,p.DueAmount,p.AmountReceived,p.BalanceAmount,p.DueStatus
+FROM         DrugSlipDetails d LEFT OUTER JOIN
+                      PaymentDue p ON d.BillNo = p.BillNo
+WHERE     d.BillNo=@BillNo and d.BillDate=@BillDate</CommandText>
+        <DataSourceName>PharmacyConnectionString</DataSourceName>
+      </Query>
+      <Fields>
+        <Field Name="BillNo">
+          <rd:TypeName>System.Decimal</rd:TypeName>
+          <DataField>BillNo</DataField>
+        </Field>
+        <Field Name="BillDate">
+          <rd:TypeName>System.DateTime</rd:TypeName>
+          <DataField>BillDate</DataField>
+        </Field>
+        <Field Name="DrName">
+          <rd:TypeName>System.String</rd:TypeName>
+          <DataField>DrName</DataField>
+        </Field>
+        <Field Name="PatientID">
+          <rd:TypeName>System.String</rd:TypeName>
+          <DataField>PatientID</DataField>
+        </Field>
+        <Field Name="PatientName">
+          <rd:TypeName>System.String</rd:TypeName>
+          <DataField>PatientName</DataField>
+        </Field>
+        <Field Name="CaseType">
+          <rd:TypeName>System.String</rd:TypeName>
+          <DataField>CaseType</DataField>
+        </Field>
+        <Field Name="SNo">
+          <rd:TypeName>System.Decimal</rd:TypeName>
+          <DataField>SNo</DataField>
+        </Field>
+        <Field Name="ProductName">
+          <rd:TypeName>System.String</rd:TypeName>
+          <DataField>ProductName</DataField>
+        </Field>
+        <Field Name="Qty">
+          <rd:TypeName>System.Decimal</rd:TypeName>
+          <DataField>Qty</DataField>
+        </Field>
+        <Field Name="BatchNo">
+          <rd:TypeName>System.String</rd:TypeName>
+          <DataField>BatchNo</DataField>
+        </Field>
+        <Field Name="ExpDate">
+          <rd:TypeName>System.DateTime</rd:TypeName>
+          <DataField>ExpDate</DataField>
+        </Field>
+        <Field Name="VAT">
+          <rd:TypeName>System.Double</rd:TypeName>
+          <DataField>VAT</DataField>
+        </Field>
+        <Field Name="MRP">
+          <rd:TypeName>System.Double</rd:TypeName>
+          <DataField>MRP</DataField>
+        </Field>
+        <Field Name="InvoiceNo">
+          <rd:TypeName>System.String</rd:TypeName>
+          <DataField>InvoiceNo</DataField>
+        </Field>
+        <Field Name="Total">
+          <rd:TypeName>System.Double</rd:TypeName>
+          <DataField>Total</DataField>
+        </Field>
+        <Field Name="Status">
+          <rd:TypeName>System.String</rd:TypeName>
+          <DataField>Status</DataField>
+        </Field>
+        <Field Name="BillDateTime">
+          <rd:TypeName>System.DateTime</rd:TypeName>
+          <DataField>BillDateTime</DataField>
+        </Field>
+        <Field Name="LastPrint">
+          <rd:TypeName>System.DateTime</rd:TypeName>
+          <DataField>LastPrint</DataField>
+        </Field>
+        <Field Name="Cash">
+          <rd:TypeName>System.String</rd:TypeName>
+          <DataField>Cash</DataField>
+        </Field>
+        <Field Name="DueNo">
+          <rd:TypeName>System.Int32</rd:TypeName>
+          <DataField>DueNo</DataField>
+        </Field>
+        <Field Name="DueDate">
+          <rd:TypeName>System.DateTime</rd:TypeName>
+          <DataField>DueDate</DataField>
+        </Field>
+        <Field Name="Amount">
+          <rd:TypeName>System.Decimal</rd:TypeName>
+          <DataField>Amount</DataField>
+        </Field>
+        <Field Name="DueAmount">
+          <rd:TypeName>System.Decimal</rd:TypeName>
+          <DataField>DueAmount</DataField>
+        </Field>
+        <Field Name="AmountReceived">
+          <rd:TypeName>System.Decimal</rd:TypeName>
+          <DataField>AmountReceived</DataField>
+        </Field>
+        <Field Name="BalanceAmount">
+          <rd:TypeName>System.Decimal</rd:TypeName>
+          <DataField>BalanceAmount</DataField>
+        </Field>
+        <Field Name="DueStatus">
+          <rd:TypeName>System.String</rd:TypeName>
+          <DataField>DueStatus</DataField>
+        </Field>
+      </Fields>
+    </DataSet>
+  </DataSets>
+  <Width>8in</Width>
+  <InteractiveHeight>11in</InteractiveHeight>
+  <Language>en-US</Language>
+  <TopMargin>1in</TopMargin>
+</Report>
