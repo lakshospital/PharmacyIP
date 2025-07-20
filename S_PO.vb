@@ -1,6 +1,7 @@
 
 Imports System.Data
 Imports System.Data.SqlClient
+Imports System.Configuration
 Public Class S_PO
     Dim myconnection As SqlConnection
     Dim mycommand As SqlCommand
@@ -24,14 +25,13 @@ Public Class S_PO
 
     Private Sub LoadData()
 
-        Dim connetionString As String = Nothing
+        Dim connetionString As String = ConfigurationManager.ConnectionStrings("Pharmacy.My.MySettings.PharmacyConnectionString").ConnectionString
         Dim connection As SqlConnection
         Dim command As SqlCommand
         Dim adapter As New SqlDataAdapter()
         Dim ds As New DataSet()
         Dim i As Integer = 0
         Dim sql As String = Nothing
-        connetionString = Module1.con.ConnectionString
 
         sql = "SELECT * FROM ProductGroupMaster WHERE     (DATALENGTH(GroupName) > 0)"
         connection = New SqlConnection(connetionString)
@@ -69,7 +69,7 @@ Public Class S_PO
         xReportString = "FULL VIEW"
         LoadDate()
 
-        Dim str As String = Module1.con.ConnectionString
+        Dim str As String = ConfigurationManager.ConnectionStrings("Pharmacy.My.MySettings.PharmacyConnectionString").ConnectionString
         Dim con As New SqlConnection(str)
         Dim xPercentageText As String = String.Empty
         xPercentageText = txtPercentage.Text + " (%)"
@@ -83,7 +83,7 @@ Public Class S_PO
         SetUpDataGridView()
     End Sub
     Private Sub LoadDate()
-        myconnection = New SqlConnection(Module1.con.ConnectionString)
+        myconnection = New SqlConnection(ConfigurationManager.ConnectionStrings("Pharmacy.My.MySettings.PharmacyConnectionString").ConnectionString)
         Dim cmd As SqlCommand = myconnection.CreateCommand()
         'cmd.CommandText = "SELECT * from ConsultantNames "
         myconnection.Open()
@@ -114,23 +114,23 @@ Public Class S_PO
         With DataGridView1
             .EditMode = DataGridViewEditMode.EditOnEnter
             .Name = "dataGridView1"
-            .AutoSizeRowsMode = _
+            .AutoSizeRowsMode =
                 DataGridViewAutoSizeRowsMode.DisplayedCellsExceptHeaders
-            .ColumnHeadersBorderStyle = _
+            .ColumnHeadersBorderStyle =
                 DataGridViewHeaderBorderStyle.Raised
-            .CellBorderStyle = _
+            .CellBorderStyle =
                 DataGridViewCellBorderStyle.Single
             .GridColor = SystemColors.ActiveBorder
             .RowHeadersVisible = False
-            .AutoSizeColumnsMode = _
+            .AutoSizeColumnsMode =
        DataGridViewAutoSizeColumnsMode.AllCells
             .ReadOnly = True
             ' Make the font italic for row four.
-            .Columns(0).DefaultCellStyle.Font = _
-                New Font(Control.DefaultFont, _
+            .Columns(0).DefaultCellStyle.Font =
+                New Font(Control.DefaultFont,
                     FontStyle.Bold)
 
-            .SelectionMode = _
+            .SelectionMode =
                 DataGridViewSelectionMode.FullRowSelect
             .MultiSelect = False
 
@@ -173,7 +173,7 @@ Public Class S_PO
         drawFormat.Alignment = StringAlignment.Center
 
         ' Draw string to screen.
-        e.Graphics.DrawString(drawString, drawFont, drawBrush, _
+        e.Graphics.DrawString(drawString, drawFont, drawBrush,
         drawRect, drawFormat)
         With DataGridView1
             Dim fmt As StringFormat = New StringFormat(StringFormatFlags.LineLimit)
@@ -219,13 +219,13 @@ Public Class S_PO
 
         xReportString = "TO ORDER"
         LoadDate()
-        Dim str As String = "Data Source=192.168.1.254;Initial Catalog=PharmacyDB;Persist Security Info=True;User ID=lhs1;Password=lhs1"
+        Dim str As String = ConfigurationManager.ConnectionStrings("Pharmacy.My.MySettings.PharmacyConnectionString").ConnectionString
         Dim con As New SqlConnection(str)
         Dim xPercentageText As String = String.Empty
         xPercentageText = txtPercentage.Text + " (%)"
         Dim com As String = "SELECT     ProductName, Sales, ClosingStock,ceiling(( " _
         & txtPercentage.Text + " / 100.00)* Sales) - ClosingStock AS '" + xPercentageText + "' FROM StockPrint where Sales - ClosingStock  + ABS(Sales -ClosingStock) * " + txtPercentage.Text + " / 100>0 order by ProductName"
-       
+
         Dim Adpt As New SqlDataAdapter(com, con)
         Dim ds As New DataSet()
         Adpt.Fill(ds, "Test")
@@ -248,8 +248,7 @@ Public Class S_PO
     Private Sub btnZeroOrder_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnZeroOrder.Click
         xReportString = "ZERO ORDER"
         LoadDate()
-
-        Dim str As String = "Data Source=192.168.1.254;Initial Catalog=PharmacyDB;Persist Security Info=True;User ID=lhs1;Password=lhs1"
+        Dim str As String = ConfigurationManager.ConnectionStrings("Pharmacy.My.MySettings.PharmacyConnectionString").ConnectionString
         Dim con As New SqlConnection(str)
         Dim xPercentageText As String = String.Empty
         xPercentageText = txtPercentage.Text + " (%)"
@@ -266,8 +265,7 @@ Public Class S_PO
     Private Sub btnNonMoving_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnNonMoving.Click
         xReportString = "NON-MOVING"
         LoadDate()
-
-        Dim str As String = "Data Source=192.168.1.254;Initial Catalog=PharmacyDB;Persist Security Info=True;User ID=lhs1;Password=lhs1"
+        Dim str As String = ConfigurationManager.ConnectionStrings("Pharmacy.My.MySettings.PharmacyConnectionString").ConnectionString
         Dim con As New SqlConnection(str)
         Dim xPercentageText As String = String.Empty
         xPercentageText = txtPercentage.Text + " (%)"
@@ -288,8 +286,7 @@ Public Class S_PO
     Private Sub btnPurchased_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnPurchased.Click
         xReportString = "PURCHASED"
         LoadDate()
-
-        Dim str As String = "Data Source=192.168.1.254;Initial Catalog=PharmacyDB;Persist Security Info=True;User ID=lhs1;Password=lhs1"
+        Dim str As String = ConfigurationManager.ConnectionStrings("Pharmacy.My.MySettings.PharmacyConnectionString").ConnectionString
         Dim con As New SqlConnection(str)
         Dim com As String = "SELECT    ProductName,Purchase FROM StockPrint where Purchase>0 order by ProductName"
         Dim Adpt As New SqlDataAdapter(com, con)
@@ -325,7 +322,7 @@ Public Class S_PO
 
         xReportString = "TO ORDER"
         LoadDate()
-        Dim str As String = "Data Source=192.168.1.254;Initial Catalog=PharmacyDB;Persist Security Info=True;User ID=lhs1;Password=lhs1"
+        Dim str As String = ConfigurationManager.ConnectionStrings("Pharmacy.My.MySettings.PharmacyConnectionString").ConnectionString
         Dim con As New SqlConnection(str)
         Dim xPercentageText As String = String.Empty
         xPercentageText = txtPercentage.Text + " (%)"

@@ -1,8 +1,10 @@
 Imports System.Data.SqlClient
-Module Module1
-    Public con As New SqlConnection("Data Source=DESKTOP-A674QQN\SQLEXPRESS01;Initial Catalog=InPatient_PharmcyDB;User ID=lhs2;Password=lhs2")
+Imports System.Configuration
 
-    'Public con As New SqlConnection("Data Source=SAM-PC\SQLExpress;Initial Catalog=PharmacyDB;Integrated Security=True")
+Module Module1
+    Dim connStr As String = ConfigurationManager.ConnectionStrings("Pharmacy.My.MySettings.PharmacyConnectionString").ConnectionString
+    ' Now you can use connStr to create your SqlConnection
+    Public con As New SqlConnection(connStr)
     Public con1 As New SqlConnection("Data Source=SERVER\SQLEXPRESS;Initial Catalog=LaskhmiHospital;Persist Security Info=True;User ID=sa;Password=''")
     'Public con1 As New SqlConnection("Data Source=SAM-PC\SQLExpress;Initial Catalog=LakshmiHospitalDB;Integrated Security=True")
     Public UserRights, UserName As String

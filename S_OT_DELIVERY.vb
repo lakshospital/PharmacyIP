@@ -2,7 +2,9 @@
 
 Imports System.Data
 Imports System.Data.SqlClient
+Imports System.Configuration
 Public Class S_OT_DELIVERY
+
 
 
 
@@ -15,7 +17,7 @@ Public Class S_OT_DELIVERY
     Dim xButtonText As String = String.Empty
     Private Sub btnShow_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnShow.Click
         xButtonText = "OT-CASE REPORT"
-        Dim str As String = "Data Source=insure\SQLEXPRESS;Initial Catalog=PharmacyDB;Integrated Security=True;User ID=user1;Password=user1"
+        Dim str As String = ConfigurationManager.ConnectionStrings("Pharmacy.My.MySettings.PharmacyConnectionString").ConnectionString
         Dim con As New SqlConnection(str)
         Dim xPercentageText As String = String.Empty
         Dim com As String = "SELECT  ROW_NUMBER() OVER (ORDER BY BillNo, DrName, PatientName, BillDateTime,casetype)  Sequence_no,BillNo, DrName, PatientName, BillDateTime,casetype FROM DrugSlipDetails WHERE BillDate >= '" + dtFromDate.Text + "' and BillDate <= '" + dtToDate.Text + "' AND (CaseType IN ('LSCS', 'MTP&DNC', 'DNC', 'BIOPSY', 'UMB.HER', 'MTP&LS', 'LAP&LS', 'LAP&APPENDIX', 'ENTOMETRIC BIOPSY', 'LAP', 'VAG HYS', 'LAP.VARICOCELE', 'OPEN ECTOPIC', 'GS','LAP ECTOPIC', 'FISTULA', 'LS', 'PS', 'HYSTEROTOMY', 'IUD', 'I&D', 'MISSED ABORTION', 'HERNIA', 'MTP', 'TAH&BSO', 'BREAST ABSCEES', 'ABH HYS', 'TAT', 'PAINLESS LABOUR EPIDURAL', 'EPIDORAL & SPINAL', 'CERVICAL STICH', 'FISSURE', 'OVARIAN CYST', 'POLLY PS', 'HEMOTATMO', 'APPEDIX', 'CHOCOLATE CYST', 'D&C L.WARD', 'DVT', 'ENDO BIOPSY', 'FIBRO BREAST',  'LAP CHOLE', 'LSCS& PS', 'LUMP BREAST', 'MYOMECTOMY',     'PILES', 'OPEN CHOLE', 'UMB.HERINA','MTP' ,'TAT' ,'LAP APPENDIX' )) AND (Status <> 'C') GROUP BY BillNo, DrName, PatientName, BillDateTime,casetype"
@@ -116,7 +118,7 @@ Public Class S_OT_DELIVERY
 
     Private Sub btnDelivery_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDelivery.Click
         xButtonText = "DELIVERY CASE REPORT"
-        Dim str As String = Module1.con.ToString
+        Dim str As String = ConfigurationManager.ConnectionStrings("Pharmacy.My.MySettings.PharmacyConnectionString").ConnectionString
 
 
         Dim con As New SqlConnection(str)
