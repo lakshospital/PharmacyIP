@@ -486,6 +486,46 @@ Public Class StockDetailsDatewise
         StockDatewisePrint.Show()
     End Sub
 
+    Private Sub dtpfromDate_ValueChanged(sender As Object, e As EventArgs) Handles dtpfromDate.ValueChanged
+
+    End Sub
+
+    Private Sub Label2_Click(sender As Object, e As EventArgs) Handles Label2.Click
+
+    End Sub
+
+    Private Sub Label1_Click(sender As Object, e As EventArgs) Handles Label1.Click
+
+    End Sub
+
+    Private Sub DataGridView1_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles DataGridView1.CellContentClick
+
+    End Sub
+
+    Private Sub dtpToDate_ValueChanged(sender As Object, e As EventArgs) Handles dtpToDate.ValueChanged
+
+    End Sub
+
+    Private Sub drpProductName_SelectedIndexChanged(sender As Object, e As EventArgs) Handles drpProductName.SelectedIndexChanged
+
+    End Sub
+
+    Private Sub Label5_Click(sender As Object, e As EventArgs) Handles Label5.Click
+
+    End Sub
+
+    Private Sub Label3_Click(sender As Object, e As EventArgs) Handles Label3.Click
+
+    End Sub
+
+    Private Sub CheckBox1_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBox1.CheckedChanged
+
+    End Sub
+
+    Private Sub CheckBox2_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBox2.CheckedChanged
+
+    End Sub
+
     'Sub Process1()
     '    Try
     '        CheckConnection()

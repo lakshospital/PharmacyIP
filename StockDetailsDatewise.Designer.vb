@@ -19,29 +19,29 @@ Partial Class StockDetailsDatewise
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.dtpToDate = New System.Windows.Forms.DateTimePicker
-        Me.dtpfromDate = New System.Windows.Forms.DateTimePicker
-        Me.Label2 = New System.Windows.Forms.Label
-        Me.Label1 = New System.Windows.Forms.Label
-        Me.DataGridView1 = New System.Windows.Forms.DataGridView
-        Me.Date1 = New System.Windows.Forms.DataGridViewTextBoxColumn
-        Me.ProductName = New System.Windows.Forms.DataGridViewTextBoxColumn
-        Me.OpeningStock = New System.Windows.Forms.DataGridViewTextBoxColumn
-        Me.Purchase = New System.Windows.Forms.DataGridViewTextBoxColumn
-        Me.Sales = New System.Windows.Forms.DataGridViewTextBoxColumn
-        Me.SalesReturn = New System.Windows.Forms.DataGridViewTextBoxColumn
-        Me.Excess = New System.Windows.Forms.DataGridViewTextBoxColumn
-        Me.Shortage = New System.Windows.Forms.DataGridViewTextBoxColumn
-        Me.ClosingStock = New System.Windows.Forms.DataGridViewTextBoxColumn
-        Me.StockValue = New System.Windows.Forms.DataGridViewTextBoxColumn
-        Me.cmdShow = New Glass.GlassButton
-        Me.drpProductName = New System.Windows.Forms.ComboBox
-        Me.Label5 = New System.Windows.Forms.Label
-        Me.drpProductGroup = New System.Windows.Forms.ComboBox
-        Me.Label3 = New System.Windows.Forms.Label
-        Me.cmdPrint = New Glass.GlassButton
-        Me.CheckBox1 = New System.Windows.Forms.CheckBox
-        Me.CheckBox2 = New System.Windows.Forms.CheckBox
+        Me.dtpToDate = New System.Windows.Forms.DateTimePicker()
+        Me.dtpfromDate = New System.Windows.Forms.DateTimePicker()
+        Me.Label2 = New System.Windows.Forms.Label()
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.DataGridView1 = New System.Windows.Forms.DataGridView()
+        Me.Date1 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.ProductName = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.OpeningStock = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.Purchase = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.Sales = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.SalesReturn = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.Excess = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.Shortage = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.ClosingStock = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.StockValue = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.cmdShow = New Glass.GlassButton()
+        Me.drpProductName = New System.Windows.Forms.ComboBox()
+        Me.Label5 = New System.Windows.Forms.Label()
+        Me.drpProductGroup = New System.Windows.Forms.ComboBox()
+        Me.Label3 = New System.Windows.Forms.Label()
+        Me.cmdPrint = New Glass.GlassButton()
+        Me.CheckBox1 = New System.Windows.Forms.CheckBox()
+        Me.CheckBox2 = New System.Windows.Forms.CheckBox()
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '

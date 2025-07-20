@@ -672,6 +672,12 @@
     <Compile Include="StockDetailsDatewise.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="StockDetailsDatewiseNew.Designer.vb">
+      <DependentUpon>StockDetailsDatewiseNew.vb</DependentUpon>
+    </Compile>
+    <Compile Include="StockDetailsDatewiseNew.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="StockDetailsDoctorwise.Designer.vb">
       <DependentUpon>StockDetailsDoctorwise.vb</DependentUpon>
     </Compile>
@@ -1077,6 +1083,9 @@
     <EmbeddedResource Include="StockDetailsDatewise.resx">
       <SubType>Designer</SubType>
       <DependentUpon>StockDetailsDatewise.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StockDetailsDatewiseNew.resx">
+      <DependentUpon>StockDetailsDatewiseNew.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="StockDetailsDoctorwise.resx">
       <SubType>Designer</SubType>

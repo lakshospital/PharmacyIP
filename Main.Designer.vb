@@ -92,6 +92,7 @@ Partial Class Main
         Me.CloudButton2 = New CloudToolkitN6.CloudButton()
         Me.CloudButton3 = New CloudToolkitN6.CloudButton()
         Me.CloudButton4 = New CloudToolkitN6.CloudButton()
+        Me.StockDetailsBetweenDateNewToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -214,25 +215,25 @@ Partial Class Main
         'AmountToBeReturnedToolStripMenuItem1
         '
         Me.AmountToBeReturnedToolStripMenuItem1.Name = "AmountToBeReturnedToolStripMenuItem1"
-        Me.AmountToBeReturnedToolStripMenuItem1.Size = New System.Drawing.Size(200, 22)
+        Me.AmountToBeReturnedToolStripMenuItem1.Size = New System.Drawing.Size(201, 22)
         Me.AmountToBeReturnedToolStripMenuItem1.Text = "Amount To Be Returned"
         '
         'AmountReturnedToolStripMenuItem
         '
         Me.AmountReturnedToolStripMenuItem.Name = "AmountReturnedToolStripMenuItem"
-        Me.AmountReturnedToolStripMenuItem.Size = New System.Drawing.Size(200, 22)
+        Me.AmountReturnedToolStripMenuItem.Size = New System.Drawing.Size(201, 22)
         Me.AmountReturnedToolStripMenuItem.Text = "Amount Returned"
         '
         'CreditToBePaidToolStripMenuItem
         '
         Me.CreditToBePaidToolStripMenuItem.Name = "CreditToBePaidToolStripMenuItem"
-        Me.CreditToBePaidToolStripMenuItem.Size = New System.Drawing.Size(200, 22)
+        Me.CreditToBePaidToolStripMenuItem.Size = New System.Drawing.Size(201, 22)
         Me.CreditToBePaidToolStripMenuItem.Text = "Credit To Be Paid"
         '
         'CreditPaidToolStripMenuItem
         '
         Me.CreditPaidToolStripMenuItem.Name = "CreditPaidToolStripMenuItem"
-        Me.CreditPaidToolStripMenuItem.Size = New System.Drawing.Size(200, 22)
+        Me.CreditPaidToolStripMenuItem.Size = New System.Drawing.Size(201, 22)
         Me.CreditPaidToolStripMenuItem.Text = "Credit Paid"
         '
         'DrugSlipBetweenDateFullToolStripMenuItem
@@ -420,7 +421,7 @@ Partial Class Main
         '
         'OtherToolStripMenuItem
         '
-        Me.OtherToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.OTTemplateToolStripMenuItem, Me.ChangePasswordToolStripMenuItem, Me.ExcessShortageToolStripMenuItem, Me.StockDetailsToolStripMenuItem, Me.StockDetailsBetweenDateToolStripMenuItem, Me.StockDetailsDoctorwiseToolStripMenuItem})
+        Me.OtherToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.OTTemplateToolStripMenuItem, Me.ChangePasswordToolStripMenuItem, Me.ExcessShortageToolStripMenuItem, Me.StockDetailsToolStripMenuItem, Me.StockDetailsBetweenDateToolStripMenuItem, Me.StockDetailsBetweenDateNewToolStripMenuItem, Me.StockDetailsDoctorwiseToolStripMenuItem})
         Me.OtherToolStripMenuItem.Name = "OtherToolStripMenuItem"
         Me.OtherToolStripMenuItem.Size = New System.Drawing.Size(54, 20)
         Me.OtherToolStripMenuItem.Text = "Others"
@@ -605,6 +606,12 @@ Partial Class Main
         Me.CloudButton4.TextSpacingX = 5
         Me.CloudButton4.TextSpacingY = 5
         '
+        'StockDetailsBetweenDateNewToolStripMenuItem
+        '
+        Me.StockDetailsBetweenDateNewToolStripMenuItem.Name = "StockDetailsBetweenDateNewToolStripMenuItem"
+        Me.StockDetailsBetweenDateNewToolStripMenuItem.Size = New System.Drawing.Size(248, 22)
+        Me.StockDetailsBetweenDateNewToolStripMenuItem.Text = "Stock Details Between Date(New)"
+        '
         'Main
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -623,7 +630,7 @@ Partial Class Main
         Me.MainMenuStrip = Me.MenuStrip1
         Me.Name = "Main"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "Pharmacy:  V:11/DEC/2024"
+        Me.Text = "Pharmacy:  20/JULY/2025"
         Me.WindowState = System.Windows.Forms.FormWindowState.Maximized
         Me.MenuStrip1.ResumeLayout(False)
         Me.MenuStrip1.PerformLayout()
@@ -702,4 +709,5 @@ Partial Class Main
     Friend WithEvents InformationToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ClaimPatientNameChangesToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ReportDailySalesToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents StockDetailsBetweenDateNewToolStripMenuItem As ToolStripMenuItem
 End Class

@@ -321,4 +321,8 @@ Public Class Main
     Private Sub ReportDailySalesToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ReportDailySalesToolStripMenuItem.Click
         frmDailySalesReport.Show()
     End Sub
+
+    Private Sub StockDetailsBetweenDateNewToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles StockDetailsBetweenDateNewToolStripMenuItem.Click
+        StockDetailsDatewiseNew.Show()
+    End Sub
 End Class
