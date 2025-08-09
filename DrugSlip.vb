@@ -833,18 +833,26 @@ Public Class DrugSlip
     End Sub
 
     Private Sub cmdPrint_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdPrint.Click
-        If cmdNew.Text = "&New" And cmdEdit.Text = "&Edit" And cmdShow.Text = "&Cancel" Then
-            'DrugPrint.Show()
-            NewPrint()
-            'CrystalBillPrint.Show()
-
-            'Dim c As New CrystalReport1
-            'Dim dt As New DataTable
-            'dt = SelectQuery("")
-            'Me.crystalReport11.FileName = "CrystalReport1"
-            'me.crystalReport11.PrintOptions.
-            'Me.crystalReport11.PrintToPrinter(1, False, 1, 1)
-        End If
+        Try
+            ' Read the URL from app.config
+            Dim url As String = System.Configuration.ConfigurationManager.AppSettings("PrintWebUrl")
+            If String.IsNullOrEmpty(url) Then
+                MsgBox("PrintWebUrl is not configured in app.config", MsgBoxStyle.Exclamation)
+                Exit Sub
+            End If
+            ' Open Chrome with the URL
+            Dim chromePath As String = "C:\Program Files\Google\Chrome\Application\chrome.exe"
+            If Not System.IO.File.Exists(chromePath) Then
+                chromePath = "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"
+            End If
+            If System.IO.File.Exists(chromePath) Then
+                Process.Start(chromePath, url)
+            Else
+                MsgBox("Google Chrome is not installed on this system.", MsgBoxStyle.Exclamation)
+            End If
+        Catch ex As Exception
+            MsgBox("Error opening Chrome: " & ex.Message, MsgBoxStyle.Critical)
+        End Try
     End Sub
 
     Private Sub drpProductName_Validating(ByVal sender As Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles drpProductName.Validating

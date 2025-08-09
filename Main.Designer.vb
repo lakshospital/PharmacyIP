@@ -79,6 +79,7 @@ Partial Class Main
         Me.ExcessShortageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.StockDetailsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.StockDetailsBetweenDateToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.StockDetailsBetweenDateNewToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.StockDetailsDoctorwiseToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ModificationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.PurchaseOrderFormToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -92,7 +93,6 @@ Partial Class Main
         Me.CloudButton2 = New CloudToolkitN6.CloudButton()
         Me.CloudButton3 = New CloudToolkitN6.CloudButton()
         Me.CloudButton4 = New CloudToolkitN6.CloudButton()
-        Me.StockDetailsBetweenDateNewToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -429,37 +429,43 @@ Partial Class Main
         'OTTemplateToolStripMenuItem
         '
         Me.OTTemplateToolStripMenuItem.Name = "OTTemplateToolStripMenuItem"
-        Me.OTTemplateToolStripMenuItem.Size = New System.Drawing.Size(216, 22)
+        Me.OTTemplateToolStripMenuItem.Size = New System.Drawing.Size(248, 22)
         Me.OTTemplateToolStripMenuItem.Text = "OT Template"
         '
         'ChangePasswordToolStripMenuItem
         '
         Me.ChangePasswordToolStripMenuItem.Name = "ChangePasswordToolStripMenuItem"
-        Me.ChangePasswordToolStripMenuItem.Size = New System.Drawing.Size(216, 22)
+        Me.ChangePasswordToolStripMenuItem.Size = New System.Drawing.Size(248, 22)
         Me.ChangePasswordToolStripMenuItem.Text = "Change Password"
         '
         'ExcessShortageToolStripMenuItem
         '
         Me.ExcessShortageToolStripMenuItem.Name = "ExcessShortageToolStripMenuItem"
-        Me.ExcessShortageToolStripMenuItem.Size = New System.Drawing.Size(216, 22)
+        Me.ExcessShortageToolStripMenuItem.Size = New System.Drawing.Size(248, 22)
         Me.ExcessShortageToolStripMenuItem.Text = "Excess Shortage"
         '
         'StockDetailsToolStripMenuItem
         '
         Me.StockDetailsToolStripMenuItem.Name = "StockDetailsToolStripMenuItem"
-        Me.StockDetailsToolStripMenuItem.Size = New System.Drawing.Size(216, 22)
+        Me.StockDetailsToolStripMenuItem.Size = New System.Drawing.Size(248, 22)
         Me.StockDetailsToolStripMenuItem.Text = "Stock Details"
         '
         'StockDetailsBetweenDateToolStripMenuItem
         '
         Me.StockDetailsBetweenDateToolStripMenuItem.Name = "StockDetailsBetweenDateToolStripMenuItem"
-        Me.StockDetailsBetweenDateToolStripMenuItem.Size = New System.Drawing.Size(216, 22)
+        Me.StockDetailsBetweenDateToolStripMenuItem.Size = New System.Drawing.Size(248, 22)
         Me.StockDetailsBetweenDateToolStripMenuItem.Text = "Stock Details Between Date"
+        '
+        'StockDetailsBetweenDateNewToolStripMenuItem
+        '
+        Me.StockDetailsBetweenDateNewToolStripMenuItem.Name = "StockDetailsBetweenDateNewToolStripMenuItem"
+        Me.StockDetailsBetweenDateNewToolStripMenuItem.Size = New System.Drawing.Size(248, 22)
+        Me.StockDetailsBetweenDateNewToolStripMenuItem.Text = "Stock Details Between Date(New)"
         '
         'StockDetailsDoctorwiseToolStripMenuItem
         '
         Me.StockDetailsDoctorwiseToolStripMenuItem.Name = "StockDetailsDoctorwiseToolStripMenuItem"
-        Me.StockDetailsDoctorwiseToolStripMenuItem.Size = New System.Drawing.Size(216, 22)
+        Me.StockDetailsDoctorwiseToolStripMenuItem.Size = New System.Drawing.Size(248, 22)
         Me.StockDetailsDoctorwiseToolStripMenuItem.Text = "Stock Details Doctorwise"
         '
         'ModificationToolStripMenuItem
@@ -606,12 +612,6 @@ Partial Class Main
         Me.CloudButton4.TextSpacingX = 5
         Me.CloudButton4.TextSpacingY = 5
         '
-        'StockDetailsBetweenDateNewToolStripMenuItem
-        '
-        Me.StockDetailsBetweenDateNewToolStripMenuItem.Name = "StockDetailsBetweenDateNewToolStripMenuItem"
-        Me.StockDetailsBetweenDateNewToolStripMenuItem.Size = New System.Drawing.Size(248, 22)
-        Me.StockDetailsBetweenDateNewToolStripMenuItem.Text = "Stock Details Between Date(New)"
-        '
         'Main
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -630,7 +630,7 @@ Partial Class Main
         Me.MainMenuStrip = Me.MenuStrip1
         Me.Name = "Main"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "Pharmacy:  20/JULY/2025"
+        Me.Text = "Pharmacy:  9/AUG/2025"
         Me.WindowState = System.Windows.Forms.FormWindowState.Maximized
         Me.MenuStrip1.ResumeLayout(False)
         Me.MenuStrip1.PerformLayout()
