@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stock Details Datewise Report</title>
+    <style>
+        .navbar {background-color: #007bff; padding: 0; margin-bottom: 20px; border-radius: 0 0 8px 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);}
+        .navbar-menu {list-style: none; margin: 0; padding: 0 20px; display: flex; align-items: center; height: 48px;}
+        .navbar-menu > li {position: relative;}
+        .navbar-menu > li > a {display: block; color: #fff; text-decoration: none; padding: 0 18px; line-height: 48px; font-weight: bold; transition: background 0.2s; border-radius: 4px;}
+        .navbar-menu > li > a:hover, .navbar-menu > li.dropdown:hover > a {background: #0056b3;}
+        .dropdown-menu {display: none; position: absolute; background: #fff; min-width: 160px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-radius: 4px; top: 48px; left: 0; z-index: 1000; padding: 6px 0;}
+        .dropdown-menu li a {color: #333; padding: 8px 18px; display: block; text-decoration: none; border-radius: 0; font-weight: normal;}
+        .dropdown-menu li a:hover {background: #f2f2f2;}
+        .navbar-menu > li.dropdown:hover .dropdown-menu {display: block;}
+        @media (max-width: 700px) {.navbar-menu {flex-direction: column; height: auto;} .navbar-menu > li {width: 100%;} .navbar-menu > li > a {padding: 0 10px;} .dropdown-menu {position: static; box-shadow: none; min-width: 100%;}}
+        .form-container {background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; width: 90%; margin: 20px auto;}
+        .form-row {display: flex; gap: 20px; align-items: center; margin-bottom: 15px;}
+        .form-row label {font-weight: bold;}
+        .form-row select, .form-row input[type="date"] {padding: 6px; border-radius: 4px; border: 1px solid #ccc;}
+        .form-row button {padding: 8px 15px; background: #007bff; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;}
+        .form-row button:hover {background: #0056b3;}
+        table {width: 95%; margin: 20px auto; border-collapse: collapse; font-size: 15px;}
+        th, td {border: 1px solid #333; padding: 6px 10px; text-align: left;}
+        th {background: #f2f2f2; position: sticky; top: 0; z-index: 2;}
+        tr:nth-child(even) {background: #f9f9f9;}
+        tr:nth-child(odd) {background: #fff;}
+        @media (max-width: 700px) {
+            table, thead, tbody, th, td, tr {display: block;}
+            th {position: static;}
+            td {border: none; border-bottom: 1px solid #eee;}
+            tr {margin-bottom: 10px;}
+            td:before {
+                content: attr(data-label);
+                font-weight: bold;
+                display: block;
+                margin-bottom: 2px;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% include '_navbar.html' %}
+    <div class="form-container">
+        <form method="POST">
+            <div class="form-row">
+                <label for="product_group">Product Group:</label>
+                <select name="product_group" id="product_group">
+                    {% for group in groups %}
+                        <option value="{{ group }}" {% if group == selected_group %}selected{% endif %}>{{ group }}</option>
+                    {% endfor %}
+                </select>
+                <label for="product_name">Product Name:</label>
+                <select name="product_name" id="product_name">
+                    {% for product in products %}
+                        <option value="{{ product }}" {% if product == selected_product %}selected{% endif %}>{{ product }}</option>
+                    {% endfor %}
+                </select>
+                <label for="from_date">From:</label>
+                <input type="date" name="from_date" id="from_date" value="{{ from_date }}">
+                <label for="to_date">To:</label>
+                <input type="date" name="to_date" id="to_date" value="{{ to_date }}">
+                <button type="submit">Show</button>
+            </div>
+        </form>
+    </div>
+    <table id="reportTable">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Product Name</th>
+                <th>Opening Stock</th>
+                <th>Purchase</th>
+                <th>Sales</th>
+                <th>Sales Return</th>
+                <th>Excess</th>
+                <th>Shortage</th>
+                <th>Closing Stock</th>
+                <th>Stock Value (Rs)</th>
+            </tr>
+        </thead>
+        <tbody id="reportBody">
+        </tbody>
+    </table>
+    <div id="loadMore" style="text-align:center; margin: 20px 0; display:none;">
+        <button id="loadMoreBtn">Load More</button>
+    </div>
+    {% if results %}
+    <div style="text-align:center; margin: 20px 0;">
+        <form id="paginationForm" method="POST" style="display:inline;">
+            <input type="hidden" name="product_group" value="{{ selected_group }}">
+            <input type="hidden" name="product_name" value="{{ selected_product }}">
+            <input type="hidden" name="from_date" value="{{ from_date }}">
+            <input type="hidden" name="to_date" value="{{ to_date }}">
+            <button type="submit" name="page" value="{{ page-1 }}" {% if page <= 1 %}disabled{% endif %}>Previous</button>
+            Page {{ page }} of {{ total_pages }}
+            <button type="submit" name="page" value="{{ page+1 }}" {% if page >= total_pages %}disabled{% endif %}>Next</button>
+        </form>
+    </div>
+    {% endif %}
+<div id="spinner" style="display:none; text-align:center; margin-top:20px;">
+    <svg width="50" height="50" viewBox="0 0 50 50">
+        <circle cx="25" cy="25" r="20" stroke="#007bff" stroke-width="5" fill="none" stroke-linecap="round">
+            <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="1s" repeatCount="indefinite"/>
+        </circle>
+    </svg>
+    <div style="color:#007bff; font-weight:bold;">Loading...</div>
+</div>
+<script>
+let offset = 0;
+const limit = 50;
+let loading = false;
+let hasMore = true;
+
+function fetchRecords() {
+    if (loading || !hasMore) return;
+    loading = true;
+    document.getElementById('spinner').style.display = 'block';
+    const form = document.querySelector('form');
+    const formData = new FormData(form);
+    formData.append('offset', offset);
+    formData.append('limit', limit);
+    fetch('/report1_data', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        //console.log('Results received:', data.results.length, data.results);
+        const tbody = document.getElementById('reportBody');
+        data.results.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td data-label="Date">${row.Date}</td>
+                <td data-label="Product Name">${row.ProductName}</td>
+                <td data-label="Opening Stock">${row.OpeningStock}</td>
+                <td data-label="Purchase">${row.Purchase}</td>
+                <td data-label="Sales">${row.Sales}</td>
+                <td data-label="Sales Return">${row.SalesReturn}</td>
+                <td data-label="Excess">${row.Excess}</td>
+                <td data-label="Shortage">${row.Shortage}</td>
+                <td data-label="Closing Stock">${row.ClosingStock}</td>
+                <td data-label="Stock Value (Rs)">${row.StockValue}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+        offset += limit;
+        hasMore = data.has_more;
+        document.getElementById('spinner').style.display = 'none';
+        document.getElementById('loadMore').style.display = hasMore ? 'block' : 'none';
+        loading = false;
+    })
+    .catch(() => {
+        document.getElementById('spinner').style.display = 'none';
+        loading = false;
+    });
+}
+
+
+
+document.getElementById('loadMoreBtn').addEventListener('click', function() {
+    fetchRecords();
+});
+
+document.querySelector('form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    document.getElementById('reportBody').innerHTML = '';
+    offset = 0;
+    hasMore = true;
+    fetchRecords();
+});
+
+// Update Product Name dropdown via AJAX when Product Group changes
+document.getElementById('product_group').addEventListener('change', function() {
+    const group = this.value;
+    const productNameSelect = document.getElementById('product_name');
+    document.getElementById('spinner').style.display = 'block';
+    fetch('/get_products', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ group }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        productNameSelect.innerHTML = '';
+        const allOpt = document.createElement('option');
+        allOpt.value = 'All';
+        allOpt.textContent = 'All';
+        productNameSelect.appendChild(allOpt);
+        data.products.forEach(function(product) {
+            const opt = document.createElement('option');
+            opt.value = product;
+            opt.textContent = product;
+            productNameSelect.appendChild(opt);
+        });
+        document.getElementById('spinner').style.display = 'none';
+    })
+    .catch(() => {
+        document.getElementById('spinner').style.display = 'none';
+    });
+});
+</script>
+</body>
+</html>

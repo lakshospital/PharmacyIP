@@ -4,6 +4,82 @@
     <title>Pharmacy Bill</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
     <style>
+        /* Navbar styles */
+        .navbar {
+            background-color: #007bff;
+            padding: 0;
+            margin-bottom: 20px;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .navbar-menu {
+            list-style: none;
+            margin: 0;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            height: 48px;
+        }
+        .navbar-menu > li {
+            position: relative;
+        }
+        .navbar-menu > li > a {
+            display: block;
+            color: #fff;
+            text-decoration: none;
+            padding: 0 18px;
+            line-height: 48px;
+            font-weight: bold;
+            transition: background 0.2s;
+            border-radius: 4px;
+        }
+        .navbar-menu > li > a:hover,
+        .navbar-menu > li.dropdown:hover > a {
+            background: #0056b3;
+        }
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            background: #fff;
+            min-width: 160px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-radius: 4px;
+            top: 48px;
+            left: 0;
+            z-index: 1000;
+            padding: 6px 0;
+        }
+        .dropdown-menu li a {
+            color: #333;
+            padding: 8px 18px;
+            display: block;
+            text-decoration: none;
+            border-radius: 0;
+            font-weight: normal;
+        }
+        .dropdown-menu li a:hover {
+            background: #f2f2f2;
+        }
+        .navbar-menu > li.dropdown:hover .dropdown-menu {
+            display: block;
+        }
+        @media (max-width: 700px) {
+            .navbar-menu {
+                flex-direction: column;
+                height: auto;
+            }
+            .navbar-menu > li {
+                width: 100%;
+            }
+            .navbar-menu > li > a {
+                padding: 0 10px;
+            }
+            .dropdown-menu {
+                position: static;
+                box-shadow: none;
+                min-width: 100%;
+            }
+        }
         body {
             background-color: #EEE;
             font-family: Arial, sans-serif;
@@ -199,6 +275,19 @@
     </style>
 </head>
 <body>
+
+    <nav class="navbar">
+        <ul class="navbar-menu">
+            <li><a href="/dashboard">Dashboard</a></li>
+            <li><a href="/billdetails">Bill Details</a></li>
+            <li class="dropdown">
+                <a href="#">Reports &#9662;</a>
+                <ul class="dropdown-menu">
+                    <li><a href="/report1">Report 1</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
 
     <div class="search-form-container">
         <form method="POST" id="main_form" autocomplete="off">

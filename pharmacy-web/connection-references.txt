@@ -1,0 +1,18 @@
+def get_db_connection():
+    conn_str = (
+        'DRIVER={ODBC Driver 17 for SQL Server};'
+        'SERVER=LAPTOP-C27U7D67\\SQLEXPRESS;'
+        'DATABASE=PharmacyDB;'
+        'Trusted_Connection=yes;'
+        'Encrypt=no;'
+    )
+
+
+def get_db_connection():
+    conn_str = (
+        'DRIVER={ODBC Driver 17 for SQL Server};'
+        'SERVER=DESKTOP-A674QQN\\SQLEXPRESS01;'
+        'DATABASE=InPatient_PharmcyDB;'
+        'UID=lhs2;'
+        'PWD=lhs2;'
+    )

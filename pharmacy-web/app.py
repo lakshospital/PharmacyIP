@@ -1,9 +1,8 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 import pyodbc
 import datetime
 
 app = Flask(__name__)
-
 # SQL Server connection details
 server = 'LAPTOP-C27U7D67\\SQLEXPRESS'
 database = 'Pharmacy'
@@ -11,12 +10,318 @@ database = 'Pharmacy'
 def get_db_connection():
     conn_str = (
         'DRIVER={ODBC Driver 17 for SQL Server};'
-        'SERVER=DESKTOP-A674QQN\\SQLEXPRESS01;'
-        'DATABASE=InPatient_PharmcyDB;'
-        'UID=lhs2;'
-        'PWD=lhs2;'
+        'SERVER=LAPTOP-C27U7D67\\SQLEXPRESS;'
+        'DATABASE=PharmacyDB;'
+        'Trusted_Connection=yes;'
+        'Encrypt=no;'
     )
     return pyodbc.connect(conn_str)
+
+
+# Dashboard
+@app.route('/dashboard')
+def dashboard():
+    return render_template('dashboard.html')
+
+# Bill Details
+@app.route('/billdetails')
+def billdetails():
+    return render_template('billdetails.html')
+
+# AJAX endpoint to get products for a selected group
+@app.route('/get_products', methods=['POST'])
+def get_products():
+    group = request.json.get('group')
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    if group == 'All':
+        cursor.execute("SELECT ProductName FROM ProductMaster WHERE ProductName IS NOT NULL AND LTRIM(RTRIM(ProductName)) <> ''")
+    else:
+        cursor.execute("SELECT ProductName FROM ProductMaster WHERE ProductGroup=? AND ProductName IS NOT NULL AND LTRIM(RTRIM(ProductName)) <> ''", (group,))
+    products = [row[0] for row in cursor.fetchall()]
+    conn.close()
+    return jsonify({'products': products})
+
+@app.route('/report1_data', methods=['POST'])
+def report1_data():
+    import sys
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    # Get parameters from AJAX
+    offset = int(request.form.get('offset', 0))
+    limit = int(request.form.get('limit', 50))
+    selected_group = request.form.get('product_group', 'All')
+    selected_product = request.form.get('product_name', 'All')
+    from_date = request.form.get('from_date', datetime.datetime.now().strftime('%Y-%m-01'))
+    to_date = request.form.get('to_date', datetime.datetime.now().strftime('%Y-%m-%d'))
+
+    # Get product list
+    if selected_product == 'All' and selected_group != 'All':
+        cursor.execute("SELECT ProductName FROM ProductMaster WHERE ProductGroup=? AND ProductName IS NOT NULL AND LTRIM(RTRIM(ProductName)) <> ''", (selected_group,))
+        product_list = [row[0] for row in cursor.fetchall()]
+    elif selected_group == 'All' and selected_product == 'All':
+        cursor.execute("SELECT ProductName FROM ProductMaster WHERE ProductName IS NOT NULL AND LTRIM(RTRIM(ProductName)) <> ''")
+        product_list = [row[0] for row in cursor.fetchall()]
+    else:
+        product_list = [selected_product]
+
+    paginated_products = product_list[offset:offset+limit]
+    print(f"[DEBUG] paginated_products: {paginated_products}", file=sys.stderr)
+    results = []
+
+    # Batch queries for all paginated products
+    placeholders = ','.join(['?'] * len(paginated_products))
+    # Opening Stock
+    cursor.execute(f"SELECT ProductName, ISNULL(SUM(Qty),0) as Qty FROM InvoiceDetails WHERE ProductName IN ({placeholders}) AND InvoiceDateTime<? AND Status<>'C' GROUP BY ProductName", (*paginated_products, from_date + ' 00:00:00'))
+    opening_purchase_dict = {row.ProductName: row.Qty for row in cursor.fetchall()}
+
+    cursor.execute(f"SELECT ProductName, ISNULL(SUM(ReturnQty),0) as Qty FROM SalesReturnDetails WHERE ProductName IN ({placeholders}) AND ReturnBillDateTime<? GROUP BY ProductName", (*paginated_products, from_date + ' 00:00:00'))
+    opening_sales_return_dict = {row.ProductName: row.Qty for row in cursor.fetchall()}
+
+    cursor.execute(f"SELECT ProductName, ISNULL(SUM(ESQty),0) as Qty FROM ESTable WHERE ProductName IN ({placeholders}) AND ESDate<? AND ESType='Excess' GROUP BY ProductName", (*paginated_products, from_date + ' 00:00:00'))
+    opening_excess_dict = {row.ProductName: row.Qty for row in cursor.fetchall()}
+
+    cursor.execute(f"SELECT ProductName, ISNULL(SUM(Qty),0) as Qty FROM DrugSlipDetails WHERE ProductName IN ({placeholders}) AND BillDate<? AND Status<>'C' GROUP BY ProductName", (*paginated_products, from_date + ' 00:00:00'))
+    opening_sales_dict = {row.ProductName: row.Qty for row in cursor.fetchall()}
+
+    cursor.execute(f"SELECT ProductName, ISNULL(SUM(ESQty),0) as Qty FROM ESTable WHERE ProductName IN ({placeholders}) AND ESDate<? AND ESType='Shortage' GROUP BY ProductName", (*paginated_products, from_date + ' 00:00:00'))
+    opening_shortage_dict = {row.ProductName: row.Qty for row in cursor.fetchall()}
+
+    # Purchase in date range
+    cursor.execute(f"SELECT ProductName, ISNULL(SUM(Qty),0) as Qty FROM InvoiceDetails WHERE ProductName IN ({placeholders}) AND InvoiceDateTime>=? AND InvoiceDateTime<=? AND Status<>'C' GROUP BY ProductName", (*paginated_products, from_date + ' 00:00:00', to_date + ' 23:59:59'))
+    purchase_dict = {row.ProductName: row.Qty for row in cursor.fetchall()}
+
+    # Sales in date range
+    cursor.execute(f"SELECT ProductName, ISNULL(SUM(Qty),0) as Qty FROM DrugSlipDetails WHERE ProductName IN ({placeholders}) AND BillDate>=? AND BillDate<=? AND Status<>'C' GROUP BY ProductName", (*paginated_products, from_date + ' 00:00:00', to_date + ' 23:59:59'))
+    sales_dict = {row.ProductName: row.Qty for row in cursor.fetchall()}
+
+    # Sales Return in date range
+    cursor.execute(f"SELECT ProductName, ISNULL(SUM(ReturnQty),0) as Qty FROM SalesReturnDetails WHERE ProductName IN ({placeholders}) AND ReturnBillDateTime>=? AND ReturnBillDateTime<=? GROUP BY ProductName", (*paginated_products, from_date + ' 00:00:00', to_date + ' 23:59:59'))
+    sales_return_dict = {row.ProductName: row.Qty for row in cursor.fetchall()}
+
+    # Excess in date range
+    cursor.execute(f"SELECT ProductName, ISNULL(SUM(ESQty),0) as Qty FROM ESTable WHERE ProductName IN ({placeholders}) AND ESDate>=? AND ESDate<=? AND ESType='Excess' GROUP BY ProductName", (*paginated_products, from_date + ' 00:00:00', to_date + ' 23:59:59'))
+    excess_dict = {row.ProductName: row.Qty for row in cursor.fetchall()}
+
+    # Shortage in date range
+    cursor.execute(f"SELECT ProductName, ISNULL(SUM(ESQty),0) as Qty FROM ESTable WHERE ProductName IN ({placeholders}) AND ESDate>=? AND ESDate<=? AND ESType='Shortage' GROUP BY ProductName", (*paginated_products, from_date + ' 00:00:00', to_date + ' 23:59:59'))
+    shortage_dict = {row.ProductName: row.Qty for row in cursor.fetchall()}
+
+    for pname in paginated_products:
+        opening_purchase = opening_purchase_dict.get(pname, 0)
+        opening_sales_return = opening_sales_return_dict.get(pname, 0)
+        opening_excess = opening_excess_dict.get(pname, 0)
+        opening_sales = opening_sales_dict.get(pname, 0)
+        opening_shortage = opening_shortage_dict.get(pname, 0)
+        opening_stock = (opening_purchase + opening_sales_return + opening_excess) - (opening_sales + opening_shortage)
+
+        purchase = purchase_dict.get(pname, 0)
+        sales = sales_dict.get(pname, 0)
+        sales_return = sales_return_dict.get(pname, 0)
+        excess = excess_dict.get(pname, 0)
+        shortage = shortage_dict.get(pname, 0)
+        closing_stock = opening_stock + purchase + sales_return + excess - sales - shortage
+
+        # OpeningValue
+        cursor.execute("SELECT ISNULL(SUM(Qty * ISNULL(HSR,0)),0) FROM InvoiceDetails WHERE ProductName=? AND InvoiceDateTime<? AND Status<>'C'", (pname, from_date + ' 00:00:00'))
+        OpeningValue = cursor.fetchone()[0] or 0
+        # PurchaseValue
+        cursor.execute("SELECT ISNULL(SUM(Qty * ISNULL(HSR,0)),0) FROM InvoiceDetails WHERE ProductName=? AND InvoiceDateTime>=? AND InvoiceDateTime<=? AND Status<>'C'", (pname, from_date + ' 00:00:00', to_date + ' 23:59:59'))
+        PurchaseValue = cursor.fetchone()[0] or 0
+        # SalesValue
+        cursor.execute("SELECT ISNULL(SUM(total),0) FROM (SELECT Qty * ISNULL((SELECT TOP 1 i.HSR FROM InvoiceDetails i WHERE i.ProductName = d.ProductName AND i.BatchNo = d.BatchNo AND i.InvoiceNo = SUBSTRING(d.InvoiceNo, 1, CHARINDEX('-', d.InvoiceNo)-1) AND YEAR(i.InvoiceDateTime) = SUBSTRING(d.InvoiceNo, CHARINDEX('-', d.InvoiceNo) + 1, 4)),0) AS total FROM DrugSlipDetails d WHERE ProductName=? AND BillDate>=? AND BillDate<=? AND Status<>'C') DERIVEDTBL", (pname, from_date + ' 00:00:00', to_date + ' 23:59:59'))
+        SalesValue = cursor.fetchone()[0] or 0
+        # SalesReturnValue
+        cursor.execute("SELECT ISNULL(SUM(total),0) FROM (SELECT ReturnQty * ISNULL((SELECT TOP 1 i.HSR FROM InvoiceDetails i WHERE i.ProductName = d.ProductName AND i.BatchNo = d.BatchNo AND i.InvoiceNo = SUBSTRING(d.InvoiceNo, 1, CHARINDEX('-', d.InvoiceNo)-1) AND YEAR(i.InvoiceDateTime) = SUBSTRING(d.InvoiceNo, CHARINDEX('-', d.InvoiceNo) + 1, 4)),0) AS total FROM SalesReturnDetails d WHERE ProductName=? AND ReturnBillDateTime>=? AND ReturnBillDateTime<=?) DERIVEDTBL", (pname, from_date + ' 00:00:00', to_date + ' 23:59:59'))
+        SalesReturnValue = cursor.fetchone()[0] or 0
+        # ExcessValue
+        cursor.execute("SELECT ISNULL(SUM(total),0) FROM (SELECT ESQty * ISNULL((SELECT TOP 1 i.HSR FROM InvoiceDetails i WHERE i.ProductName = d.ProductName AND i.BatchNo = d.BatchNo AND i.InvoiceNo = d.InvoiceNo AND YEAR(i.InvoiceDateTime) = d.InvoiceYear),0) AS total FROM ESTable d WHERE ProductName=? AND ESDate>=? AND ESDate<=? AND ESType='Excess') DERIVEDTBL", (pname, from_date + ' 00:00:00', to_date + ' 23:59:59'))
+        ExcessValue = cursor.fetchone()[0] or 0
+        # ShortageValue
+        cursor.execute("SELECT ISNULL(SUM(total),0) FROM (SELECT ESQty * ISNULL((SELECT TOP 1 i.HSR FROM InvoiceDetails i WHERE i.ProductName = d.ProductName AND i.BatchNo = d.BatchNo AND i.InvoiceNo = d.InvoiceNo AND YEAR(i.InvoiceDateTime) = d.InvoiceYear),0) AS total FROM ESTable d WHERE ProductName=? AND ESDate>=? AND ESDate<=? AND ESType='Shortage') DERIVEDTBL", (pname, from_date + ' 00:00:00', to_date + ' 23:59:59'))
+        ShortageValue = cursor.fetchone()[0] or 0
+        # Always append every product, even if all values are zero (match VB logic)
+        cursor.execute("""
+            SELECT ISNULL(SUM(s.CurrentQty * i.HSR), 0)
+            FROM StockDetails s
+            INNER JOIN InvoiceDetails i ON s.InvoiceNo = i.InvoiceNo AND s.BatchNo = i.BatchNo AND s.ProductName = i.ProductName
+            WHERE s.ProductName = ? AND s.CurrentQty > 0
+        """, (pname,))
+        StockValue = cursor.fetchone()[0] or 0
+        results.append({
+            'ProductName': pname,
+            'OpeningStock': opening_stock,
+            'Purchase': purchase,
+            'Sales': sales,
+            'SalesReturn': sales_return,
+            'Excess': excess,
+            'Shortage': shortage,
+            'ClosingStock': closing_stock,
+            'StockValue': StockValue,
+            'Date': from_date
+        })
+    conn.close()
+    return jsonify({'results': results, 'has_more': offset+limit < len(product_list)})
+
+
+# Report 1 (moved from report1.py)
+@app.route('/report1', methods=['GET', 'POST'])
+def report1():
+    import sys
+    print("=== [Flask] Entered report1() route from app.py ===", file=sys.stderr)
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    # Fetch product groups (exclude empty/null)
+    cursor.execute("SELECT GroupName FROM ProductGroupMaster WHERE GroupName IS NOT NULL AND LTRIM(RTRIM(GroupName)) <> ''")
+    groups = [row[0] for row in cursor.fetchall()]
+    groups.insert(0, 'All')
+
+    # Pagination: read from form for POST, args for GET
+    try:
+        if request.method == 'POST':
+            page = int(request.form.get('page', 1))
+        else:
+            page = int(request.args.get('page', 1))
+        if page < 1:
+            page = 1
+    except Exception:
+        page = 1
+    per_page = 50
+    offset = (page - 1) * per_page
+
+    selected_group = request.form.get('product_group', 'All')
+    selected_product = request.form.get('product_name', 'All')
+    from_date = request.form.get('from_date', datetime.datetime.now().strftime('%Y-%m-01'))
+    to_date = request.form.get('to_date', datetime.datetime.now().strftime('%Y-%m-%d'))
+
+    # Always update products list based on selected group
+    if selected_group == 'All':
+        cursor.execute("SELECT ProductName FROM ProductMaster WHERE ProductName IS NOT NULL AND LTRIM(RTRIM(ProductName)) <> ''")
+    else:
+        cursor.execute("SELECT ProductName FROM ProductMaster WHERE ProductGroup=? AND ProductName IS NOT NULL AND LTRIM(RTRIM(ProductName)) <> ''", (selected_group,))
+    products = [row[0] for row in cursor.fetchall()]
+    products.insert(0, 'All')
+    products.insert(0, 'All')
+
+    results = []
+    total_records = 0
+    if request.method == 'POST' and (request.form.get('product_group') or request.form.get('product_name')):
+        # Determine product list for query
+        if selected_product == 'All' and selected_group != 'All':
+            cursor.execute("SELECT ProductName FROM ProductMaster WHERE ProductGroup=? AND ProductName IS NOT NULL AND LTRIM(RTRIM(ProductName)) <> ''", (selected_group,))
+            product_list = [row[0] for row in cursor.fetchall()]
+        elif selected_group == 'All' and selected_product == 'All':
+            cursor.execute("SELECT ProductName FROM ProductMaster WHERE ProductName IS NOT NULL AND LTRIM(RTRIM(ProductName)) <> ''")
+            product_list = [row[0] for row in cursor.fetchall()]
+        else:
+            product_list = [selected_product]
+
+        # Pagination: count total
+        total_records = len(product_list)
+        paginated_products = product_list[offset:offset+per_page]
+
+        # Batch queries for all paginated products
+        placeholders = ','.join(['?'] * len(paginated_products))
+        # Opening Stock
+        cursor.execute(f"SELECT ProductName, ISNULL(SUM(Qty),0) as Qty FROM InvoiceDetails WHERE ProductName IN ({placeholders}) AND InvoiceDateTime<? AND Status<>'C' GROUP BY ProductName", (*paginated_products, from_date + ' 00:00:00'))
+        opening_purchase_dict = {row.ProductName: row.Qty for row in cursor.fetchall()}
+
+        cursor.execute(f"SELECT ProductName, ISNULL(SUM(ReturnQty),0) as Qty FROM SalesReturnDetails WHERE ProductName IN ({placeholders}) AND ReturnBillDateTime<? GROUP BY ProductName", (*paginated_products, from_date + ' 00:00:00'))
+        opening_sales_return_dict = {row.ProductName: row.Qty for row in cursor.fetchall()}
+
+        cursor.execute(f"SELECT ProductName, ISNULL(SUM(ESQty),0) as Qty FROM ESTable WHERE ProductName IN ({placeholders}) AND ESDate<? AND ESType='Excess' GROUP BY ProductName", (*paginated_products, from_date + ' 00:00:00'))
+        opening_excess_dict = {row.ProductName: row.Qty for row in cursor.fetchall()}
+
+        cursor.execute(f"SELECT ProductName, ISNULL(SUM(Qty),0) as Qty FROM DrugSlipDetails WHERE ProductName IN ({placeholders}) AND BillDate<? AND Status<>'C' GROUP BY ProductName", (*paginated_products, from_date + ' 00:00:00'))
+        opening_sales_dict = {row.ProductName: row.Qty for row in cursor.fetchall()}
+
+        cursor.execute(f"SELECT ProductName, ISNULL(SUM(ESQty),0) as Qty FROM ESTable WHERE ProductName IN ({placeholders}) AND ESDate<? AND ESType='Shortage' GROUP BY ProductName", (*paginated_products, from_date + ' 00:00:00'))
+        opening_shortage_dict = {row.ProductName: row.Qty for row in cursor.fetchall()}
+
+        # Purchase in date range
+        cursor.execute(f"SELECT ProductName, ISNULL(SUM(Qty),0) as Qty FROM InvoiceDetails WHERE ProductName IN ({placeholders}) AND InvoiceDateTime>=? AND InvoiceDateTime<=? AND Status<>'C' GROUP BY ProductName", (*paginated_products, from_date + ' 00:00:00', to_date + ' 23:59:59'))
+        purchase_dict = {row.ProductName: row.Qty for row in cursor.fetchall()}
+
+        # Sales in date range
+        cursor.execute(f"SELECT ProductName, ISNULL(SUM(Qty),0) as Qty FROM DrugSlipDetails WHERE ProductName IN ({placeholders}) AND BillDate>=? AND BillDate<=? AND Status<>'C' GROUP BY ProductName", (*paginated_products, from_date + ' 00:00:00', to_date + ' 23:59:59'))
+        sales_dict = {row.ProductName: row.Qty for row in cursor.fetchall()}
+
+        # Sales Return in date range
+        cursor.execute(f"SELECT ProductName, ISNULL(SUM(ReturnQty),0) as Qty FROM SalesReturnDetails WHERE ProductName IN ({placeholders}) AND ReturnBillDateTime>=? AND ReturnBillDateTime<=? GROUP BY ProductName", (*paginated_products, from_date + ' 00:00:00', to_date + ' 23:59:59'))
+        sales_return_dict = {row.ProductName: row.Qty for row in cursor.fetchall()}
+
+        # Excess in date range
+        cursor.execute(f"SELECT ProductName, ISNULL(SUM(ESQty),0) as Qty FROM ESTable WHERE ProductName IN ({placeholders}) AND ESDate>=? AND ESDate<=? AND ESType='Excess' GROUP BY ProductName", (*paginated_products, from_date + ' 00:00:00', to_date + ' 23:59:59'))
+        excess_dict = {row.ProductName: row.Qty for row in cursor.fetchall()}
+
+        # Shortage in date range
+        cursor.execute(f"SELECT ProductName, ISNULL(SUM(ESQty),0) as Qty FROM ESTable WHERE ProductName IN ({placeholders}) AND ESDate>=? AND ESDate<=? AND ESType='Shortage' GROUP BY ProductName", (*paginated_products, from_date + ' 00:00:00', to_date + ' 23:59:59'))
+        shortage_dict = {row.ProductName: row.Qty for row in cursor.fetchall()}
+
+        # Value calculations using subqueries for HSR, matching VB logic
+        for pname in paginated_products:
+            opening_purchase = opening_purchase_dict.get(pname, 0)
+            opening_sales_return = opening_sales_return_dict.get(pname, 0)
+            opening_excess = opening_excess_dict.get(pname, 0)
+            opening_sales = opening_sales_dict.get(pname, 0)
+            opening_shortage = opening_shortage_dict.get(pname, 0)
+            opening_stock = (opening_purchase + opening_sales_return + opening_excess) - (opening_sales + opening_shortage)
+
+            purchase = purchase_dict.get(pname, 0)
+            sales = sales_dict.get(pname, 0)
+            sales_return = sales_return_dict.get(pname, 0)
+            excess = excess_dict.get(pname, 0)
+            shortage = shortage_dict.get(pname, 0)
+            closing_stock = opening_stock + purchase + sales_return + excess - sales - shortage
+
+            # OpeningValue
+            cursor.execute("SELECT ISNULL(SUM(total),0) FROM (SELECT Qty * HSR as total FROM InvoiceDetails WHERE ProductName=? AND InvoiceDateTime<? AND Status<>'C') AS DERIVEDTBL", (pname, from_date + ' 00:00:00'))
+            OpeningValue = cursor.fetchone()[0] or 0
+            # PurchaseValue
+            cursor.execute("SELECT ISNULL(SUM(total),0) FROM (SELECT Qty * HSR as total FROM InvoiceDetails WHERE ProductName=? AND InvoiceDateTime>=? AND InvoiceDateTime<=? AND Status<>'C') AS DERIVEDTBL", (pname, from_date + ' 00:00:00', to_date + ' 23:59:59'))
+            PurchaseValue = cursor.fetchone()[0] or 0
+            # SalesValue
+            cursor.execute("SELECT ISNULL(SUM(total),0) FROM (SELECT Qty * (SELECT TOP 1 i.HSR FROM InvoiceDetails i WHERE i.ProductName = d.productname AND i.BatchNo = d.batchno AND i.invoiceno = SUBSTRING(d.InvoiceNo, 1, CHARINDEX('-', d.InvoiceNo)-1) AND year(i.invoicedatetime) = SUBSTRING(d.InvoiceNo, CHARINDEX('-', d.InvoiceNo) + 1, 4)) AS total FROM DrugSlipDetails d WHERE ProductName=? AND BillDate>=? AND BillDate<=? AND Status<>'C') DERIVEDTBL", (pname, from_date + ' 00:00:00', to_date + ' 23:59:59'))
+            SalesValue = cursor.fetchone()[0] or 0
+            # SalesReturnValue
+            cursor.execute("SELECT ISNULL(SUM(total),0) FROM (SELECT ReturnQty * (SELECT TOP 1 i.HSR FROM InvoiceDetails i WHERE i.ProductName = d.productname AND i.BatchNo = d.batchno AND i.invoiceno = SUBSTRING(d.InvoiceNo, 1, CHARINDEX('-', d.InvoiceNo)-1) AND year(i.invoicedatetime) = SUBSTRING(d.InvoiceNo, CHARINDEX('-', d.InvoiceNo) + 1, 4)) AS total FROM SalesReturnDetails d WHERE ProductName=? AND ReturnBillDateTime>=? AND ReturnBillDateTime<=?) DERIVEDTBL", (pname, from_date + ' 00:00:00', to_date + ' 23:59:59'))
+            SalesReturnValue = cursor.fetchone()[0] or 0
+            # ExcessValue
+            cursor.execute("SELECT ISNULL(SUM(total),0) FROM (SELECT ESQty * (SELECT TOP 1 i.HSR FROM InvoiceDetails i WHERE i.ProductName = d.productname AND i.BatchNo = d.batchno AND i.invoiceno = d.InvoiceNo AND year(i.invoicedatetime) = d.InvoiceYear) AS total FROM ESTable d WHERE ProductName=? AND ESDate>=? AND ESDate<=? AND ESType='Excess') DERIVEDTBL", (pname, from_date + ' 00:00:00', to_date + ' 23:59:59'))
+            ExcessValue = cursor.fetchone()[0] or 0
+            # ShortageValue
+            cursor.execute("SELECT ISNULL(SUM(total),0) FROM (SELECT ESQty * (SELECT TOP 1 i.HSR FROM InvoiceDetails i WHERE i.ProductName = d.productname AND i.BatchNo = d.batchno AND i.invoiceno = d.InvoiceNo AND year(i.invoicedatetime) = d.InvoiceYear) AS total FROM ESTable d WHERE ProductName=? AND ESDate>=? AND ESDate<=? AND ESType='Shortage') DERIVEDTBL", (pname, from_date + ' 00:00:00', to_date + ' 23:59:59'))
+            ShortageValue = cursor.fetchone()[0] or 0
+
+            StockValue = round((OpeningValue + PurchaseValue) - (SalesValue + SalesReturnValue + ExcessValue) - ShortageValue, 2)
+
+            results.append({
+                'ProductName': pname,
+                'OpeningStock': opening_stock,
+                'Purchase': purchase,
+                'Sales': sales,
+                'SalesReturn': sales_return,
+                'Excess': excess,
+                'Shortage': shortage,
+                'ClosingStock': closing_stock,
+                'StockValue': StockValue,
+                'Date': from_date # Or use actual date if available
+            })
+    else:
+        total_records = 0
+
+    show_sales = request.form.get('show_sales') == 'on'
+    hide_sales = request.form.get('hide_sales') == 'on'
+
+    if show_sales:
+        results = [row for row in results if row['Sales'] > 0 or row['SalesReturn'] > 0]
+    elif hide_sales:
+        results = [row for row in results if row['Sales'] == 0 and row['SalesReturn'] == 0]
+
+    total_pages = (total_records + per_page - 1) // per_page if total_records else 1
+    conn.close()
+    return render_template('report1.html', groups=groups, products=products, selected_group=selected_group, selected_product=selected_product, from_date=from_date, to_date=to_date, results=results, page=page, total_pages=total_pages, show_sales=show_sales, hide_sales=hide_sales)
+
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -100,4 +405,3 @@ def index():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
-
