@@ -1,12 +1,53 @@
-<nav class="navbar">
-    <ul class="navbar-menu">
-        <li><a href="/dashboard">Dashboard</a></li>
-        <li><a href="/billdetails">Bill Details</a></li>
-        <li class="dropdown">
-            <a href="#">Reports &#9662;</a>
-            <ul class="dropdown-menu">
-                <li><a href="/report1">Report 1</a></li>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<nav class="navbar" style="background: linear-gradient(90deg, #007bff 0%, #43cea2 100%); box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+    <ul class="navbar-menu" style="display: flex; align-items: center; gap: 18px; padding: 0 32px; height: 54px;">
+        <li><a href="/dashboard" style="display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
+        <li><a href="/" style="display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-file-invoice"></i> Bill Details</a></li>
+        <li class="dropdown" style="position: relative;">
+            <a href="#" style="display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-chart-bar"></i> Reports <span style="font-size: 1.1em; margin-left: 4px;">&#9662;</span></a>
+            <ul class="dropdown-menu" style="position: absolute; left: 0; top: 54px; background: #fff; min-width: 200px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-radius: 4px; padding: 8px 0; z-index: 1000;">
+                <li><a href="/report1" style="display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-boxes-stacked"></i> Stock Details between date</a></li>
             </ul>
         </li>
     </ul>
 </nav>
+<style>
+    .navbar-menu > li > a {
+        color: #fff;
+        text-decoration: none;
+        padding: 0 18px;
+        line-height: 54px;
+        font-weight: bold;
+        border-radius: 4px;
+        transition: background 0.2s, color 0.2s;
+        font-size: 1.08em;
+    }
+    .navbar-menu > li > a:hover, .navbar-menu > li.dropdown:hover > a {
+        background: rgba(255,255,255,0.12);
+        color: #ffd700;
+    }
+    .dropdown-menu li a {
+        color: #333;
+        padding: 10px 18px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        border-radius: 0;
+        font-weight: normal;
+        font-size: 1em;
+    }
+    .dropdown-menu li a:hover {
+        background: #f2f2f2;
+        color: #007bff;
+    }
+    .navbar-menu > li.dropdown:hover .dropdown-menu {
+        display: block;
+    }
+    @media (max-width: 700px) {
+        .navbar-menu {flex-direction: column; height: auto;}
+        .navbar-menu > li {width: 100%;}
+        .navbar-menu > li > a {padding: 0 10px;}
+        .dropdown-menu {position: static; box-shadow: none; min-width: 100%;}
+    }
+</style>

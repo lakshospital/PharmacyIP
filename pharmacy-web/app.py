@@ -1,32 +1,176 @@
 from flask import Flask, render_template, request, jsonify
-import pyodbc
 import datetime
+from db import get_db_connection
 
 app = Flask(__name__)
 # SQL Server connection details
 server = 'LAPTOP-C27U7D67\\SQLEXPRESS'
 database = 'Pharmacy'
 
-def get_db_connection():
-    conn_str = (
-        'DRIVER={ODBC Driver 17 for SQL Server};'
-        'SERVER=LAPTOP-C27U7D67\\SQLEXPRESS;'
-        'DATABASE=PharmacyDB;'
-        'Trusted_Connection=yes;'
-        'Encrypt=no;'
-    )
-    return pyodbc.connect(conn_str)
+ # ...existing code...
 
 
-# Dashboard
-@app.route('/dashboard')
+
+# Dashboard with high-level data
+
+@app.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
-    return render_template('dashboard.html')
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    # Total Products (not date dependent)
+    cursor.execute("SELECT COUNT(*) FROM ProductMaster")
+    total_products = cursor.fetchone()[0]
+    # Total Suppliers (not date dependent)
+    cursor.execute("SELECT COUNT(*) FROM SupplierMaster")
+    total_suppliers = cursor.fetchone()[0]
+
+    # Get from_date and to_date from form, default to current month
+    today = datetime.datetime.now()
+    current_date_str = today.strftime('%Y-%m-%d')
+    if request.method == 'POST':
+        from_date = request.form.get('from_date', current_date_str)
+        to_date = request.form.get('to_date', current_date_str)
+    else:
+        from_date = request.args.get('from_date', current_date_str)
+        to_date = request.args.get('to_date', current_date_str)
+
+    # Total Purchase Bills (InvoiceDetails)
+    cursor.execute("SELECT COUNT(DISTINCT InvoiceNo) FROM InvoiceDetails WHERE InvoiceDateTime >= ? AND InvoiceDateTime <= ?", (from_date + ' 00:00:00', to_date + ' 23:59:59'))
+    total_purchase_bills = cursor.fetchone()[0]
+    # Total Sales Bills (DrugSlipDetails)
+    cursor.execute("SELECT COUNT(DISTINCT BillNo) FROM DrugSlipDetails WHERE BillDate >= ? AND BillDate <= ?", (from_date + ' 00:00:00', to_date + ' 23:59:59'))
+    total_sales_bills = cursor.fetchone()[0]
+    # Total Purchase Value
+    cursor.execute("SELECT ISNULL(SUM(Total),0) FROM InvoiceDetails WHERE InvoiceDateTime >= ? AND InvoiceDateTime <= ?", (from_date + ' 00:00:00', to_date + ' 23:59:59'))
+    total_purchase_value = round(cursor.fetchone()[0] or 0, 2)
+    # Total Sales Value
+    cursor.execute("SELECT ISNULL(SUM(Total),0) FROM DrugSlipDetails WHERE BillDate >= ? AND BillDate <= ?", (from_date + ' 00:00:00', to_date + ' 23:59:59'))
+    total_sales_value = round(cursor.fetchone()[0] or 0, 2)
+
+    # Recent Sales grouped by BillNo (filtered by date)
+    cursor.execute("""
+        SELECT BillNo, MIN(BillDate) AS BillDate, MAX(PatientName) AS PatientName
+        FROM DrugSlipDetails
+        WHERE BillNo IS NOT NULL AND BillDate >= ? AND BillDate <= ?
+        GROUP BY BillNo
+        ORDER BY MIN(BillDate) DESC
+    """, (from_date + ' 00:00:00', to_date + ' 23:59:59'))
+    recent_sales = [dict(zip([column[0] for column in cursor.description], row)) for row in cursor.fetchall()]
+
+    # Recent Purchases grouped by InvoiceNo (filtered by date)
+    cursor.execute("""
+        SELECT i.InvoiceNo, MIN(i.InvoiceDateTime) AS InvoiceDateTime, MAX(s.SupplierName) AS SupplierName
+        FROM InvoiceDetails i
+        LEFT JOIN SupplierMaster s ON i.SupplierID = s.SupplierID
+        WHERE i.InvoiceNo IS NOT NULL AND i.InvoiceDateTime >= ? AND i.InvoiceDateTime <= ?
+        GROUP BY i.InvoiceNo
+        ORDER BY MIN(i.InvoiceDateTime) DESC
+    """, (from_date + ' 00:00:00', to_date + ' 23:59:59'))
+    recent_purchases = [dict(zip([column[0] for column in cursor.description], row)) for row in cursor.fetchall()]
+    conn.close()
+    return render_template('dashboard.html',
+        total_products=total_products,
+        total_suppliers=total_suppliers,
+        total_purchase_bills=total_purchase_bills,
+        total_sales_bills=total_sales_bills,
+        total_purchase_value=total_purchase_value,
+        total_sales_value=total_sales_value,
+        from_date=from_date,
+        to_date=to_date,
+        recent_sales=recent_sales,
+        recent_purchases=recent_purchases)
+
 
 # Bill Details
-@app.route('/billdetails')
+@app.route('/billdetails', methods=['GET'])
 def billdetails():
-    return render_template('billdetails.html')
+    bill_no = request.args.get('bill_no')
+    rows = []
+    header_data = {}
+    print_time = None
+    grand_total = 0
+    year = None
+    if bill_no:
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            # Get year from BillDate for the bill_no
+            cursor.execute("SELECT TOP 1 YEAR(BillDate) FROM DrugSlipDetails WHERE BillNo = ?", (bill_no,))
+            year_row = cursor.fetchone()
+            if year_row:
+                year = year_row[0]
+                sql_query = """
+                    SELECT BillNo, BillDate, DrName, PatientID, PatientName, CaseType,
+                           SNo, ProductName, Qty, BatchNo, ExpDate, VAT, MRP, InvoiceNo, Total 
+                    FROM DrugSlipDetails 
+                    WHERE BillNo = ? AND YEAR(BillDate) = ?
+                """
+                cursor.execute(sql_query, (bill_no, year))
+                all_rows_for_bill = cursor.fetchall()
+                conn.close()
+                if all_rows_for_bill:
+                    print_time = datetime.datetime.now().strftime('%d/%b/%Y %I:%M:%S %p')
+                    first_row = all_rows_for_bill[0]
+                    header_data = {
+                        'BillNo': first_row.BillNo,
+                        'BillDate': first_row.BillDate,
+                        'DrName': first_row.DrName,
+                        'PatientID': first_row.PatientID,
+                        'PatientName': first_row.PatientName,
+                        'Case': first_row.CaseType
+                    }
+                    rows = all_rows_for_bill
+                    grand_total = sum(row.Total for row in rows)
+        except Exception as e:
+            print(f"Database error: {e}")
+    return render_template('billdetails.html', rows=rows, header_data=header_data, print_time=print_time, grand_total=grand_total)
+
+
+# Purchase Details
+ # ...existing code...
+ # ...existing code...
+
+# Purchase Details
+@app.route('/purchasedetails', methods=['GET'])
+def purchasedetails():
+    invoice_no = request.args.get('invoice_no')
+    rows = []
+    header_data = {}
+    print_time = None
+    grand_total = 0
+    if invoice_no:
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            # Get header info
+            cursor.execute("""
+                SELECT TOP 1 i.InvoiceNo, i.InvoiceDateTime, s.SupplierName
+                FROM InvoiceDetails i
+                LEFT JOIN SupplierMaster s ON i.SupplierID = s.SupplierID
+                WHERE i.InvoiceNo = ?
+            """, (invoice_no,))
+            header_row = cursor.fetchone()
+            if header_row:
+                header_data = {
+                    'InvoiceNo': header_row.InvoiceNo,
+                    'InvoiceDateTime': header_row.InvoiceDateTime,
+                    'SupplierName': header_row.SupplierName
+                }
+            # Get product rows
+            cursor.execute("""
+                SELECT SNo, ProductName, Qty, BatchNo, ExpDate, VAT, MRP, HSR, Total
+                FROM InvoiceDetails
+                WHERE InvoiceNo = ?
+            """, (invoice_no,))
+            rows = cursor.fetchall()
+            conn.close()
+            if rows:
+                print_time = datetime.datetime.now().strftime('%d/%b/%Y %I:%M:%S %p')
+                grand_total = sum(row.Total for row in rows)
+        except Exception as e:
+            print(f"Database error: {e}")
+    return render_template('purchasedetails.html', rows=rows, header_data=header_data, print_time=print_time, grand_total=grand_total)
+
 
 # AJAX endpoint to get products for a selected group
 @app.route('/get_products', methods=['POST'])
@@ -57,10 +201,10 @@ def report1_data():
 
     # Get product list
     if selected_product == 'All' and selected_group != 'All':
-        cursor.execute("SELECT ProductName FROM ProductMaster WHERE ProductGroup=? AND ProductName IS NOT NULL AND LTRIM(RTRIM(ProductName)) <> ''", (selected_group,))
+        cursor.execute("SELECT ProductName FROM ProductMaster WHERE ProductGroup=? AND ProductName IS NOT NULL AND LTRIM(RTRIM(ProductName)) <> '' ORDER BY ProductName ASC", (selected_group,))
         product_list = [row[0] for row in cursor.fetchall()]
     elif selected_group == 'All' and selected_product == 'All':
-        cursor.execute("SELECT ProductName FROM ProductMaster WHERE ProductName IS NOT NULL AND LTRIM(RTRIM(ProductName)) <> ''")
+        cursor.execute("SELECT ProductName FROM ProductMaster WHERE ProductName IS NOT NULL AND LTRIM(RTRIM(ProductName)) <> '' ORDER BY ProductName ASC")
         product_list = [row[0] for row in cursor.fetchall()]
     else:
         product_list = [selected_product]

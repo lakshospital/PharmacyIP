@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Bill Details</title>
+    <title>Purchase Details</title>
     <style>
         .navbar {background-color: #007bff; padding: 0; margin-bottom: 20px; border-radius: 0 0 8px 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);}
         .navbar-menu {list-style: none; margin: 0; padding: 0 20px; display: flex; align-items: center; height: 48px;}
@@ -17,30 +17,20 @@
 </head>
 <body>
     {% include '_navbar.html' %}
-    <h1>Bill Details</h1>
+    <h1>Purchase Details</h1>
     {% if header_data %}
     <table border="1" cellpadding="8" cellspacing="0" style="width:100%; margin-bottom: 18px;">
         <tr>
-            <th>Bill No</th>
-            <td>{{ header_data.BillNo }}</td>
-            <th>Bill Date</th>
-            <td>{{ header_data.BillDate }}</td>
+            <th>Invoice No</th>
+            <td>{{ header_data.InvoiceNo }}</td>
+            <th>Invoice Date</th>
+            <td>{{ header_data.InvoiceDateTime }}</td>
         </tr>
         <tr>
-            <th>Doctor Name</th>
-            <td>{{ header_data.DrName }}</td>
-            <th>Patient ID</th>
-            <td>{{ header_data.PatientID }}</td>
-        </tr>
-        <tr>
-            <th>Patient Name</th>
-            <td>{{ header_data.PatientName }}</td>
-            <th>Case Type</th>
-            <td>{{ header_data.Case }}</td>
-        </tr>
-        <tr>
+            <th>Supplier Name</th>
+            <td>{{ header_data.SupplierName }}</td>
             <th>Print Time</th>
-            <td colspan="3">{{ print_time }}</td>
+            <td>{{ print_time }}</td>
         </tr>
     </table>
     {% endif %}
@@ -55,7 +45,7 @@
                 <th>Exp Date</th>
                 <th>VAT</th>
                 <th>MRP</th>
-                <th>Invoice No</th>
+                <th>HSR</th>
                 <th>Total</th>
             </tr>
         </thead>
@@ -69,7 +59,7 @@
                 <td>{{ row.ExpDate }}</td>
                 <td>{{ row.VAT }}</td>
                 <td>{{ row.MRP }}</td>
-                <td>{{ row.InvoiceNo }}</td>
+                <td>{{ row.HSR }}</td>
                 <td>₹{{ row.Total }}</td>
             </tr>
             {% endfor %}
@@ -77,7 +67,7 @@
     </table>
     <div style="font-weight: bold; font-size: 1.2rem;">Grand Total: ₹{{ grand_total }}</div>
     {% else %}
-    <div>No bill details found.</div>
+    <div>No purchase details found.</div>
     {% endif %}
 </body>
 </html>

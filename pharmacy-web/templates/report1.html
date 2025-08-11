@@ -107,7 +107,7 @@
 </div>
 <script>
 let offset = 0;
-const limit = 50;
+const limit = 5;
 let loading = false;
 let hasMore = true;
 
@@ -125,7 +125,7 @@ function fetchRecords() {
     })
     .then(response => response.json())
     .then(data => {
-        //console.log('Results received:', data.results.length, data.results);
+        console.log('Results received:', data.results.length, data.results);
         const tbody = document.getElementById('reportBody');
         data.results.forEach(row => {
             const tr = document.createElement('tr');
@@ -145,21 +145,19 @@ function fetchRecords() {
         });
         offset += limit;
         hasMore = data.has_more;
-        document.getElementById('spinner').style.display = 'none';
-        document.getElementById('loadMore').style.display = hasMore ? 'block' : 'none';
         loading = false;
+        if (hasMore) {
+            fetchRecords(); // Automatically fetch next batch
+        } else {
+            document.getElementById('spinner').style.display = 'none';
+            document.getElementById('loadMore').style.display = 'none';
+        }
     })
     .catch(() => {
         document.getElementById('spinner').style.display = 'none';
         loading = false;
     });
 }
-
-
-
-document.getElementById('loadMoreBtn').addEventListener('click', function() {
-    fetchRecords();
-});
 
 document.querySelector('form').addEventListener('submit', function(e) {
     e.preventDefault();
