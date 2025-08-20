@@ -2,10 +2,63 @@ from flask import Flask, render_template, request, jsonify
 import datetime
 from db import get_db_connection
 
+from metrics import (
+    get_total_products,
+    get_total_suppliers,
+    get_purchase_metrics,
+    get_sales_metrics,
+    get_sales_return_metrics,
+    get_cashless_metrics
+)
+from metrics import get_credit_metrics
+
 app = Flask(__name__)
-# SQL Server connection details
 server = 'LAPTOP-C27U7D67\\SQLEXPRESS'
 database = 'Pharmacy'
+
+# Sales Return Details
+@app.route('/salesreturnview', methods=['GET'])
+def salesreturnview():
+    return_bill_no = request.args.get('return_bill_no')
+    rows = []
+    header_data = {}
+    print_time = None
+    grand_total = 0
+    year = None
+    if return_bill_no:
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            # Get year from ReturnBillDateTime for the return_bill_no
+            cursor.execute("SELECT TOP 1 YEAR(ReturnBillDateTime) FROM SalesReturnDetails WHERE ReturnBillNo = ?", (return_bill_no,))
+            year_row = cursor.fetchone()
+            if year_row:
+                year = year_row[0]
+                sql_query = """
+                    SELECT ReturnBillNo, ReturnBillDateTime, SalesBillNo, SalesBillDate, DrName, PatientID, PatientName, SNo, ProductName, ReturnQty, InvoiceNo, BatchNo, MRP, VAT, Total
+                    FROM SalesReturnDetails
+                    WHERE ReturnBillNo = ? AND YEAR(ReturnBillDateTime) = ?
+                """
+                cursor.execute(sql_query, (return_bill_no, year))
+                all_rows_for_bill = cursor.fetchall()
+                conn.close()
+                if all_rows_for_bill:
+                    print_time = datetime.datetime.now().strftime('%d/%b/%Y %I:%M:%S %p')
+                    first_row = all_rows_for_bill[0]
+                    header_data = {
+                        'ReturnBillNo': first_row.ReturnBillNo,
+                        'ReturnBillDateTime': first_row.ReturnBillDateTime,
+                        'SalesBillNo': first_row.SalesBillNo,
+                        'SalesBillDate': first_row.SalesBillDate,
+                        'DrName': first_row.DrName,
+                        'PatientID': first_row.PatientID,
+                        'PatientName': first_row.PatientName
+                    }
+                    rows = all_rows_for_bill
+                    grand_total = sum(getattr(row, 'Total', 0) for row in rows)
+        except Exception as e:
+            print(f"Database error: {e}")
+    return render_template('salesreturnview.html', rows=rows, header_data=header_data, print_time=print_time, grand_total=grand_total)
 
 # Sales details API for dashboard modal
 @app.route('/get_sales')
@@ -45,16 +98,6 @@ def get_purchases():
 
 @app.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    # Total Products (not date dependent)
-    cursor.execute("SELECT COUNT(*) FROM ProductMaster")
-    total_products = cursor.fetchone()[0]
-    # Total Suppliers (not date dependent)
-    cursor.execute("SELECT COUNT(*) FROM SupplierMaster")
-    total_suppliers = cursor.fetchone()[0]
-
-    # Get from_date and to_date from form, default to current month
     today = datetime.datetime.now()
     current_date_str = today.strftime('%Y-%m-%d')
     if request.method == 'POST':
@@ -64,38 +107,17 @@ def dashboard():
         from_date = request.args.get('from_date', current_date_str)
         to_date = request.args.get('to_date', current_date_str)
 
-    # Total Purchase Bills (InvoiceDetails)
-    cursor.execute("SELECT COUNT(DISTINCT InvoiceNo) FROM InvoiceDetails WHERE InvoiceDateTime >= ? AND InvoiceDateTime <= ?", (from_date + ' 00:00:00', to_date + ' 23:59:59'))
-    total_purchase_bills = cursor.fetchone()[0]
-    # Total Sales Bills (DrugSlipDetails)
-    cursor.execute("SELECT COUNT(DISTINCT BillNo) FROM DrugSlipDetails WHERE BillDate >= ? AND BillDate <= ?", (from_date + ' 00:00:00', to_date + ' 23:59:59'))
-    total_sales_bills = cursor.fetchone()[0]
-    # Total Purchase Value
-    cursor.execute("SELECT ISNULL(SUM(Total),0) FROM InvoiceDetails WHERE InvoiceDateTime >= ? AND InvoiceDateTime <= ?", (from_date + ' 00:00:00', to_date + ' 23:59:59'))
-    total_purchase_value = round(cursor.fetchone()[0] or 0, 2)
-    # Total Sales Value
-    cursor.execute("SELECT ISNULL(SUM(Total),0) FROM DrugSlipDetails WHERE BillDate >= ? AND BillDate <= ?", (from_date + ' 00:00:00', to_date + ' 23:59:59'))
-    total_sales_value = round(cursor.fetchone()[0] or 0, 2)
-
-    # Sales Return Value
-    cursor.execute("SELECT ISNULL(SUM(ReturnQty * MRP),0) FROM SalesReturnDetails WHERE ReturnBillDateTime >= ? AND ReturnBillDateTime <= ?", (from_date + ' 00:00:00', to_date + ' 23:59:59'))
-    sales_return_value = round(cursor.fetchone()[0] or 0, 2)
-
-    # Purchase Return Value & Bill Count
-
-    # Sales Return Value & Bill Count
-    cursor.execute("IF OBJECT_ID('SalesReturnDetails', 'U') IS NOT NULL SELECT ISNULL(SUM(ReturnQty * MRP),0) FROM SalesReturnDetails WHERE ReturnBillDateTime >= ? AND ReturnBillDateTime <= ? ELSE SELECT 0", (from_date + ' 00:00:00', to_date + ' 23:59:59'))
-    sales_return_value = round(cursor.fetchone()[0] or 0, 2)
-    cursor.execute("IF OBJECT_ID('SalesReturnDetails', 'U') IS NOT NULL SELECT COUNT(DISTINCT ReturnBillNo) FROM SalesReturnDetails WHERE ReturnBillDateTime >= ? AND ReturnBillDateTime <= ? ELSE SELECT 0", (from_date + ' 00:00:00', to_date + ' 23:59:59'))
-    sales_return_count = cursor.fetchone()[0]
-
-    # Cashless Value & Bill Count (fix: cashless is cash = 'Y')
-    cursor.execute("SELECT ISNULL(SUM(Total),0) FROM DrugSlipDetails WHERE BillDate >= ? AND BillDate <= ? AND cash = 'Y'", (from_date + ' 00:00:00', to_date + ' 23:59:59'))
-    cashless_value = round(cursor.fetchone()[0] or 0, 2)
-    cursor.execute("SELECT COUNT(DISTINCT BillNo) FROM DrugSlipDetails WHERE BillDate >= ? AND BillDate <= ? AND cash = 'Y'", (from_date + ' 00:00:00', to_date + ' 23:59:59'))
-    cashless_count = cursor.fetchone()[0]
+    total_products = get_total_products()
+    total_suppliers = get_total_suppliers()
+    total_purchase_bills, total_purchase_value = get_purchase_metrics(from_date, to_date)
+    total_sales_bills, total_sales_value = get_sales_metrics(from_date, to_date)
+    sales_return_count, sales_return_value = get_sales_return_metrics(from_date, to_date)
+    cashless_count, cashless_value = get_cashless_metrics(from_date, to_date)
+    credit_count, credit_balance = get_credit_metrics(from_date, to_date)
 
     # Recent Sales grouped by BillNo (filtered by date)
+    conn = get_db_connection()
+    cursor = conn.cursor()
     cursor.execute("""
         SELECT BillNo, MIN(BillDate) AS BillDate, MAX(PatientName) AS PatientName
         FROM DrugSlipDetails
@@ -115,6 +137,38 @@ def dashboard():
         ORDER BY MIN(i.InvoiceDateTime) DESC
     """, (from_date + ' 00:00:00', to_date + ' 23:59:59'))
     recent_purchases = [dict(zip([column[0] for column in cursor.description], row)) for row in cursor.fetchall()]
+
+    # Recent Sales Returns grouped by ReturnBillNo (filtered by date)
+    cursor.execute("""
+        SELECT ReturnBillNo, MIN(ReturnBillDateTime) AS ReturnDate, MAX(PatientName) AS PatientName
+        FROM SalesReturnDetails
+        WHERE ReturnBillNo IS NOT NULL AND ReturnBillDateTime >= ? AND ReturnBillDateTime <= ?
+        GROUP BY ReturnBillNo
+        ORDER BY MIN(ReturnBillDateTime) DESC
+    """, (from_date + ' 00:00:00', to_date + ' 23:59:59'))
+    sales_return_rows = [dict(zip([column[0] for column in cursor.description], row)) for row in cursor.fetchall()]
+
+    # Recent Cashless Bills grouped by BillNo (filtered by date)
+    cursor.execute("""
+        SELECT BillNo, MIN(BillDate) AS BillDate, MAX(PatientName) AS PatientName
+        FROM DrugSlipDetails
+        WHERE BillNo IS NOT NULL AND BillDate >= ? AND BillDate <= ? AND cash = 'Y'
+        GROUP BY BillNo
+        ORDER BY MIN(BillDate) DESC
+    """, (from_date + ' 00:00:00', to_date + ' 23:59:59'))
+    recent_cashless = [dict(zip([column[0] for column in cursor.description], row)) for row in cursor.fetchall()]
+
+    # Recent Credit Bills grouped by BillNo (filtered by date)
+    cursor.execute("""
+        SELECT p.BillNo, p.BillDate, d.PatientID, d.PatientName, p.BalanceAmount
+        FROM PaymentDue p
+        INNER JOIN DrugSlipDetails d ON p.BillNo = d.BillNo AND p.BillDate = d.BillDate
+        WHERE p.DueStatus = 'CT' AND p.BillStatus = 'P' AND p.DueDate BETWEEN ? AND ?
+        GROUP BY p.BillNo, p.BillDate, d.PatientID, d.PatientName, p.BalanceAmount
+        ORDER BY p.BillDate DESC
+    """, (from_date + ' 00:00:00', to_date + ' 23:59:59'))
+    recent_credit = [dict(zip([column[0] for column in cursor.description], row)) for row in cursor.fetchall()]
+
     conn.close()
     return render_template('dashboard.html',
         total_products=total_products,
@@ -127,10 +181,15 @@ def dashboard():
         sales_return_count=sales_return_count,
         cashless_value=cashless_value,
         cashless_count=cashless_count,
+        credit_count=credit_count,
+        credit_balance=credit_balance,
         from_date=from_date,
         to_date=to_date,
         recent_sales=recent_sales,
-        recent_purchases=recent_purchases)
+        recent_purchases=recent_purchases,
+        sales_return_rows=sales_return_rows,
+        recent_cashless=recent_cashless,
+        recent_credit=recent_credit)
 
 @app.route('/get_suppliers', methods=['GET'])
 def get_suppliers():

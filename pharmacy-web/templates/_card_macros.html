@@ -1,0 +1,29 @@
+{# Jinja macro for dashboard cards #}
+{% macro dashboard_card(title, icon, value, subtitle=None, color_class='card-metric', extra_html='') %}
+<div class="{{ color_class }}" style="min-width:220px; display:flex; align-items:center; gap:18px;">
+    <i class="fa-solid {{ icon }}"></i>
+    <div>
+        <h2 style="font-size: 1.3rem; margin-bottom: 8px;">{{ title }}</h2>
+        {% if subtitle %}
+        <div style="font-size: 1.1rem; color: #e0e0e0;">{{ subtitle }}</div>
+        {% endif %}
+        <div style="font-size: 2.2rem; font-weight: bold;">{{ value }}</div>
+        {{ extra_html|safe }}
+    </div>
+</div>
+{% endmacro %}
+
+{# Macro for combo cards (Bills & Value) #}
+{% macro dashboard_combo_card(title, icon, bills, value, bills_label='Bills', value_label='Value', color_class='card-metric', bills_color='#e0e0e0', value_color='#e0e0e0', extra_html='') %}
+<div class="{{ color_class }}" style="min-width:220px; display:flex; align-items:center; gap:18px;">
+    <i class="fa-solid {{ icon }}"></i>
+    <div>
+        <h2 style="font-size: 1.3rem; margin-bottom: 8px;">{{ title }}</h2>
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+            <span style="font-size: 1.1rem; color: {{ bills_color }};">{{ bills_label }}: <span style="font-size: 1.5rem; font-weight: bold; color: #fff;">{{ bills }}</span></span>
+            <span style="font-size: 1.1rem; color: {{ value_color }};">{{ value_label }}: <span style="font-size: 1.5rem; font-weight: bold; color: #fff;">{{ value }}</span></span>
+        </div>
+        {{ extra_html|safe }}
+    </div>
+</div>
+{% endmacro %}

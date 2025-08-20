@@ -1,0 +1,5 @@
+{% import '_table_macros.html' as tmacros %}
+<h2 style="margin-bottom:18px; color:#007bff;">Sales Return (Filtered by Date Range)</h2>
+<div style="max-height:400px; overflow-y:auto;">
+    {{ tmacros.neat_table(['Return Bill No', 'Return Date', 'Patient Name', 'View'], sales_return_rows, view_type='salesreturn') }}
+</div>

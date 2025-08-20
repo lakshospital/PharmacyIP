@@ -1,0 +1,83 @@
+{# Jinja macro for rendering tables #}
+{% macro neat_table(headers, rows, view_type=None) %}
+<table class="neat-table">
+    <thead>
+        <tr>
+        {% for header in headers %}
+            <th>{{ header }}</th>
+        {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in rows %}
+            <tr>
+                {% if view_type == 'sales' %}
+                    <td>{{ row['BillNo'] }}</td>
+                    <td>
+                        {% if row['BillDate'] %}
+                            {{ row['BillDate'].strftime('%d/%b/%Y')|upper }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>{{ row['PatientName'] }}</td>
+                    <td>
+                        <a href="/billdetails?bill_no={{ row['BillNo'] }}" target="_blank" class="neat-btn neat-btn-view">
+                            <i class="fa-solid fa-eye"></i> View Details
+                        </a>
+                    </td>
+                {% elif view_type == 'purchase' %}
+                    <td>{{ row['InvoiceNo'] }}</td>
+                    <td>
+                        {% if row['InvoiceDateTime'] %}
+                            {{ row['InvoiceDateTime'].strftime('%d/%b/%Y')|upper }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>{{ row['SupplierName'] }}</td>
+                    <td>
+                        <a href="/purchasedetails?invoice_no={{ row['InvoiceNo'] }}" target="_blank" class="neat-btn neat-btn-view" style="background: #ffb347;">
+                            <i class="fa-solid fa-eye"></i> View Details
+                        </a>
+                    </td>
+                {% elif view_type == 'salesreturn' %}
+                    <td>{{ row['ReturnBillNo'] }}</td>
+                    <td>
+                        {% if row['ReturnDate'] %}
+                            {{ row['ReturnDate'].strftime('%d/%b/%Y')|upper }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>{{ row['PatientName'] }}</td>
+                    <td>
+                        <a href="/salesreturnview?return_bill_no={{ row['ReturnBillNo'] }}" target="_blank" class="neat-btn neat-btn-view" style="background: #ffc371; color: #333;">
+                            <i class="fa-solid fa-eye"></i> View Details
+                        </a>
+                    </td>
+                {% elif view_type == 'cashless' %}
+                    <td>{{ row['BillNo'] }}</td>
+                    <td>
+                        {% if row['BillDate'] %}
+                            {{ row['BillDate'].strftime('%d/%b/%Y')|upper }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>{{ row['PatientName'] }}</td>
+                    <td>
+                        <a href="/billdetails?bill_no={{ row['BillNo'] }}" target="_blank" class="neat-btn neat-btn-view">
+                            <i class="fa-solid fa-eye"></i> View Details
+                        </a>
+                    </td>
+                {% else %}
+                    {% for cell in row.values() %}
+                        <td>{{ cell }}</td>
+                    {% endfor %}
+                {% endif %}
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endmacro %}

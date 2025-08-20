@@ -1,0 +1,22 @@
+/* Dashboard card styles - simple and neat */
+.card-metric {
+	background: #fff;
+	border-radius: 8px;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+	padding: 24px;
+	min-width: 220px;
+	max-width: 260px;
+	width: 240px;
+	display: flex;
+	align-items: center;
+	gap: 18px;
+	flex: none;
+}
+.card-products {background: #4e54c8; color: #fff;}
+.card-suppliers {background: #43cea2; color: #fff;}
+.card-purchase-combo {background: #0072ff; color: #fff;}
+.card-sales-combo {background: #ff5f6d; color: #fff;}
+.card-sales-return-combo {background: #ffc371; color: #333;}
+.card-cashless-combo {background: #36d1c4; color: #fff;}
+.card-credit-combo {background: #f7b731; color: #333;}
+.card-metric .fa-solid {font-size: 2.5rem; margin-right: 10px;}

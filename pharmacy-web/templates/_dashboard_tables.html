@@ -1,0 +1,9 @@
+{% import '_table_macros.html' as tmacros %}
+<h2 style="margin-bottom:18px; color:#007bff;">Sales (Filtered by Date Range)</h2>
+<div style="max-height:400px; overflow-y:auto;">
+    {{ tmacros.neat_table(['Bill No', 'Bill Date', 'Patient Name', 'View'], recent_sales, view_type='sales') }}
+</div>
+<h2 style="margin-bottom:18px; color:#007bff;">Purchases (Filtered by Date Range)</h2>
+<div style="max-height:400px; overflow-y:auto;">
+    {{ tmacros.neat_table(['Invoice No', 'Invoice Date', 'Supplier', 'View'], recent_purchases, view_type='purchase') }}
+</div>

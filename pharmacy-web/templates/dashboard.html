@@ -3,6 +3,7 @@
 <head>
     <title>Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/dashboard.css">
     <style>
         .navbar {background-color: #007bff; padding: 0; margin-bottom: 20px; border-radius: 0 0 8px 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);}
         .navbar-menu {list-style: none; margin: 0; padding: 0 20px; display: flex; align-items: center; height: 48px;}
@@ -14,224 +15,183 @@
         .dropdown-menu li a:hover {background: #f2f2f2;}
         .navbar-menu > li.dropdown:hover .dropdown-menu {display: block;}
         @media (max-width: 700px) {.navbar-menu {flex-direction: column; height: auto;} .navbar-menu > li {width: 100%;} .navbar-menu > li > a {padding: 0 10px;} .dropdown-menu {position: static; box-shadow: none; min-width: 100%;}}
-        .card-metric {background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); padding: 24px; flex: 1; min-width: 220px; display: flex; align-items: center; gap: 18px;}
-        .card-products {background: linear-gradient(90deg, #4e54c8 0%, #8f94fb 100%); color: #fff;}
-        .card-suppliers {background: linear-gradient(90deg, #43cea2 0%, #185a9d 100%); color: #fff;}
-        .card-purchase {background: linear-gradient(90deg, #ffb347 0%, #ffcc33 100%); color: #fff;}
-        .card-sales {background: linear-gradient(90deg, #ff5f6d 0%, #ffc371 100%); color: #fff;}
-        .card-value {background: linear-gradient(90deg, #36d1c4 0%, #b2fefa 100%); color: #fff;}
-        .card-metric .fa-solid {font-size: 2.5rem; margin-right: 10px;}
         .loading-spinner {display: none; justify-content: center; align-items: center; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(255,255,255,0.7); z-index: 9999;}
         .loading-spinner .fa-spinner {font-size: 3rem; color: #007bff; animation: spin 1s linear infinite;}
         @keyframes spin {100% {transform: rotate(360deg);}}
+        .accordion {
+            background: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            margin-bottom: 24px;
+        }
+        .accordion-header {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 18px 24px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #007bff;
+            border-bottom: 1px solid #e3e3e3;
+            user-select: none;
+        }
+        .accordion-header .fa-chevron-down {
+            margin-right: 12px;
+            transition: transform 0.2s;
+        }
+        .accordion-header.active .fa-chevron-down {
+            transform: rotate(180deg);
+        }
+        .accordion-content {
+            display: none;
+            padding: 18px 24px;
+            background: #fff;
+            border-radius: 0 0 8px 8px;
+        }
+        .accordion-content.open {
+            display: block;
+        }
+        .accordion-content.purchases-scroll {
+            max-height: 350px;
+            overflow-x: auto;
+            overflow-y: auto;
+        }
+        .accordion-content.sales-scroll {
+            max-height: 350px;
+            overflow-x: auto;
+            overflow-y: auto;
+        }
+        .accordion-content.cashless-scroll {
+            max-height: 600px;
+            overflow-x: auto;
+            overflow-y: auto;
+        }
+        .neat-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #f9f9f9;
+            border-radius: 8px;
+            overflow: hidden;
+            font-size: 1rem;
+        }
+        .neat-table th, .neat-table td {
+            padding: 12px 14px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .neat-table th {
+            background: #f3f3f3;
+            color: #444;
+            font-weight: bold;
+        }
+        .neat-table tr:last-child td {
+            border-bottom: none;
+        }
+        .neat-table tbody tr:hover {
+            background: #eaf6ff;
+        }
+        .neat-btn {
+            background: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 7px 16px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.98rem;
+            transition: background 0.2s;
+        }
+        .neat-btn-view {
+            background: #ff5f6d;
+        }
+        .neat-btn-view:hover {
+            background: #e04c4c;
+        }
+        .neat-btn:hover {
+            background: #0056b3;
+        }
     </style>
 </head>
 <body>
     {% include '_navbar.html' %}
     <div style="max-width: 100%; margin: 0 auto; padding-left: 2%; padding-right: 2%; padding-top: 4px; padding-bottom: 24px; width: 96%; box-sizing: border-box;">
         <h1 style="color: #007bff; font-size: 2.5rem; margin-bottom: 18px;">Pharmacy Dashboard</h1>
-    <form method="post" style="margin-bottom: 24px; display: flex; gap: 16px; align-items: center;" onsubmit="showLoading()">
-    <div class="loading-spinner" id="loadingSpinner">
-        <i class="fa-solid fa-spinner"></i>
-    </div>
+        <form method="post" style="margin-bottom: 24px; display: flex; gap: 16px; align-items: center;" onsubmit="showLoading()">
+            <div class="loading-spinner" id="loadingSpinner">
+                <i class="fa-solid fa-spinner"></i>
+            </div>
             <label for="from_date" style="font-weight: bold; color: #333;">From Date:</label>
             <input type="date" id="from_date" name="from_date" value="{{ from_date }}" style="padding: 6px 12px; border-radius: 4px; border: 1px solid #ccc;">
             <label for="to_date" style="font-weight: bold; color: #333;">To Date:</label>
             <input type="date" id="to_date" name="to_date" value="{{ to_date }}" style="padding: 6px 12px; border-radius: 4px; border: 1px solid #ccc;">
-    <script>
-    // Persist date selection using localStorage
-    window.addEventListener('DOMContentLoaded', function() {
-        const fromDateInput = document.getElementById('from_date');
-        const toDateInput = document.getElementById('to_date');
-        // Restore saved dates if present
-        if(localStorage.getItem('dashboard_from_date')) {
-            fromDateInput.value = localStorage.getItem('dashboard_from_date');
-        }
-        if(localStorage.getItem('dashboard_to_date')) {
-            toDateInput.value = localStorage.getItem('dashboard_to_date');
-        }
-        // Save dates on form submit
-        const dashboardForm = fromDateInput.form;
-        dashboardForm.addEventListener('submit', function() {
-            localStorage.setItem('dashboard_from_date', fromDateInput.value);
-            localStorage.setItem('dashboard_to_date', toDateInput.value);
-        });
-    });
-    </script>
+    <script src="/static/dashboard.js"></script>
             <button type="submit" style="background: #007bff; color: #fff; border: none; border-radius: 4px; padding: 8px 18px; font-weight: bold; cursor: pointer;">Filter</button>
         </form>
-        <div style="display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 32px;">
-            <div class="card-metric card-products">
-                <i class="fa-solid fa-capsules"></i>
-                <div>
-                    <h2 style="font-size: 1.3rem; margin-bottom: 8px;">Total Products</h2>
-                    <div style="font-size: 2.2rem; font-weight: bold;">{{ total_products }}</div>
-                </div>
+    {% include '_dashboard_cards.html' %}
+        <!-- Accordion for Sales -->
+        <div class="accordion">
+            <div class="accordion-header" onclick="toggleAccordion(this)"><i class="fa fa-chevron-down"></i> Sales (Filtered by Date Range)</div>
+            <div class="accordion-content sales-scroll">
+                {% import '_table_macros.html' as tmacros %}
+                {{ tmacros.neat_table(['Bill No', 'Bill Date', 'Patient Name', 'View'], recent_sales, view_type='sales') }}
             </div>
-            <div class="card-metric card-suppliers" id="suppliersCard" style="cursor:pointer;">
-                <i class="fa-solid fa-truck"></i>
-                <div>
-                    <h2 style="font-size: 1.3rem; margin-bottom: 8px;">Total Suppliers</h2>
-                    <div style="font-size: 2.2rem; font-weight: bold;">{{ total_suppliers }}</div>
-                </div>
-            </div>
-                <div class="card-metric card-purchase-combo" id="purchaseCard" style="background: linear-gradient(90deg, #00c6ff 0%, #0072ff 100%); color: #fff; cursor:pointer;">
-                    <i class="fa-solid fa-file-invoice-dollar"></i>
-                    <div>
-                        <h2 style="font-size: 1.3rem; margin-bottom: 8px;">Total Purchase</h2>
-                        <div style="display: flex; flex-direction: column; gap: 4px;">
-                            <span style="font-size: 1.1rem; color: #e0e0e0;">Bills: <span style="font-size: 1.5rem; font-weight: bold; color: #fff;">{{ total_purchase_bills }}</span></span>
-                            <span style="font-size: 1.1rem; color: #e0e0e0;">Value: <span style="font-size: 1.5rem; font-weight: bold; color: #fff;">{{ '{:,.2f}'.format(total_purchase_value) }}</span></span>
-                        </div>
-                    </div>
-                </div>
-            <div class="card-metric card-sales-combo" id="salesCard" style="background: linear-gradient(90deg, #ff5f6d 0%, #ffc371 100%); color: #fff; cursor:pointer;">
-                <i class="fa-solid fa-receipt"></i>
-                <div>
-                    <h2 style="font-size: 1.3rem; margin-bottom: 8px;">Total Sales</h2>
-                    <div style="display: flex; flex-direction: column; gap: 4px;">
-                        <span style="font-size: 1.1rem; color: #ffe3e3;">Bills: <span style="font-size: 1.5rem; font-weight: bold; color: #fff;">{{ total_sales_bills }}</span></span>
-                        <span style="font-size: 1.1rem; color: #ffe3e3;">Value: <span style="font-size: 1.5rem; font-weight: bold; color: #fff;">{{ '{:,.2f}'.format(total_sales_value) }}</span></span>
-                    </div>
-                </div>
-            </div>
-                <div class="card-metric card-sales-return-combo" style="background: linear-gradient(90deg, #ff5f6d 0%, #ffc371 100%); color: #fff;">
-                    <i class="fa-solid fa-arrow-rotate-right"></i>
-                    <div>
-                        <h2 style="font-size: 1.3rem; margin-bottom: 8px;">Sales Return</h2>
-                        <div style="display: flex; flex-direction: column; gap: 4px;">
-                            <span style="font-size: 1.1rem; color: #ffe3e3;">Bills: <span style="font-size: 1.5rem; font-weight: bold; color: #fff;">{{ sales_return_count }}</span></span>
-                            <span style="font-size: 1.1rem; color: #ffe3e3;">Value: <span style="font-size: 1.5rem; font-weight: bold; color: #fff;">{{ '{:,.2f}'.format(sales_return_value) }}</span></span>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-metric card-cashless-combo" style="background: linear-gradient(90deg, #36d1c4 0%, #b2fefa 100%); color: #fff;">
-                    <i class="fa-solid fa-money-bill-wave"></i>
-                    <div>
-                        <h2 style="font-size: 1.3rem; margin-bottom: 8px;">Cashless</h2>
-                        <div style="display: flex; flex-direction: column; gap: 4px;">
-                            <span style="font-size: 1.1rem; color: #e0f7fa;">Bills: <span style="font-size: 1.5rem; font-weight: bold; color: #fff;">{{ cashless_count }}</span></span>
-                            <span style="font-size: 1.1rem; color: #e0f7fa;">Value: <span style="font-size: 1.5rem; font-weight: bold; color: #fff;">{{ '{:,.2f}'.format(cashless_value) }}</span></span>
-                        </div>
-                    </div>
-                </div>
         </div>
+        <!-- Accordion for Purchases -->
+        <div class="accordion">
+            <div class="accordion-header" onclick="toggleAccordion(this)"><i class="fa fa-chevron-down"></i> Purchases (Filtered by Date Range)</div>
+            <div class="accordion-content purchases-scroll">
+                {% import '_table_macros.html' as tmacros %}
+                {{ tmacros.neat_table(['Invoice No', 'Invoice Date', 'Supplier Name', 'View'], recent_purchases, view_type='purchase') }}
+            </div>
+        </div>
+        <!-- Accordion for Sales Return -->
+        <div class="accordion">
+            <div class="accordion-header" onclick="toggleAccordion(this)"><i class="fa fa-chevron-down"></i> Sales Return (Filtered by Date Range)</div>
+            <div class="accordion-content">
+                {% import '_table_macros.html' as tmacros %}
+                {{ tmacros.neat_table(['Return Bill No', 'Return Date', 'Patient Name', 'View'], sales_return_rows, view_type='salesreturn') }}
+            </div>
+        </div>
+
+        <!-- Accordion for Cashless -->
+        <div class="accordion">
+            <div class="accordion-header" onclick="toggleAccordion(this)"><i class="fa fa-chevron-down"></i> Cashless (Filtered by Date Range)</div>
+            <div class="accordion-content cashless-scroll">
+                {% import '_table_macros.html' as tmacros %}
+                {{ tmacros.neat_table(['Bill No', 'Bill Date', 'Patient Name', 'View'], recent_cashless, view_type='cashless') }}
+            </div>
+        </div>
+
+            <!-- Accordion for Credit To Be Paid -->
+            <div class="accordion">
+                <div class="accordion-header" onclick="toggleAccordion(this)"><i class="fa fa-chevron-down"></i> Credit To Be Paid (Filtered by Date Range)</div>
+                <div class="accordion-content cashless-scroll">
+                    {% import '_table_macros.html' as tmacros %}
+                    {{ tmacros.neat_table(['Bill No', 'Bill Date', 'Patient ID', 'Patient Name', 'Balance Amount'], recent_credit, view_type='credit') }}
+                </div>
+            </div>
+    </div>
     <script>
         function showLoading() {
             document.getElementById('loadingSpinner').style.display = 'flex';
         }
-    </script>
-        <div style="margin-top: 24px; display: flex; gap: 32px; flex-wrap: wrap;">
-            <div style="flex: 1; min-width: 400px;">
-                <!-- Sales table moved to modal -->
-    <!-- Sales Details Modal -->
-    <div id="salesModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.3); z-index:9999; justify-content:center; align-items:center;">
-        <div style="background:#fff; border-radius:12px; padding:32px 24px; min-width:400px; max-width:90vw; box-shadow:0 2px 16px rgba(0,0,0,0.15);">
-            <h2 style="margin-bottom:18px; color:#007bff;">Sales (Filtered by Date Range)</h2>
-            <div style="max-height:400px; overflow-y:auto;">
-                <table class="neat-table">
-                    <thead>
-                        <tr>
-                            <th>Bill No</th>
-                            <th>Bill Date</th>
-                            <th>Patient Name</th>
-                            <th>View</th>
-                        </tr>
-                    </thead>
-                    <tbody id="salesTableBody">
-                        <!-- Populated by JS -->
-                    </tbody>
-                </table>
-            </div>
-            <button onclick="closeSalesModal()" class="neat-btn" style="margin-top:18px; background:#007bff;">Close</button>
-        </div>
-    </div>
-    <script>
-    document.getElementById('salesCard').onclick = function() {
-        fetch('/get_sales?from_date={{ from_date }}&to_date={{ to_date }}')
-            .then(response => response.json())
-            .then(data => {
-                const tbody = document.getElementById('salesTableBody');
-                tbody.innerHTML = '';
-                data.sales.forEach(sale => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${sale.BillNo}</td>
-                        <td>${sale.BillDate}</td>
-                        <td>${sale.PatientName}</td>
-                        <td>
-                            <a href='/billdetails?bill_no=${sale.BillNo}' target='_blank' class='neat-btn neat-btn-view'>
-                                <i class='fa-solid fa-eye'></i> View Details
-                            </a>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-                document.getElementById('salesModal').style.display = 'flex';
+        function toggleAccordion(header) {
+            var content = header.nextElementSibling;
+            var isOpen = content.classList.contains('open');
+            // Collapse all
+            document.querySelectorAll('.accordion-header').forEach(function(h) {
+                h.classList.remove('active');
             });
-    };
-    function closeSalesModal() {
-        document.getElementById('salesModal').style.display = 'none';
-    }
-    </script>
-            </div>
-            <div style="flex: 1; min-width: 400px;">
-                <div style="background: #fff; color: #333; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); padding: 18px 18px 8px 18px; margin-bottom: 18px;">
-                    <!-- Purchases table moved to modal -->
-    <!-- Purchase Details Modal -->
-    <div id="purchaseModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.3); z-index:9999; justify-content:center; align-items:center;">
-        <div style="background:#fff; border-radius:12px; padding:32px 24px; min-width:400px; max-width:90vw; box-shadow:0 2px 16px rgba(0,0,0,0.15);">
-            <h2 style="margin-bottom:18px; color:#007bff;">Purchases (Filtered by Date Range)</h2>
-            <div style="max-height:400px; overflow-y:auto;">
-                <table class="neat-table">
-                    <thead>
-                        <tr>
-                            <th>Invoice No</th>
-                            <th>Invoice Date</th>
-                            <th>Supplier</th>
-                            <th>View</th>
-                        </tr>
-                    </thead>
-                    <tbody id="purchaseTableBody">
-                        <!-- Populated by JS -->
-                    </tbody>
-                </table>
-            </div>
-            <button onclick="closePurchaseModal()" class="neat-btn" style="margin-top:18px; background:#007bff;">Close</button>
-        </div>
-    </div>
-    <script>
-    document.getElementById('purchaseCard').onclick = function() {
-        // Show loading spinner if needed
-        fetch('/get_purchases?from_date={{ from_date }}&to_date={{ to_date }}')
-            .then(response => response.json())
-            .then(data => {
-                const tbody = document.getElementById('purchaseTableBody');
-                tbody.innerHTML = '';
-                data.purchases.forEach(purchase => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${purchase.InvoiceNo}</td>
-                        <td>${purchase.InvoiceDateTime}</td>
-                        <td>${purchase.SupplierName}</td>
-                        <td>
-                            <a href='/purchasedetails?invoice_no=${purchase.InvoiceNo}' target='_blank' class='neat-btn neat-btn-view' style='background: #ffb347;'>
-                                <i class='fa-solid fa-eye'></i> View Details
-                            </a>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-                document.getElementById('purchaseModal').style.display = 'flex';
+            document.querySelectorAll('.accordion-content').forEach(function(c) {
+                c.classList.remove('open');
             });
-    };
-    function closePurchaseModal() {
-        document.getElementById('purchaseModal').style.display = 'none';
-    }
+            // Toggle selected
+            if (!isOpen) {
+                header.classList.add('active');
+                content.classList.add('open');
+            }
+        }
     </script>
-                </div>
-            </div>
-        </div>
     <!-- Supplier Details Modal -->
     <div id="supplierModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.3); z-index:9999; justify-content:center; align-items:center;">
         <div style="background:#fff; border-radius:12px; padding:32px 24px; min-width:400px; max-width:90vw; box-shadow:0 2px 16px rgba(0,0,0,0.15);">
@@ -276,52 +236,5 @@
         document.getElementById('supplierModal').style.display = 'none';
     }
     </script>
-        <style>
-            .neat-table {
-                width: 100%;
-                border-collapse: collapse;
-                background: #f9f9f9;
-                border-radius: 8px;
-                overflow: hidden;
-                font-size: 1rem;
-            }
-            .neat-table th, .neat-table td {
-                padding: 12px 14px;
-                text-align: left;
-                border-bottom: 1px solid #e0e0e0;
-            }
-            .neat-table th {
-                background: #f3f3f3;
-                color: #444;
-                font-weight: bold;
-            }
-            .neat-table tr:last-child td {
-                border-bottom: none;
-            }
-            .neat-table tbody tr:hover {
-                background: #eaf6ff;
-            }
-            .neat-btn {
-                background: #007bff;
-                color: #fff;
-                border: none;
-                border-radius: 8px;
-                padding: 7px 16px;
-                font-weight: bold;
-                cursor: pointer;
-                font-size: 0.98rem;
-                transition: background 0.2s;
-            }
-            .neat-btn-view {
-                background: #ff5f6d;
-            }
-            .neat-btn-view:hover {
-                background: #e04c4c;
-            }
-            .neat-btn:hover {
-                background: #0056b3;
-            }
-        </style>
-    </div>
 </body>
 </html>

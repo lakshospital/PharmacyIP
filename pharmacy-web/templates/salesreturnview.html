@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Purchase Details</title>
+    <style>
+        .navbar {background-color: #007bff; padding: 0; margin-bottom: 20px; border-radius: 0 0 8px 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);}
+        .navbar-menu {list-style: none; margin: 0; padding: 0 20px; display: flex; align-items: center; height: 48px;}
+        .navbar-menu > li {position: relative;}
+        .navbar-menu > li > a {display: block; color: #fff; text-decoration: none; padding: 0 18px; line-height: 48px; font-weight: bold; transition: background 0.2s; border-radius: 4px;}
+        .navbar-menu > li > a:hover, .navbar-menu > li.dropdown:hover > a {background: #0056b3;}
+        .dropdown-menu {display: none; position: absolute; background: #fff; min-width: 160px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-radius: 4px; top: 48px; left: 0; z-index: 1000; padding: 6px 0;}
+        .dropdown-menu li a {color: #333; padding: 8px 18px; display: block; text-decoration: none; border-radius: 0; font-weight: normal;}
+        .dropdown-menu li a:hover {background: #f2f2f2;}
+        .navbar-menu > li.dropdown:hover .dropdown-menu {display: block;}
+        @media (max-width: 700px) {.navbar-menu {flex-direction: column; height: auto;} .navbar-menu > li {width: 100%;} .navbar-menu > li > a {padding: 0 10px;} .dropdown-menu {position: static; box-shadow: none; min-width: 100%;}}
+    </style>
+</head>
+<body>
+    {% include '_navbar.html' %}
+<div style="text-align:center; margin-top:20px;">
+    <h2 style="font-weight:bold; margin-bottom:0;">Lakshmi Hospitals - Pharmacy</h2>
+    <div>101 A, Madurai Road, Tirunelveli</div>
+    <div>Ph: 0462 2334812</div>
+    <div style="margin-bottom:10px;">Bill Printed As On: {{ print_time }}</div>
+</div>
+<table style="width:100%; border-collapse:collapse; margin-bottom:10px;">
+    <tr>
+        <td><strong>Bill No:</strong> {{ header_data.ReturnBillNo }}</td>
+        <td><strong>Bill Date:</strong> {{ header_data.ReturnBillDateTime }}</td>
+    </tr>
+    <tr>
+        <td><strong>Dr. Name:</strong> {{ header_data.DrName }}</td>
+        <td><strong>Case:</strong> {{ header_data.Case if header_data.Case is defined else '' }}</td>
+    </tr>
+    <tr>
+        <td><strong>Patient ID:</strong> {{ header_data.PatientID }}</td>
+        <td><strong>Patient Name:</strong> {{ header_data.PatientName }}</td>
+    </tr>
+</table>
+<table style="width:100%; border-collapse:collapse; border:1px solid #333;">
+    <thead>
+        <tr style="background:#f8f8f8;">
+            <th style="border:1px solid #333;">Product Name</th>
+            <th style="border:1px solid #333;">Batch No</th>
+            <th style="border:1px solid #333;">Exp. Date</th>
+            <th style="border:1px solid #333;">Qty</th>
+            <th style="border:1px solid #333;">MRP</th>
+            <th style="border:1px solid #333;">Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in rows %}
+        <tr>
+            <td style="border:1px solid #333;">{{ row.ProductName }}</td>
+            <td style="border:1px solid #333;">{{ row.BatchNo }}</td>
+            <td style="border:1px solid #333;">{{ row.ExpDate }}</td>
+            <td style="border:1px solid #333;">{{ row.ReturnQty }}</td>
+            <td style="border:1px solid #333;">{{ row.MRP }}</td>
+            <td style="border:1px solid #333;">{{ row.Total }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="5" style="text-align:right; font-weight:bold; border:1px solid #333;">Total Rs.</td>
+            <td style="font-weight:bold; border:1px solid #333;">{{ grand_total }}</td>
+        </tr>
+    </tfoot>
+</table>
+</body>
+</html>
