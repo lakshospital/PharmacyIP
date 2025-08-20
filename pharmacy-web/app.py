@@ -20,6 +20,7 @@ database = 'Pharmacy'
 @app.route('/salesreturnview', methods=['GET'])
 def salesreturnview():
     return_bill_no = request.args.get('return_bill_no')
+    return_date = request.args.get('return_date')
     rows = []
     header_data = {}
     print_time = None
@@ -29,33 +30,45 @@ def salesreturnview():
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            # Get year from ReturnBillDateTime for the return_bill_no
-            cursor.execute("SELECT TOP 1 YEAR(ReturnBillDateTime) FROM SalesReturnDetails WHERE ReturnBillNo = ?", (return_bill_no,))
-            year_row = cursor.fetchone()
-            if year_row:
-                year = year_row[0]
+            if return_date:
+                # Use both return_bill_no and return_date for unique selection
                 sql_query = """
                     SELECT ReturnBillNo, ReturnBillDateTime, SalesBillNo, SalesBillDate, DrName, PatientID, PatientName, SNo, ProductName, ReturnQty, InvoiceNo, BatchNo, MRP, VAT, Total
                     FROM SalesReturnDetails
-                    WHERE ReturnBillNo = ? AND YEAR(ReturnBillDateTime) = ?
+                    WHERE ReturnBillNo = ? AND CONVERT(VARCHAR(10), ReturnBillDateTime, 120) = ?
                 """
-                cursor.execute(sql_query, (return_bill_no, year))
+                cursor.execute(sql_query, (return_bill_no, return_date))
                 all_rows_for_bill = cursor.fetchall()
-                conn.close()
-                if all_rows_for_bill:
-                    print_time = datetime.datetime.now().strftime('%d/%b/%Y %I:%M:%S %p')
-                    first_row = all_rows_for_bill[0]
-                    header_data = {
-                        'ReturnBillNo': first_row.ReturnBillNo,
-                        'ReturnBillDateTime': first_row.ReturnBillDateTime,
-                        'SalesBillNo': first_row.SalesBillNo,
-                        'SalesBillDate': first_row.SalesBillDate,
-                        'DrName': first_row.DrName,
-                        'PatientID': first_row.PatientID,
-                        'PatientName': first_row.PatientName
-                    }
-                    rows = all_rows_for_bill
-                    grand_total = sum(getattr(row, 'Total', 0) for row in rows)
+            else:
+                # Get year from ReturnBillDateTime for the return_bill_no
+                cursor.execute("SELECT TOP 1 YEAR(ReturnBillDateTime) FROM SalesReturnDetails WHERE ReturnBillNo = ?", (return_bill_no,))
+                year_row = cursor.fetchone()
+                if year_row:
+                    year = year_row[0]
+                    sql_query = """
+                        SELECT ReturnBillNo, ReturnBillDateTime, SalesBillNo, SalesBillDate, DrName, PatientID, PatientName, SNo, ProductName, ReturnQty, InvoiceNo, BatchNo, MRP, VAT, Total
+                        FROM SalesReturnDetails
+                        WHERE ReturnBillNo = ? AND YEAR(ReturnBillDateTime) = ?
+                    """
+                    cursor.execute(sql_query, (return_bill_no, year))
+                    all_rows_for_bill = cursor.fetchall()
+                else:
+                    all_rows_for_bill = []
+            conn.close()
+            if all_rows_for_bill:
+                print_time = datetime.datetime.now().strftime('%d/%b/%Y %I:%M:%S %p')
+                first_row = all_rows_for_bill[0]
+                header_data = {
+                    'ReturnBillNo': first_row.ReturnBillNo,
+                    'ReturnBillDateTime': first_row.ReturnBillDateTime,
+                    'SalesBillNo': first_row.SalesBillNo,
+                    'SalesBillDate': first_row.SalesBillDate,
+                    'DrName': first_row.DrName,
+                    'PatientID': first_row.PatientID,
+                    'PatientName': first_row.PatientName
+                }
+                rows = all_rows_for_bill
+                grand_total = sum(getattr(row, 'Total', 0) for row in rows)
         except Exception as e:
             print(f"Database error: {e}")
     return render_template('salesreturnview.html', rows=rows, header_data=header_data, print_time=print_time, grand_total=grand_total)
@@ -115,50 +128,53 @@ def dashboard():
     cashless_count, cashless_value = get_cashless_metrics(from_date, to_date)
     credit_count, credit_balance = get_credit_metrics(from_date, to_date)
 
-    # Recent Sales grouped by BillNo (filtered by date)
+    # Recent Sales grouped by BillNo and BillDate (filtered by date)
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT BillNo, MIN(BillDate) AS BillDate, MAX(PatientName) AS PatientName
+        SELECT BillNo, BillDate, MAX(PatientName) AS PatientName
         FROM DrugSlipDetails
         WHERE BillNo IS NOT NULL AND BillDate >= ? AND BillDate <= ?
-        GROUP BY BillNo
-        ORDER BY MIN(BillDate) DESC
+        GROUP BY BillNo, BillDate
+        ORDER BY BillDate DESC
     """, (from_date + ' 00:00:00', to_date + ' 23:59:59'))
     recent_sales = [dict(zip([column[0] for column in cursor.description], row)) for row in cursor.fetchall()]
 
-    # Recent Purchases grouped by InvoiceNo (filtered by date)
+    # Recent Purchases grouped by InvoiceNo and InvoiceDateTime (filtered by date)
     cursor.execute("""
-        SELECT i.InvoiceNo, MIN(i.InvoiceDateTime) AS InvoiceDateTime, MAX(s.SupplierName) AS SupplierName
+        SELECT i.InvoiceNo, i.InvoiceDateTime, MAX(s.SupplierName) AS SupplierName
         FROM InvoiceDetails i
         LEFT JOIN SupplierMaster s ON i.SupplierID = s.SupplierID
         WHERE i.InvoiceNo IS NOT NULL AND i.InvoiceDateTime >= ? AND i.InvoiceDateTime <= ?
-        GROUP BY i.InvoiceNo
-        ORDER BY MIN(i.InvoiceDateTime) DESC
+        GROUP BY i.InvoiceNo, i.InvoiceDateTime
+        ORDER BY i.InvoiceDateTime DESC
     """, (from_date + ' 00:00:00', to_date + ' 23:59:59'))
     recent_purchases = [dict(zip([column[0] for column in cursor.description], row)) for row in cursor.fetchall()]
 
-    # Recent Sales Returns grouped by ReturnBillNo (filtered by date)
+    # Recent Sales Returns grouped by ReturnBillNo and ReturnDate (filtered by date)
     cursor.execute("""
-        SELECT ReturnBillNo, MIN(ReturnBillDateTime) AS ReturnDate, MAX(PatientName) AS PatientName
-        FROM SalesReturnDetails
-        WHERE ReturnBillNo IS NOT NULL AND ReturnBillDateTime >= ? AND ReturnBillDateTime <= ?
-        GROUP BY ReturnBillNo
-        ORDER BY MIN(ReturnBillDateTime) DESC
+        SELECT ReturnBillNo, ReturnDate, MAX(PatientName) AS PatientName
+        FROM (
+            SELECT ReturnBillNo, ReturnBillDateTime AS ReturnDate, PatientName
+            FROM SalesReturnDetails
+            WHERE ReturnBillNo IS NOT NULL AND ReturnBillDateTime >= ? AND ReturnBillDateTime <= ?
+        ) AS sub
+        GROUP BY ReturnBillNo, ReturnDate
+        ORDER BY ReturnDate DESC
     """, (from_date + ' 00:00:00', to_date + ' 23:59:59'))
     sales_return_rows = [dict(zip([column[0] for column in cursor.description], row)) for row in cursor.fetchall()]
 
-    # Recent Cashless Bills grouped by BillNo (filtered by date)
+    # Recent Cashless Bills grouped by BillNo and BillDate (filtered by date)
     cursor.execute("""
-        SELECT BillNo, MIN(BillDate) AS BillDate, MAX(PatientName) AS PatientName
+        SELECT BillNo, BillDate, MAX(PatientName) AS PatientName
         FROM DrugSlipDetails
         WHERE BillNo IS NOT NULL AND BillDate >= ? AND BillDate <= ? AND cash = 'Y'
-        GROUP BY BillNo
-        ORDER BY MIN(BillDate) DESC
+        GROUP BY BillNo, BillDate
+        ORDER BY BillDate DESC
     """, (from_date + ' 00:00:00', to_date + ' 23:59:59'))
     recent_cashless = [dict(zip([column[0] for column in cursor.description], row)) for row in cursor.fetchall()]
 
-    # Recent Credit Bills grouped by BillNo (filtered by date)
+    # Recent Credit Bills grouped by BillNo and BillDate (filtered by date)
     cursor.execute("""
         SELECT p.BillNo, p.BillDate, d.PatientID, d.PatientName, p.BalanceAmount
         FROM PaymentDue p
@@ -212,6 +228,7 @@ def get_suppliers():
 @app.route('/billdetails', methods=['GET'])
 def billdetails():
     bill_no = request.args.get('bill_no')
+    bill_date = request.args.get('bill_date')
     rows = []
     header_data = {}
     print_time = None
@@ -221,33 +238,46 @@ def billdetails():
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            # Get year from BillDate for the bill_no
-            cursor.execute("SELECT TOP 1 YEAR(BillDate) FROM DrugSlipDetails WHERE BillNo = ?", (bill_no,))
-            year_row = cursor.fetchone()
-            if year_row:
-                year = year_row[0]
+            if bill_date:
+                # If both bill_no and bill_date are provided, use both in the query
                 sql_query = """
                     SELECT BillNo, BillDate, DrName, PatientID, PatientName, CaseType,
                            SNo, ProductName, Qty, BatchNo, ExpDate, VAT, MRP, InvoiceNo, Total 
                     FROM DrugSlipDetails 
-                    WHERE BillNo = ? AND YEAR(BillDate) = ?
+                    WHERE BillNo = ? AND BillDate = ?
                 """
-                cursor.execute(sql_query, (bill_no, year))
+                cursor.execute(sql_query, (bill_no, bill_date))
                 all_rows_for_bill = cursor.fetchall()
-                conn.close()
-                if all_rows_for_bill:
-                    print_time = datetime.datetime.now().strftime('%d/%b/%Y %I:%M:%S %p')
-                    first_row = all_rows_for_bill[0]
-                    header_data = {
-                        'BillNo': first_row.BillNo,
-                        'BillDate': first_row.BillDate,
-                        'DrName': first_row.DrName,
-                        'PatientID': first_row.PatientID,
-                        'PatientName': first_row.PatientName,
-                        'Case': first_row.CaseType
-                    }
-                    rows = all_rows_for_bill
-                    grand_total = sum(row.Total for row in rows)
+            else:
+                # Get year from BillDate for the bill_no
+                cursor.execute("SELECT TOP 1 YEAR(BillDate) FROM DrugSlipDetails WHERE BillNo = ?", (bill_no,))
+                year_row = cursor.fetchone()
+                if year_row:
+                    year = year_row[0]
+                    sql_query = """
+                        SELECT BillNo, BillDate, DrName, PatientID, PatientName, CaseType,
+                               SNo, ProductName, Qty, BatchNo, ExpDate, VAT, MRP, InvoiceNo, Total 
+                        FROM DrugSlipDetails 
+                        WHERE BillNo = ? AND YEAR(BillDate) = ?
+                    """
+                    cursor.execute(sql_query, (bill_no, year))
+                    all_rows_for_bill = cursor.fetchall()
+                else:
+                    all_rows_for_bill = []
+            conn.close()
+            if all_rows_for_bill:
+                print_time = datetime.datetime.now().strftime('%d/%b/%Y %I:%M:%S %p')
+                first_row = all_rows_for_bill[0]
+                header_data = {
+                    'BillNo': first_row.BillNo,
+                    'BillDate': first_row.BillDate,
+                    'DrName': first_row.DrName,
+                    'PatientID': first_row.PatientID,
+                    'PatientName': first_row.PatientName,
+                    'Case': first_row.CaseType
+                }
+                rows = all_rows_for_bill
+                grand_total = sum(row.Total for row in rows)
         except Exception as e:
             print(f"Database error: {e}")
     return render_template('billdetails.html', rows=rows, header_data=header_data, print_time=print_time, grand_total=grand_total)
@@ -257,6 +287,7 @@ def billdetails():
 @app.route('/purchasedetails', methods=['GET'])
 def purchasedetails():
     invoice_no = request.args.get('invoice_no')
+    invoice_date = request.args.get('invoice_date')
     rows = []
     header_data = {}
     print_time = None
@@ -265,27 +296,48 @@ def purchasedetails():
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            # Get header info
-            cursor.execute("""
-                SELECT TOP 1 i.InvoiceNo, i.InvoiceDateTime, s.SupplierName
-                FROM InvoiceDetails i
-                LEFT JOIN SupplierMaster s ON i.SupplierID = s.SupplierID
-                WHERE i.InvoiceNo = ?
-            """, (invoice_no,))
-            header_row = cursor.fetchone()
-            if header_row:
-                header_data = {
-                    'InvoiceNo': header_row.InvoiceNo,
-                    'InvoiceDateTime': header_row.InvoiceDateTime,
-                    'SupplierName': header_row.SupplierName
-                }
-            # Get product rows
-            cursor.execute("""
-                SELECT SNo, ProductName, Qty, BatchNo, ExpDate, VAT, MRP, HSR, Total
-                FROM InvoiceDetails
-                WHERE InvoiceNo = ?
-            """, (invoice_no,))
-            rows = cursor.fetchall()
+            if invoice_date:
+                # Use both invoice_no and invoice_date for unique selection
+                cursor.execute("""
+                    SELECT TOP 1 i.InvoiceNo, i.InvoiceDateTime, s.SupplierName
+                    FROM InvoiceDetails i
+                    LEFT JOIN SupplierMaster s ON i.SupplierID = s.SupplierID
+                    WHERE i.InvoiceNo = ? AND CAST(i.InvoiceDateTime AS DATE) = ?
+                """, (invoice_no, invoice_date))
+                header_row = cursor.fetchone()
+                if header_row:
+                    header_data = {
+                        'InvoiceNo': header_row.InvoiceNo,
+                        'InvoiceDateTime': header_row.InvoiceDateTime,
+                        'SupplierName': header_row.SupplierName
+                    }
+                cursor.execute("""
+                    SELECT SNo, ProductName, Qty, BatchNo, ExpDate, VAT, MRP, HSR, Total
+                    FROM InvoiceDetails
+                    WHERE InvoiceNo = ? AND CAST(InvoiceDateTime AS DATE) = ?
+                """, (invoice_no, invoice_date))
+                rows = cursor.fetchall()
+            else:
+                # Fallback to old logic
+                cursor.execute("""
+                    SELECT TOP 1 i.InvoiceNo, i.InvoiceDateTime, s.SupplierName
+                    FROM InvoiceDetails i
+                    LEFT JOIN SupplierMaster s ON i.SupplierID = s.SupplierID
+                    WHERE i.InvoiceNo = ?
+                """, (invoice_no,))
+                header_row = cursor.fetchone()
+                if header_row:
+                    header_data = {
+                        'InvoiceNo': header_row.InvoiceNo,
+                        'InvoiceDateTime': header_row.InvoiceDateTime,
+                        'SupplierName': header_row.SupplierName
+                    }
+                cursor.execute("""
+                    SELECT SNo, ProductName, Qty, BatchNo, ExpDate, VAT, MRP, HSR, Total
+                    FROM InvoiceDetails
+                    WHERE InvoiceNo = ?
+                """, (invoice_no,))
+                rows = cursor.fetchall()
             conn.close()
             if rows:
                 print_time = datetime.datetime.now().strftime('%d/%b/%Y %I:%M:%S %p')

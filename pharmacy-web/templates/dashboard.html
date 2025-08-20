@@ -128,31 +128,6 @@
             <button type="submit" style="background: #007bff; color: #fff; border: none; border-radius: 4px; padding: 8px 18px; font-weight: bold; cursor: pointer;">Filter</button>
         </form>
     {% include '_dashboard_cards.html' %}
-        <!-- Accordion for Sales -->
-        <div class="accordion">
-            <div class="accordion-header" onclick="toggleAccordion(this)"><i class="fa fa-chevron-down"></i> Sales (Filtered by Date Range)</div>
-            <div class="accordion-content sales-scroll">
-                {% import '_table_macros.html' as tmacros %}
-                {{ tmacros.neat_table(['Bill No', 'Bill Date', 'Patient Name', 'View'], recent_sales, view_type='sales') }}
-            </div>
-        </div>
-        <!-- Accordion for Purchases -->
-        <div class="accordion">
-            <div class="accordion-header" onclick="toggleAccordion(this)"><i class="fa fa-chevron-down"></i> Purchases (Filtered by Date Range)</div>
-            <div class="accordion-content purchases-scroll">
-                {% import '_table_macros.html' as tmacros %}
-                {{ tmacros.neat_table(['Invoice No', 'Invoice Date', 'Supplier Name', 'View'], recent_purchases, view_type='purchase') }}
-            </div>
-        </div>
-        <!-- Accordion for Sales Return -->
-        <div class="accordion">
-            <div class="accordion-header" onclick="toggleAccordion(this)"><i class="fa fa-chevron-down"></i> Sales Return (Filtered by Date Range)</div>
-            <div class="accordion-content">
-                {% import '_table_macros.html' as tmacros %}
-                {{ tmacros.neat_table(['Return Bill No', 'Return Date', 'Patient Name', 'View'], sales_return_rows, view_type='salesreturn') }}
-            </div>
-        </div>
-
         <!-- Accordion for Cashless -->
         <div class="accordion">
             <div class="accordion-header" onclick="toggleAccordion(this)"><i class="fa fa-chevron-down"></i> Cashless (Filtered by Date Range)</div>
@@ -162,14 +137,41 @@
             </div>
         </div>
 
-            <!-- Accordion for Credit To Be Paid -->
-            <div class="accordion">
-                <div class="accordion-header" onclick="toggleAccordion(this)"><i class="fa fa-chevron-down"></i> Credit To Be Paid (Filtered by Date Range)</div>
-                <div class="accordion-content cashless-scroll">
-                    {% import '_table_macros.html' as tmacros %}
-                    {{ tmacros.neat_table(['Bill No', 'Bill Date', 'Patient ID', 'Patient Name', 'Balance Amount'], recent_credit, view_type='credit') }}
-                </div>
+        <!-- Accordion for Credit To Be Paid -->
+        <div class="accordion">
+            <div class="accordion-header" onclick="toggleAccordion(this)"><i class="fa fa-chevron-down"></i> Credit To Be Paid (Filtered by Date Range)</div>
+            <div class="accordion-content cashless-scroll">
+                {% import '_table_macros.html' as tmacros %}
+                {{ tmacros.neat_table(['Bill No', 'Bill Date', 'Patient ID', 'Patient Name', 'Balance Amount'], recent_credit, view_type='credit') }}
             </div>
+        </div>
+
+        <!-- Accordion for Sales Return -->
+        <div class="accordion">
+            <div class="accordion-header" onclick="toggleAccordion(this)"><i class="fa fa-chevron-down"></i> Sales Return (Filtered by Date Range)</div>
+            <div class="accordion-content">
+                {% import '_table_macros.html' as tmacros %}
+                {{ tmacros.neat_table(['Return Bill No', 'Return Date', 'Patient Name', 'View'], sales_return_rows, view_type='salesreturn') }}
+            </div>
+        </div>
+
+        <!-- Accordion for Sales -->
+        <div class="accordion">
+            <div class="accordion-header" onclick="toggleAccordion(this)"><i class="fa fa-chevron-down"></i> Sales (Filtered by Date Range)</div>
+            <div class="accordion-content sales-scroll">
+                {% import '_table_macros.html' as tmacros %}
+                {{ tmacros.neat_table(['Bill No', 'Bill Date', 'Patient Name', 'View'], recent_sales, view_type='sales') }}
+            </div>
+        </div>
+
+        <!-- Accordion for Purchases -->
+        <div class="accordion">
+            <div class="accordion-header" onclick="toggleAccordion(this)"><i class="fa fa-chevron-down"></i> Purchases (Filtered by Date Range)</div>
+            <div class="accordion-content purchases-scroll">
+                {% import '_table_macros.html' as tmacros %}
+                {{ tmacros.neat_table(['Invoice No', 'Invoice Date', 'Supplier Name', 'View'], recent_purchases, view_type='purchase') }}
+            </div>
+        </div>
     </div>
     <script>
         function showLoading() {

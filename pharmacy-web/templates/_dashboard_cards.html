@@ -4,7 +4,7 @@
     {{ macros.dashboard_card('Total Suppliers', 'fa-truck', total_suppliers, color_class='card-metric card-suppliers', extra_html='', subtitle=None) }}
     <div id="purchaseCard" style="cursor:pointer;">{{ macros.dashboard_combo_card('Total Purchase', 'fa-file-invoice-dollar', total_purchase_bills or 0, '{:,.2f}'.format(total_purchase_value or 0), color_class='card-metric card-purchase-combo', bills_color='#e0e0e0', value_color='#e0e0e0') }}</div>
     <div id="salesCard" style="cursor:pointer;">{{ macros.dashboard_combo_card('Total Sales', 'fa-receipt', total_sales_bills or 0, '{:,.2f}'.format(total_sales_value or 0), color_class='card-metric card-sales-combo', bills_color='#ffe3e3', value_color='#ffe3e3') }}</div>
-    {{ macros.dashboard_combo_card('Sales Return', 'fa-arrow-rotate-right', sales_return_count or 0, '{:,.2f}'.format(sales_return_value or 0), color_class='card-metric card-sales-return-combo', bills_color='#ffe3e3', value_color='#ffe3e3') }}
     {{ macros.dashboard_combo_card('Cashless', 'fa-money-bill-wave', cashless_count or 0, '{:,.2f}'.format(cashless_value or 0), color_class='card-metric card-cashless-combo', bills_color='#e0f7fa', value_color='#e0f7fa') }}
-        {{ macros.dashboard_combo_card('Credit To Be Paid', 'fa-credit-card', credit_count or 0, '{:,.2f}'.format(credit_balance or 0), color_class='card-metric card-credit-combo', bills_color='#ffe3e3', value_color='#ffe3e3') }}
+    {{ macros.dashboard_combo_card('Credit To Be Paid', 'fa-credit-card', credit_count or 0, '{:,.2f}'.format(credit_balance or 0), color_class='card-metric card-credit-combo', bills_color='#ffe3e3', value_color='#ffe3e3') }}
+    {{ macros.dashboard_combo_card('Sales Return', 'fa-arrow-rotate-right', sales_return_count or 0, '{:,.2f}'.format(sales_return_value or 0), color_class='card-metric card-sales-return-combo', bills_color='#ffe3e3', value_color='#ffe3e3') }}
 </div>

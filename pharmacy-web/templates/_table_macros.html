@@ -22,7 +22,7 @@
                     </td>
                     <td>{{ row['PatientName'] }}</td>
                     <td>
-                        <a href="/billdetails?bill_no={{ row['BillNo'] }}" target="_blank" class="neat-btn neat-btn-view">
+                        <a href="/billdetails?bill_no={{ row['BillNo'] }}&bill_date={{ row['BillDate'].strftime('%Y-%m-%d') if row['BillDate'] else '' }}" target="_blank" class="neat-btn neat-btn-view">
                             <i class="fa-solid fa-eye"></i> View Details
                         </a>
                     </td>
@@ -37,7 +37,7 @@
                     </td>
                     <td>{{ row['SupplierName'] }}</td>
                     <td>
-                        <a href="/purchasedetails?invoice_no={{ row['InvoiceNo'] }}" target="_blank" class="neat-btn neat-btn-view" style="background: #ffb347;">
+                        <a href="/purchasedetails?invoice_no={{ row['InvoiceNo'] }}&invoice_date={{ row['InvoiceDateTime'].strftime('%Y-%m-%d') if row['InvoiceDateTime'] else '' }}" target="_blank" class="neat-btn neat-btn-view" style="background: #ffb347;">
                             <i class="fa-solid fa-eye"></i> View Details
                         </a>
                     </td>
@@ -52,7 +52,7 @@
                     </td>
                     <td>{{ row['PatientName'] }}</td>
                     <td>
-                        <a href="/salesreturnview?return_bill_no={{ row['ReturnBillNo'] }}" target="_blank" class="neat-btn neat-btn-view" style="background: #ffc371; color: #333;">
+                        <a href="/salesreturnview?return_bill_no={{ row['ReturnBillNo'] }}&return_date={{ row['ReturnDate'].strftime('%Y-%m-%d') if row['ReturnDate'] else '' }}" target="_blank" class="neat-btn neat-btn-view" style="background: #ffc371; color: #333;">
                             <i class="fa-solid fa-eye"></i> View Details
                         </a>
                     </td>
@@ -67,7 +67,7 @@
                     </td>
                     <td>{{ row['PatientName'] }}</td>
                     <td>
-                        <a href="/billdetails?bill_no={{ row['BillNo'] }}" target="_blank" class="neat-btn neat-btn-view">
+                        <a href="/billdetails?bill_no={{ row['BillNo'] }}&bill_date={{ row['BillDate'].strftime('%Y-%m-%d') if row['BillDate'] else '' }}" target="_blank" class="neat-btn neat-btn-view">
                             <i class="fa-solid fa-eye"></i> View Details
                         </a>
                     </td>
