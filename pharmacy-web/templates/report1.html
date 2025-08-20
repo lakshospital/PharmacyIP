@@ -13,11 +13,11 @@
         .dropdown-menu li a:hover {background: #f2f2f2;}
         .navbar-menu > li.dropdown:hover .dropdown-menu {display: block;}
         @media (max-width: 700px) {.navbar-menu {flex-direction: column; height: auto;} .navbar-menu > li {width: 100%;} .navbar-menu > li > a {padding: 0 10px;} .dropdown-menu {position: static; box-shadow: none; min-width: 100%;}}
-        .form-container {background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; width: 90%; margin: 20px auto;}
+        .form-container {background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 12px; padding: 24px; margin-bottom: 18px;}
         .form-row {display: flex; gap: 20px; align-items: center; margin-bottom: 15px;}
         .form-row label {font-weight: bold;}
-        .form-row select, .form-row input[type="date"] {padding: 6px; border-radius: 4px; border: 1px solid #ccc;}
-        .form-row button {padding: 8px 15px; background: #007bff; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;}
+        .form-row select, .form-row input[type="date"] {padding: 6px 12px; border-radius: 6px; border: 1px solid #ccc; min-width: 120px;}
+        .form-row button {padding: 10px 20px; background: #007bff; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 15px; min-width: 80px;}
         .form-row button:hover {background: #0056b3;}
         table {width: 95%; margin: 20px auto; border-collapse: collapse; font-size: 15px;}
         th, td {border: 1px solid #333; padding: 6px 10px; text-align: left;}
@@ -40,28 +40,41 @@
 </head>
 <body>
     {% include '_navbar.html' %}
-    <div class="form-container">
-        <form method="POST">
-            <div class="form-row">
-                <label for="product_group">Product Group:</label>
-                <select name="product_group" id="product_group">
-                    {% for group in groups %}
-                        <option value="{{ group }}" {% if group == selected_group %}selected{% endif %}>{{ group }}</option>
-                    {% endfor %}
-                </select>
-                <label for="product_name">Product Name:</label>
-                <select name="product_name" id="product_name">
-                    {% for product in products %}
-                        <option value="{{ product }}" {% if product == selected_product %}selected{% endif %}>{{ product }}</option>
-                    {% endfor %}
-                </select>
-                <label for="from_date">From:</label>
-                <input type="date" name="from_date" id="from_date" value="{{ from_date }}">
-                <label for="to_date">To:</label>
-                <input type="date" name="to_date" id="to_date" value="{{ to_date }}">
-                <button type="submit">Show</button>
-            </div>
-        </form>
+    <div style="max-width: 900px; margin: 0 auto;">
+        <div class="form-container">
+            <form method="POST" style="display: flex; align-items: center; gap: 18px; flex-wrap: wrap; justify-content: flex-start;">
+                <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 4px;">
+                    <label for="product_group" style="font-weight: bold; margin-bottom: 2px;">Product Group:</label>
+                    <select name="product_group" id="product_group" style="padding: 6px 12px; border-radius: 6px; border: 1px solid #ccc; min-width: 120px;">
+                        {% for group in groups %}
+                            <option value="{{ group }}" {% if group == selected_group %}selected{% endif %}>{{ group }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 4px;">
+                    <label for="product_name" style="font-weight: bold; margin-bottom: 2px;">Product Name:</label>
+                    <select name="product_name" id="product_name" style="padding: 6px 12px; border-radius: 6px; border: 1px solid #ccc; min-width: 120px;">
+                        {% for product in products %}
+                            <option value="{{ product }}" {% if product == selected_product %}selected{% endif %}>{{ product }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 4px;">
+                    <label for="from_date" style="font-weight: bold; margin-bottom: 2px;">From:</label>
+                    <input type="date" name="from_date" id="from_date" value="{{ from_date }}" style="padding: 6px 12px; border-radius: 6px; border: 1px solid #ccc; min-width: 120px;">
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 4px;">
+                    <label for="to_date" style="font-weight: bold; margin-bottom: 2px;">To:</label>
+                    <input type="date" name="to_date" id="to_date" value="{{ to_date }}" style="padding: 6px 12px; border-radius: 6px; border: 1px solid #ccc; min-width: 120px;">
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 4px; margin-top: 18px;">
+                    <button type="submit" style="background: #007bff; color: #fff; border: none; border-radius: 6px; padding: 10px 20px; font-weight: bold; cursor: pointer; font-size: 15px; min-width: 80px;">Show</button>
+                </div>
+                <div id="totalStockValueContainer" style="background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); padding: 8px 18px; margin-left: 12px; font-size: 1.1rem; font-weight: bold; color: #007bff; display: flex; align-items: center; height: 48px;">
+                    Total Stock Value: ₹<span id="totalStockValue">0.00</span>
+                </div>
+            </form>
+        </div>
     </div>
     <table id="reportTable">
         <thead>
@@ -110,6 +123,12 @@ let offset = 0;
 const limit = 5;
 let loading = false;
 let hasMore = true;
+let totalStockValue = 0;
+
+function updateTotalStockValue(value) {
+    totalStockValue += value;
+    document.getElementById('totalStockValue').textContent = totalStockValue.toFixed(2);
+}
 
 function fetchRecords() {
     if (loading || !hasMore) return;
@@ -125,7 +144,6 @@ function fetchRecords() {
     })
     .then(response => response.json())
     .then(data => {
-        console.log('Results received:', data.results.length, data.results);
         const tbody = document.getElementById('reportBody');
         data.results.forEach(row => {
             const tr = document.createElement('tr');
@@ -142,6 +160,7 @@ function fetchRecords() {
                 <td data-label="Stock Value (Rs)">${row.StockValue}</td>
             `;
             tbody.appendChild(tr);
+            updateTotalStockValue(Number(row.StockValue));
         });
         offset += limit;
         hasMore = data.has_more;
@@ -164,6 +183,8 @@ document.querySelector('form').addEventListener('submit', function(e) {
     document.getElementById('reportBody').innerHTML = '';
     offset = 0;
     hasMore = true;
+    totalStockValue = 0;
+    document.getElementById('totalStockValue').textContent = '0.00';
     fetchRecords();
 });
 
