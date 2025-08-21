@@ -25,26 +25,40 @@ def authenticate_user(username, password, role):
         cursor.execute(query, (username, password, role))
         user = cursor.fetchone()
         conn.close()
-        return user is not None
+        return user
     except Exception as e:
         print(f"Authentication error: {e}")
-        return False
+        return None
+
 
 # Login route
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    error = None
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
         role = request.form.get('role')
-        if authenticate_user(username, password, role):
+        user = authenticate_user(username, password, role)
+        if user:
+            session['user_id'] = username  # Use username as ID for now
             session['username'] = username
-            session['role'] = role
+            session['usertype'] = role
             return redirect(url_for('dashboard'))
         else:
-            flash('Invalid credentials. Please try again.', 'danger')
-            return render_template('login.html')
-    return render_template('login.html')
+            error = 'Invalid username, password, or role.'
+    return render_template('login.html', error=error)
+
+# Logout route
+# Login required decorator
+from functools import wraps
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
 
 # Logout route
 @app.route('/logout')
@@ -183,9 +197,8 @@ def get_purchases():
     return jsonify({'purchases': purchases})
 
 @app.route('/dashboard', methods=['GET', 'POST'])
+@login_required
 def dashboard():
-    if 'username' not in session:
-        return redirect(url_for('login'))
     today = datetime.datetime.now()
     current_date_str = today.strftime('%Y-%m-%d')
     if request.method == 'POST':
@@ -728,6 +741,7 @@ def report1():
 
 
 @app.route('/', methods=['GET', 'POST'])
+@login_required
 def index():
     rows = []
     header_data = {}
