@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session, flash
 import datetime
 from db import get_db_connection
 
@@ -13,8 +13,81 @@ from metrics import (
 from metrics import get_credit_metrics
 
 app = Flask(__name__)
+app.secret_key = 'your_secret_key_here'  # Change to a secure random value in production
+def authenticate_user(username, password, role):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        query = """
+            SELECT UserName, Password, Rights FROM UserDetails
+            WHERE UserName = ? AND Password = ? AND Rights = ?
+        """
+        cursor.execute(query, (username, password, role))
+        user = cursor.fetchone()
+        conn.close()
+        return user is not None
+    except Exception as e:
+        print(f"Authentication error: {e}")
+        return False
+
+# Login route
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        role = request.form.get('role')
+        if authenticate_user(username, password, role):
+            session['username'] = username
+            session['role'] = role
+            return redirect(url_for('dashboard'))
+        else:
+            flash('Invalid credentials. Please try again.', 'danger')
+            return render_template('login.html')
+    return render_template('login.html')
+
+# Logout route
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
 server = 'LAPTOP-C27U7D67\\SQLEXPRESS'
 database = 'Pharmacy'
+
+@app.route('/creditdetails')
+def creditdetails():
+    bill_no = request.args.get('bill_no')
+    bill_date = request.args.get('bill_date')
+    rows = []
+    header_data = {}
+    print_time = None
+    grand_total = 0
+    if bill_no and bill_date:
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            sql_query = """
+                SELECT p.BillNo, p.BillDate, d.PatientID, d.PatientName, p.BalanceAmount, p.AmountReceived, p.DueNo, p.DueDate, p.DueStatus
+                FROM PaymentDue p
+                INNER JOIN DrugSlipDetails d ON p.BillNo = d.BillNo AND p.BillDate = d.BillDate
+                WHERE p.BillNo = ? AND CONVERT(VARCHAR(10), p.BillDate, 120) = ?
+            """
+            cursor.execute(sql_query, (bill_no, bill_date))
+            rows = cursor.fetchall()
+            if rows:
+                print_time = datetime.datetime.now().strftime('%d/%b/%Y %I:%M:%S %p')
+                first_row = rows[0]
+                header_data = {
+                    'BillNo': first_row.BillNo,
+                    'BillDate': first_row.BillDate,
+                    'PatientID': first_row.PatientID,
+                    'PatientName': first_row.PatientName
+                }
+                grand_total = sum(getattr(row, 'BalanceAmount', 0) for row in rows)
+            conn.close()
+        except Exception as e:
+            print(f"Database error: {e}")
+    return render_template('creditdetails.html', rows=rows, header_data=header_data, print_time=print_time, grand_total=grand_total)
 
 # Sales Return Details
 @app.route('/salesreturnview', methods=['GET'])
@@ -111,6 +184,8 @@ def get_purchases():
 
 @app.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
+    if 'username' not in session:
+        return redirect(url_for('login'))
     today = datetime.datetime.now()
     current_date_str = today.strftime('%Y-%m-%d')
     if request.method == 'POST':
@@ -176,14 +251,24 @@ def dashboard():
 
     # Recent Credit Bills grouped by BillNo and BillDate (filtered by date)
     cursor.execute("""
-        SELECT p.BillNo, p.BillDate, d.PatientID, d.PatientName, p.BalanceAmount
+        SELECT d.PatientID, d.PatientName, p.BillNo, p.BillDate, SUM(p.BalanceAmount) AS BalanceAmount
         FROM PaymentDue p
         INNER JOIN DrugSlipDetails d ON p.BillNo = d.BillNo AND p.BillDate = d.BillDate
-        WHERE p.DueStatus = 'CT' AND p.BillStatus = 'P' AND p.DueDate BETWEEN ? AND ?
-        GROUP BY p.BillNo, p.BillDate, d.PatientID, d.PatientName, p.BalanceAmount
+        WHERE p.DueStatus = 'CT' AND p.BillStatus = 'P' AND p.BalanceAmount > 0
+            AND p.DueDate BETWEEN ? AND ?
+        GROUP BY d.PatientID, d.PatientName, p.BillNo, p.BillDate
         ORDER BY p.BillDate DESC
     """, (from_date + ' 00:00:00', to_date + ' 23:59:59'))
-    recent_credit = [dict(zip([column[0] for column in cursor.description], row)) for row in cursor.fetchall()]
+    recent_credit = []
+    for row in cursor.fetchall():
+        # Map columns correctly
+        recent_credit.append({
+            'PatientID': row.PatientID,
+            'PatientName': row.PatientName,
+            'BillNo': row.BillNo,
+            'BillDate': row.BillDate,
+            'BalanceAmount': row.BalanceAmount
+        })
 
     conn.close()
     return render_template('dashboard.html',
@@ -721,6 +806,7 @@ def index():
                 print(f"Database error: {e}")
                 
     return render_template('index.html', rows=rows, years=years, header_data=header_data, print_time=print_time, grand_total=grand_total, show_sno=show_sno, show_seq_id=show_seq_id, last_10_bills=last_10_bills)
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

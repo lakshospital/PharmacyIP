@@ -71,6 +71,29 @@
                             <i class="fa-solid fa-eye"></i> View Details
                         </a>
                     </td>
+                {% elif view_type == 'credit' %}
+                    <td>{{ row['PatientID'] }}</td>
+                    <td>{{ row['BillNo'] }}</td>
+                    <td>
+                        {% if row['BillDate'] %}
+                            {{ row['BillDate'].strftime('%d/%b/%Y')|upper }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>{{ row['PatientName'] }}</td>
+                    <td style="text-align: right; font-variant-numeric: tabular-nums;">
+                        {% if row['BalanceAmount'] is not none %}
+                            {{ '{:,.2f}'.format(row['BalanceAmount']) }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="/creditdetails?bill_no={{ row['BillNo'] }}&bill_date={{ row['BillDate'].strftime('%Y-%m-%d') if row['BillDate'] else '' }}" target="_blank" class="neat-btn neat-btn-view" style="background: #b2dfdb; color: #333;">
+                            <i class="fa-solid fa-eye"></i> View Details
+                        </a>
+                    </td>
                 {% else %}
                     {% for cell in row.values() %}
                         <td>{{ cell }}</td>

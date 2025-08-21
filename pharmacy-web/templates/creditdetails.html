@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Credit Bill Details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/dashboard.css">
+</head>
+<body>
+    <div style="max-width: 800px; margin: 0 auto; padding: 32px;">
+        <h2 style="color: #007bff; margin-bottom: 18px;">Credit Bill Details</h2>
+        {% if header_data %}
+        <div style="margin-bottom: 18px;">
+            <strong>Bill No:</strong> {{ header_data.BillNo }}<br>
+            <strong>Bill Date:</strong> {{ header_data.BillDate.strftime('%d/%b/%Y') if header_data.BillDate else '-' }}<br>
+            <strong>Patient ID:</strong> {{ header_data.PatientID }}<br>
+            <strong>Patient Name:</strong> {{ header_data.PatientName }}<br>
+            <strong>Printed At:</strong> {{ print_time }}
+        </div>
+        {% endif %}
+        <table class="neat-table">
+            <thead>
+                <tr>
+                    <th>Due No</th>
+                    <th>Due Date</th>
+                    <th>Amount Received</th>
+                    <th>Balance Amount</th>
+                    <th>Due Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                <tr>
+                    <td>{{ row.DueNo }}</td>
+                    <td>{{ row.DueDate.strftime('%d/%b/%Y') if row.DueDate else '-' }}</td>
+                    <td>{{ row.AmountReceived }}</td>
+                    <td>{{ row.BalanceAmount }}</td>
+                    <td>{{ row.DueStatus }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div style="margin-top: 18px; font-weight: bold; color: #007bff;">Grand Total: {{ grand_total }}</div>
+    </div>
+</body>
+</html>

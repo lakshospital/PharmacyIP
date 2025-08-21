@@ -1,29 +1,131 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/static/dashboard.css">
     <style>
-        .navbar {background-color: #007bff; padding: 0; margin-bottom: 20px; border-radius: 0 0 8px 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);}
-        .navbar-menu {list-style: none; margin: 0; padding: 0 20px; display: flex; align-items: center; height: 48px;}
-        .navbar-menu > li {position: relative;}
-        .navbar-menu > li > a {display: block; color: #fff; text-decoration: none; padding: 0 18px; line-height: 48px; font-weight: bold; transition: background 0.2s; border-radius: 4px;}
-        .navbar-menu > li > a:hover, .navbar-menu > li.dropdown:hover > a {background: #0056b3;}
-        .dropdown-menu {display: none; position: absolute; background: #fff; min-width: 160px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-radius: 4px; top: 48px; left: 0; z-index: 1000; padding: 6px 0;}
-        .dropdown-menu li a {color: #333; padding: 8px 18px; display: block; text-decoration: none; border-radius: 0; font-weight: normal;}
-        .dropdown-menu li a:hover {background: #f2f2f2;}
-        .navbar-menu > li.dropdown:hover .dropdown-menu {display: block;}
-        @media (max-width: 700px) {.navbar-menu {flex-direction: column; height: auto;} .navbar-menu > li {width: 100%;} .navbar-menu > li > a {padding: 0 10px;} .dropdown-menu {position: static; box-shadow: none; min-width: 100%;}}
-        .loading-spinner {display: none; justify-content: center; align-items: center; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(255,255,255,0.7); z-index: 9999;}
-        .loading-spinner .fa-spinner {font-size: 3rem; color: #007bff; animation: spin 1s linear infinite;}
-        @keyframes spin {100% {transform: rotate(360deg);}}
+        .navbar {
+            background-color: #007bff;
+            padding: 0;
+            margin-bottom: 20px;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .navbar-menu {
+            list-style: none;
+            margin: 0;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            height: 48px;
+        }
+
+        .navbar-menu>li {
+            position: relative;
+        }
+
+        .navbar-menu>li>a {
+            display: block;
+            color: #fff;
+            text-decoration: none;
+            padding: 0 18px;
+            line-height: 48px;
+            font-weight: bold;
+            transition: background 0.2s;
+            border-radius: 4px;
+        }
+
+        .navbar-menu>li>a:hover,
+        .navbar-menu>li.dropdown:hover>a {
+            background: #0056b3;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            background: #fff;
+            min-width: 160px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border-radius: 4px;
+            top: 48px;
+            left: 0;
+            z-index: 1000;
+            padding: 6px 0;
+        }
+
+        .dropdown-menu li a {
+            color: #333;
+            padding: 8px 18px;
+            display: block;
+            text-decoration: none;
+            border-radius: 0;
+            font-weight: normal;
+        }
+
+        .dropdown-menu li a:hover {
+            background: #f2f2f2;
+        }
+
+        .navbar-menu>li.dropdown:hover .dropdown-menu {
+            display: block;
+        }
+
+        @media (max-width: 700px) {
+            .navbar-menu {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .navbar-menu>li {
+                width: 100%;
+            }
+
+            .navbar-menu>li>a {
+                padding: 0 10px;
+            }
+
+            .dropdown-menu {
+                position: static;
+                box-shadow: none;
+                min-width: 100%;
+            }
+        }
+
+        .loading-spinner {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.7);
+            z-index: 9999;
+        }
+
+        .loading-spinner .fa-spinner {
+            font-size: 3rem;
+            color: #007bff;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
         .accordion {
             background: #f8f9fa;
             border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
             margin-bottom: 24px;
         }
+
         .accordion-header {
             display: flex;
             align-items: center;
@@ -35,37 +137,45 @@
             border-bottom: 1px solid #e3e3e3;
             user-select: none;
         }
+
         .accordion-header .fa-chevron-down {
             margin-right: 12px;
             transition: transform 0.2s;
         }
+
         .accordion-header.active .fa-chevron-down {
             transform: rotate(180deg);
         }
+
         .accordion-content {
             display: none;
             padding: 18px 24px;
             background: #fff;
             border-radius: 0 0 8px 8px;
         }
+
         .accordion-content.open {
             display: block;
         }
+
         .accordion-content.purchases-scroll {
             max-height: 350px;
             overflow-x: auto;
             overflow-y: auto;
         }
+
         .accordion-content.sales-scroll {
             max-height: 350px;
             overflow-x: auto;
             overflow-y: auto;
         }
+
         .accordion-content.cashless-scroll {
             max-height: 600px;
             overflow-x: auto;
             overflow-y: auto;
         }
+
         .neat-table {
             width: 100%;
             border-collapse: collapse;
@@ -74,22 +184,28 @@
             overflow: hidden;
             font-size: 1rem;
         }
-        .neat-table th, .neat-table td {
+
+        .neat-table th,
+        .neat-table td {
             padding: 12px 14px;
             text-align: left;
             border-bottom: 1px solid #e0e0e0;
         }
+
         .neat-table th {
             background: #f3f3f3;
             color: #444;
             font-weight: bold;
         }
+
         .neat-table tr:last-child td {
             border-bottom: none;
         }
+
         .neat-table tbody tr:hover {
             background: #eaf6ff;
         }
+
         .neat-btn {
             background: #007bff;
             color: #fff;
@@ -101,142 +217,165 @@
             font-size: 0.98rem;
             transition: background 0.2s;
         }
+
         .neat-btn-view {
             background: #ff5f6d;
         }
+
         .neat-btn-view:hover {
             background: #e04c4c;
         }
+
         .neat-btn:hover {
             background: #0056b3;
         }
     </style>
 </head>
+
 <body>
     {% include '_navbar.html' %}
-    <div style="max-width: 100%; margin: 0 auto; padding-left: 2%; padding-right: 2%; padding-top: 4px; padding-bottom: 24px; width: 96%; box-sizing: border-box;">
+    <div
+        style="max-width: 100%; margin: 0 auto; padding-left: 2%; padding-right: 2%; padding-top: 4px; padding-bottom: 24px; width: 96%; box-sizing: border-box;">
         <h1 style="color: #007bff; font-size: 2.5rem; margin-bottom: 18px;">Pharmacy Dashboard</h1>
-        <form method="post" style="margin-bottom: 24px; display: flex; gap: 16px; align-items: center;" onsubmit="showLoading()">
+        <form method="post" style="margin-bottom: 24px; display: flex; gap: 16px; align-items: center;"
+            onsubmit="showLoading()">
             <div class="loading-spinner" id="loadingSpinner">
                 <i class="fa-solid fa-spinner"></i>
             </div>
             <label for="from_date" style="font-weight: bold; color: #333;">From Date:</label>
-            <input type="date" id="from_date" name="from_date" value="{{ from_date }}" style="padding: 6px 12px; border-radius: 4px; border: 1px solid #ccc;">
+            <input type="date" id="from_date" name="from_date" value="{{ from_date }}"
+                style="padding: 6px 12px; border-radius: 4px; border: 1px solid #ccc;">
             <label for="to_date" style="font-weight: bold; color: #333;">To Date:</label>
-            <input type="date" id="to_date" name="to_date" value="{{ to_date }}" style="padding: 6px 12px; border-radius: 4px; border: 1px solid #ccc;">
-    <script src="/static/dashboard.js"></script>
-            <button type="submit" style="background: #007bff; color: #fff; border: none; border-radius: 4px; padding: 8px 18px; font-weight: bold; cursor: pointer;">Filter</button>
+            <input type="date" id="to_date" name="to_date" value="{{ to_date }}"
+                style="padding: 6px 12px; border-radius: 4px; border: 1px solid #ccc;">
+            <script src="/static/dashboard.js"></script>
+            <button type="submit"
+                style="background: #007bff; color: #fff; border: none; border-radius: 4px; padding: 8px 18px; font-weight: bold; cursor: pointer;">Filter</button>
         </form>
-    {% include '_dashboard_cards.html' %}
-        <!-- Accordion for Cashless -->
-        <div class="accordion">
-            <div class="accordion-header" onclick="toggleAccordion(this)"><i class="fa fa-chevron-down"></i> Cashless (Filtered by Date Range)</div>
-            <div class="accordion-content cashless-scroll">
-                {% import '_table_macros.html' as tmacros %}
-                {{ tmacros.neat_table(['Bill No', 'Bill Date', 'Patient Name', 'View'], recent_cashless, view_type='cashless') }}
-            </div>
-        </div>
-
-        <!-- Accordion for Credit To Be Paid -->
-        <div class="accordion">
-            <div class="accordion-header" onclick="toggleAccordion(this)"><i class="fa fa-chevron-down"></i> Credit To Be Paid (Filtered by Date Range)</div>
-            <div class="accordion-content cashless-scroll">
-                {% import '_table_macros.html' as tmacros %}
-                {{ tmacros.neat_table(['Bill No', 'Bill Date', 'Patient ID', 'Patient Name', 'Balance Amount'], recent_credit, view_type='credit') }}
-            </div>
-        </div>
-
-        <!-- Accordion for Sales Return -->
-        <div class="accordion">
-            <div class="accordion-header" onclick="toggleAccordion(this)"><i class="fa fa-chevron-down"></i> Sales Return (Filtered by Date Range)</div>
-            <div class="accordion-content">
-                {% import '_table_macros.html' as tmacros %}
-                {{ tmacros.neat_table(['Return Bill No', 'Return Date', 'Patient Name', 'View'], sales_return_rows, view_type='salesreturn') }}
-            </div>
-        </div>
-
-        <!-- Accordion for Sales -->
-        <div class="accordion">
-            <div class="accordion-header" onclick="toggleAccordion(this)"><i class="fa fa-chevron-down"></i> Sales (Filtered by Date Range)</div>
-            <div class="accordion-content sales-scroll">
-                {% import '_table_macros.html' as tmacros %}
-                {{ tmacros.neat_table(['Bill No', 'Bill Date', 'Patient Name', 'View'], recent_sales, view_type='sales') }}
-            </div>
-        </div>
+        {% include '_dashboard_cards.html' %}
 
         <!-- Accordion for Purchases -->
         <div class="accordion">
-            <div class="accordion-header" onclick="toggleAccordion(this)"><i class="fa fa-chevron-down"></i> Purchases (Filtered by Date Range)</div>
+            <div class="accordion-header" onclick="toggleAccordion(this)"><i class="fa fa-chevron-down"></i> Purchases
+                (Filtered by Date Range)</div>
             <div class="accordion-content purchases-scroll">
                 {% import '_table_macros.html' as tmacros %}
-                {{ tmacros.neat_table(['Invoice No', 'Invoice Date', 'Supplier Name', 'View'], recent_purchases, view_type='purchase') }}
+                {{ tmacros.neat_table(['Invoice No', 'Invoice Date', 'Supplier Name', 'View'], recent_purchases,
+                view_type='purchase') }}
+            </div>
+            <!-- </div> -->
+            <!-- Accordion for Sales -->
+            <div class="accordion">
+                <div class="accordion-header" onclick="toggleAccordion(this)"><i class="fa fa-chevron-down"></i> Sales
+                    (Filtered by Date Range)</div>
+                <div class="accordion-content sales-scroll">
+                    {% import '_table_macros.html' as tmacros %}
+                    {{ tmacros.neat_table(['Bill No', 'Bill Date', 'Patient Name', 'View'], recent_sales,
+                    view_type='sales') }}
+                </div>
+            </div>
+
+            <!-- Accordion for Cashless -->
+            <div class="accordion">
+                <div class="accordion-header" onclick="toggleAccordion(this)"><i class="fa fa-chevron-down"></i>
+                    Cashless (Filtered by Date Range)</div>
+                <div class="accordion-content cashless-scroll">
+                    {% import '_table_macros.html' as tmacros %}
+                    {{ tmacros.neat_table(['Bill No', 'Bill Date', 'Patient Name', 'View'], recent_cashless,
+                    view_type='cashless') }}
+                </div>
+            </div>
+
+            <!-- Accordion for Credit To Be Paid -->
+            <div class="accordion">
+                <div class="accordion-header" onclick="toggleAccordion(this)"><i class="fa fa-chevron-down"></i> Credit
+                    To Be Paid (Filtered by Date Range)</div>
+                <div class="accordion-content cashless-scroll">
+                    {% import '_table_macros.html' as tmacros %}
+                    {{ tmacros.neat_table(['Patient ID', 'Bill No', 'Bill Date','Patient Name', 'Balance Amount'],
+                    recent_credit, view_type='credit') }}
+                </div>
+            </div>
+
+            <!-- Accordion for Sales Return -->
+            <div class="accordion">
+                <div class="accordion-header" onclick="toggleAccordion(this)"><i class="fa fa-chevron-down"></i> Sales
+                    Return (Filtered by Date Range)</div>
+                <div class="accordion-content">
+                    {% import '_table_macros.html' as tmacros %}
+                    {{ tmacros.neat_table(['Return Bill No', 'Return Date', 'Patient Name', 'View'], sales_return_rows,
+                    view_type='salesreturn') }}
+                </div>
             </div>
         </div>
-    </div>
-    <script>
-        function showLoading() {
-            document.getElementById('loadingSpinner').style.display = 'flex';
-        }
-        function toggleAccordion(header) {
-            var content = header.nextElementSibling;
-            var isOpen = content.classList.contains('open');
-            // Collapse all
-            document.querySelectorAll('.accordion-header').forEach(function(h) {
-                h.classList.remove('active');
-            });
-            document.querySelectorAll('.accordion-content').forEach(function(c) {
-                c.classList.remove('open');
-            });
-            // Toggle selected
-            if (!isOpen) {
-                header.classList.add('active');
-                content.classList.add('open');
+        <script>
+            function showLoading() {
+                document.getElementById('loadingSpinner').style.display = 'flex';
             }
-        }
-    </script>
-    <!-- Supplier Details Modal -->
-    <div id="supplierModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.3); z-index:9999; justify-content:center; align-items:center;">
-        <div style="background:#fff; border-radius:12px; padding:32px 24px; min-width:400px; max-width:90vw; box-shadow:0 2px 16px rgba(0,0,0,0.15);">
-            <h2 style="margin-bottom:18px; color:#007bff;">Supplier Details</h2>
-            <div style="max-height:400px; overflow-y:auto;">
-                <table class="neat-table">
-                    <thead>
-                        <tr>
-                            <th>Supplier Name</th>
-                            <th>Address</th>
-                            <th>Phone</th>
-                        </tr>
-                    </thead>
-                    <tbody id="supplierTableBody">
-                        <!-- Populated by JS -->
-                    </tbody>
-                </table>
+            function toggleAccordion(header) {
+                var content = header.nextElementSibling;
+                var isOpen = content.classList.contains('open');
+                // Collapse all
+                document.querySelectorAll('.accordion-header').forEach(function (h) {
+                    h.classList.remove('active');
+                });
+                document.querySelectorAll('.accordion-content').forEach(function (c) {
+                    c.classList.remove('open');
+                });
+                // Toggle selected
+                if (!isOpen) {
+                    header.classList.add('active');
+                    content.classList.add('open');
+                }
+            }
+        </script>
+        <!-- Supplier Details Modal -->
+        <div id="supplierModal"
+            style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.3); z-index:9999; justify-content:center; align-items:center;">
+            <div
+                style="background:#fff; border-radius:12px; padding:32px 24px; min-width:400px; max-width:90vw; box-shadow:0 2px 16px rgba(0,0,0,0.15);">
+                <h2 style="margin-bottom:18px; color:#007bff;">Supplier Details</h2>
+                <div style="max-height:400px; overflow-y:auto;">
+                    <table class="neat-table">
+                        <thead>
+                            <tr>
+                                <th>Supplier Name</th>
+                                <th>Address</th>
+                                <th>Phone</th>
+                            </tr>
+                        </thead>
+                        <tbody id="supplierTableBody">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <button onclick="closeSupplierModal()" class="neat-btn"
+                    style="margin-top:18px; background:#007bff;">Close</button>
             </div>
-            <button onclick="closeSupplierModal()" class="neat-btn" style="margin-top:18px; background:#007bff;">Close</button>
         </div>
-    </div>
-    <script>
-    document.getElementById('suppliersCard').onclick = function() {
-            fetch('/get_suppliers')
-                .then(response => response.json())
-                .then(data => {
-                    const tbody = document.getElementById('supplierTableBody');
-                    tbody.innerHTML = '';
-                    data.suppliers.forEach(supplier => {
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `
+        <script>
+            document.getElementById('suppliersCard').onclick = function () {
+                fetch('/get_suppliers')
+                    .then(response => response.json())
+                    .then(data => {
+                        const tbody = document.getElementById('supplierTableBody');
+                        tbody.innerHTML = '';
+                        data.suppliers.forEach(supplier => {
+                            const tr = document.createElement('tr');
+                            tr.innerHTML = `
                             <td>${supplier.SupplierName}</td>
                             <td>${supplier.Address || ''}</td>
                             <td>${supplier.Phone || ''}</td>
                         `;
-                        tbody.appendChild(tr);
+                            tbody.appendChild(tr);
+                        });
+                        document.getElementById('supplierModal').style.display = 'flex';
                     });
-                    document.getElementById('supplierModal').style.display = 'flex';
-                });
-    };
-    function closeSupplierModal() {
-        document.getElementById('supplierModal').style.display = 'none';
-    }
-    </script>
+            };
+            function closeSupplierModal() {
+                document.getElementById('supplierModal').style.display = 'none';
+            }
+        </script>
 </body>
+
 </html>
