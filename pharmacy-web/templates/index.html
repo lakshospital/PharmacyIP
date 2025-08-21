@@ -2,391 +2,216 @@
 <html>
 <head>
     <title>Pharmacy Bill</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
     <style>
-        /* Navbar styles */
-        .navbar {
-            background-color: #007bff;
-            padding: 0;
-            margin-bottom: 20px;
-            border-radius: 0 0 8px 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-        .navbar-menu {
-            list-style: none;
-            margin: 0;
-            padding: 0 20px;
-            display: flex;
-            align-items: center;
-            height: 48px;
-        }
-        .navbar-menu > li {
-            position: relative;
-        }
-        .navbar-menu > li > a {
-            display: block;
-            color: #fff;
-            text-decoration: none;
-            padding: 0 18px;
-            line-height: 48px;
-            font-weight: bold;
-            transition: background 0.2s;
-            border-radius: 4px;
-        }
-        .navbar-menu > li > a:hover,
-        .navbar-menu > li.dropdown:hover > a {
-            background: #0056b3;
-        }
-        .dropdown-menu {
-            display: none;
-            position: absolute;
-            background: #fff;
-            min-width: 160px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            border-radius: 4px;
-            top: 48px;
-            left: 0;
-            z-index: 1000;
-            padding: 6px 0;
-        }
-        .dropdown-menu li a {
-            color: #333;
-            padding: 8px 18px;
-            display: block;
-            text-decoration: none;
-            border-radius: 0;
-            font-weight: normal;
-        }
-        .dropdown-menu li a:hover {
-            background: #f2f2f2;
-        }
-        .navbar-menu > li.dropdown:hover .dropdown-menu {
-            display: block;
-        }
-        @media (max-width: 700px) {
-            .navbar-menu {
-                flex-direction: column;
-                height: auto;
+        @media print {
+            body * {
+                visibility: hidden !important;
             }
-            .navbar-menu > li {
-                width: 100%;
+            .card.print-area, .card.print-area * {
+                visibility: visible !important;
             }
-            .navbar-menu > li > a {
-                padding: 0 10px;
-            }
-            .dropdown-menu {
-                position: static;
-                box-shadow: none;
-                min-width: 100%;
+            .card.print-area {
+                position: absolute !important;
+                left: 0;
+                top: 0;
+                width: 100vw !important;
+                box-shadow: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
             }
         }
         body {
-            background-color: #EEE;
-            font-family: Arial, sans-serif;
+            background-color: #f6f8fa;
+            font-family: 'Inter', Arial, sans-serif;
         }
-        .search-form-container {
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            width: 90%;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .search-form, .sno-form, .controls-form {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .controls-form {
-             margin-top: 15px;
-             padding-top: 15px;
-             border-top: 1px solid #dee2e6;
-        }
-        .sno-form {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid #dee2e6;
-        }
-        .search-form label, .sno-form label, .controls-form label {
-            font-weight: bold;
-        }
-        .search-form input[type="text"], .search-form select {
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        .select2-container {
-            width: 200px !important;
-        }
-        .search-form button, .sno-form button, #print_button {
-            padding: 8px 15px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background-color 0.3s;
-        }
-        #print_button {
-            background-color: #28a745; /* Green for print */
-        }
-        .search-form button:hover, .sno-form button:hover {
-            background-color: #0056b3;
-        }
-        #print_button:hover {
-            background-color: #218838;
-        }
-        .sno-checkbox-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            max-height: 100px;
-            overflow-y: auto;
-            border: 1px solid #ccc;
-            padding: 10px;
-            border-radius: 4px;
-            background-color: #fff;
-        }
-        .sno-checkbox-container label {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-weight: normal;
-        }
-        /* Switch styles */
-        .switch {
-          position: relative;
-          display: inline-block;
-          width: 50px;
-          height: 24px;
-        }
-        .switch input { 
-          opacity: 0;
-          width: 0;
-          height: 0;
-        }
-        .slider {
-          position: absolute;
-          cursor: pointer;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background-color: #ccc;
-          transition: .4s;
-          border-radius: 24px;
-        }
-        .slider:before {
-          position: absolute;
-          content: "";
-          height: 16px;
-          width: 16px;
-          left: 4px;
-          bottom: 4px;
-          background-color: white;
-          transition: .4s;
-          border-radius: 50%;
-        }
-        input:checked + .slider {
-          background-color: #2196F3;
-        }
-        input:checked + .slider:before {
-          transform: translateX(26px);
-        }
-        .page {
-            background: white;
+        .main-content {
+            flex: 1;
+            padding: 32px 0 32px 0;
+            min-width: 0;
+            margin-left: 0;
             display: flex;
             flex-direction: column;
-            margin: 0 auto;
-            margin-bottom: 0.5cm;
-            box-shadow: 0 0 0.5cm rgba(0,0,0,0.5);
-            width: 90%; /* Match search form width for screen */
-        }
-        .page[size="A4"] {  
-            /* A4 size is enforced for printing only */
-            padding: 1.5cm;
-        }
-        .page-content {
-            flex-grow: 1;
-        }
-        .header-table, .bill-info-table, .items-table {
+            align-items: stretch;
             width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-            font-size: 12px;
         }
-        .header-table td {
-            padding: 2px;
-            vertical-align: top;
+        .card {
+            width: 100%;
+            margin-left: 0;
         }
-        .header-table .shop-details {
+        @media (max-width: 991px) {
+            .main-content {
+                padding: 16px 0;
+            }
+        }
+        @media (max-width: 991px) {
+            .main-content {
+                padding: 16px 8px;
+            }
+        }
+        .card {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            border-radius: 12px;
+        }
+        .form-label {
+            font-weight: 600;
+        }
+        .form-select, .form-control {
+            border-radius: 8px;
+        }
+        .form-check-input {
+            accent-color: #007bff;
+        }
+        .btn-primary, #print_button {
+            background: linear-gradient(90deg,#007bff 60%,#0056b3 100%);
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            padding: 8px 20px;
+            transition: box-shadow .2s;
+        }
+        .btn-primary:hover, #print_button:hover {
+            box-shadow: 0 2px 8px rgba(0,123,255,0.15);
+        }
+        .btn-success {
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        .table {
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .table th {
+            background: #f2f4f8;
+            font-weight: 600;
+        }
+        .table-striped > tbody > tr:nth-of-type(odd) {
+            background-color: #f8fafc;
+        }
+        .table td, .table th {
+            vertical-align: middle;
+        }
+        .muted-note {
+            color: #6c757d;
             text-align: center;
-        }
-        .header-table h2 {
-            margin: 0;
-            font-size: 20px;
-            font-weight: bold;
-        }
-        .bill-info-table td {
-            border: 1px solid #333;
-            padding: 5px;
-        }
-        .bill-info-table .label {
-            font-weight: bold;
-            width: 15%;
-        }
-        .bill-info-table .value {
-            width: 35%;
-        }
-        .items-table th, .items-table td {
-            border: 1px solid #333;
-            padding: 5px;
-            text-align: left;
-        }
-        .items-table th {
-            background-color: #f2f2f2;
-        }
-        .items-table .right {
-            text-align: right;
-        }
-        .items-table tfoot td {
-            font-weight: bold;
             font-size: 14px;
+            margin-top: 32px;
         }
-
-        @media print {
-            body, .page {
-                margin: 0;
-                box-shadow: none;
-                background: white;
-                width: auto; /* Reset width for print */
-            }
-            .page[size="A4"] {
-                width: 21cm;
-                height: 29.7cm;
-            }
-            .search-form-container {
-                display: none;
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+                padding: 16px 8px;
             }
         }
     </style>
+   
 </head>
 <body>
 
-    <nav class="navbar">
-        <ul class="navbar-menu">
-            <li><a href="/dashboard">Dashboard</a></li>
-            <li><a href="/">Bill Details</a></li>
-            <li class="dropdown">
-                <a href="#">Reports &#9662;</a>
-                <ul class="dropdown-menu">
-                    <li><a href="/report1">Report 1</a></li>
-                </ul>
-            </li>
-        </ul>
-    </nav>
-
-    <div class="search-form-container">
-        <form method="POST" id="main_form" autocomplete="off">
-            <div class="search-form">
-                <label for="bill_no">Bill No:</label>
-                <select id="bill_no" name="bill_no" required>
-                    <option></option>
-                    {% for bill in last_10_bills %}
-                    <option value="{{ bill }}" {% if request.form.bill_no == bill %}selected{% endif %}>{{ bill }}</option>
-                    {% endfor %}
-                </select>
-                <label for="year">Year:</label>
-                <select id="year" name="year" required>
-                    {% for year in years %}
-                    <option value="{{ year }}" {% if request.form.year == year|string %}selected{% endif %}>{{ year }}</option>
-                    {% endfor %}
-                </select>
-                 <label>Show Seq ID:</label>
-                <label class="switch">
-                  <input type="checkbox" name="show_seq_id" {% if show_seq_id %}checked{% endif %}>
-                  <span class="slider"></span>
-                </label>
-                <label>Show SNo:</label>
-                <label class="switch">
-                  <input type="checkbox" name="show_sno" {% if show_sno %}checked{% endif %}>
-                  <span class="slider"></span>
-                </label>
-
-                <button type="submit" name="search_bill">Search</button>
-            </div>
- 
-            {% if rows %}
-            <div class="sno-form">
-                <label for="sno_checkbox">Select SNo:</label>
-                <div class="sno-checkbox-container">
-                    {% for row in rows %}
-                    <label>
-                        <input type="checkbox" name="sno_checkbox" value="{{ row.SNo }}" checked>
-                        {{ row.SNo }}
-                    </label>
-                    {% endfor %}
+    {% include '_navbar.html' %}
+    <div class="container" style="max-width:100vw; margin-left:240px; padding:32px 32px 24px 32px; width:auto; box-sizing:border-box;">
+        <div class="card p-4 mb-4">
+            <form method="POST" id="main_form" autocomplete="off" class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label for="bill_no" class="form-label">Bill No:</label>
+                    <select id="bill_no" name="bill_no" class="form-select" required>
+                        <option></option>
+                        {% for bill in last_10_bills %}
+                        <option value="{{ bill }}" {% if request.form.bill_no == bill %}selected{% endif %}>{{ bill }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
-                <button type="submit" name="search_sno">Filter with SNo</button>
-                           {% if header_data %}
-                <button type="button" id="print_button">Print Bill</button>
+                <div class="col-md-2">
+                    <label for="year" class="form-label">Year:</label>
+                    <select id="year" name="year" class="form-select" required>
+                        {% for year in years %}
+                        <option value="{{ year }}" {% if request.form.year == year|string %}selected{% endif %}>{{ year }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="show_seq_id" name="show_seq_id" {% if show_seq_id %}checked{% endif %}>
+                        <label class="form-check-label" for="show_seq_id">Show Seq ID</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="show_sno" name="show_sno" {% if show_sno %}checked{% endif %}>
+                        <label class="form-check-label" for="show_sno">Show SNo</label>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" name="search_bill" class="btn btn-primary w-100">Search</button>
+                </div>
+            </form>
+            {% if rows %}
+            <form method="POST" class="row g-3 mt-3 align-items-end">
+                <div class="col-md-4">
+                    <label for="sno_checkbox" class="form-label">Select SNo:</label>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for row in rows %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="sno_checkbox" value="{{ row.SNo }}" checked>
+                            <label class="form-check-label">{{ row.SNo }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" name="search_sno" class="btn btn-primary w-100">Filter with SNo</button>
+                </div>
+                {% if header_data %}
+                <div class="col-md-2">
+                    <button type="button" id="print_button" class="btn btn-success w-100">Print Bill</button>
+                </div>
                 {% endif %}
-            </div>
+            </form>
             {% endif %}
-        </form>
-    </div>
-
-    {% if header_data %}
-    <div class="page" size="A4">
-        <div class="page-content">
-            <table class="header-table">
-                <tr>
-                    <td style="width:84%;" class="shop-details">
-                        <h2>Lakshmi Hospitals - Pharmacy </h2>
-                        <p>101 A, Madurai Road, Tirunelveli</p>
-                        <p>Ph: 0462 2334812</p>
-                    </td>
-                </tr>
-                 <tr>
-                    <td colspan="3" style="text-align:center; padding-top:5px;">Bill Printed As On: {{ print_time }}</td>
-                </tr>
+        </div>
+        {% if header_data %}
+        <div class="card p-4 print-area">
+            <div class="mb-3 text-center">
+                <h2 class="fw-bold mb-1">Lakshmi Hospitals - Pharmacy</h2>
+                <div class="text-muted">101 A, Madurai Road, Tirunelveli<br>Ph: 0462 2334812</div>
+            </div>
+            <div class="mb-2 text-center">
+                <span class="fw-semibold">Bill Printed As On:</span> {{ print_time }}
+            </div>
+            <table class="table table-bordered table-striped mb-3">
+                <tbody>
+                    <tr>
+                        <td class="fw-semibold">Bill No:</td>
+                        <td>{{ header_data.BillNo }}</td>
+                        <td class="fw-semibold">Bill Date:</td>
+                        <td>{{ header_data.BillDate.strftime('%d/%b/%Y') if header_data.BillDate }}</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-semibold">Dr. Name:</td>
+                        <td>{{ header_data.DrName }}</td>
+                        <td class="fw-semibold">Case:</td>
+                        <td>{{ header_data.Case }}</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-semibold">Patient ID:</td>
+                        <td>{{ header_data.PatientID }}</td>
+                        <td class="fw-semibold">Patient Name:</td>
+                        <td>{{ header_data.PatientName }}</td>
+                    </tr>
+                </tbody>
             </table>
-
-            <table class="bill-info-table">
-                <tr>
-                    <td class="label">Bill No:</td>
-                    <td class="value">{{ header_data.BillNo }}</td>
-                    <td class="label">Bill Date:</td>
-                    <td class="value">{{ header_data.BillDate.strftime('%d/%b/%Y') if header_data.BillDate }}</td>
-                </tr>
-                <tr>
-                    <td class="label">Dr. Name:</td>
-                    <td class="value">{{ header_data.DrName }}</td>
-                    <td class="label">Case:</td>
-                    <td class="value">{{ header_data.Case }}</td>
-                </tr>
-                <tr>
-                    <td class="label">Patient ID:</td>
-                    <td class="value">{{ header_data.PatientID }}</td>
-                    <td class="label">Patient Name:</td>
-                    <td class="value">{{ header_data.PatientName }}</td>
-                </tr>
-            </table>
-
-            <table class="items-table">
+            <table class="table table-bordered table-striped">
                 <thead>
                     <tr>
-                        {% if show_seq_id %}<th style="width:4%;">Id</th>{% endif %}
-                        {% if show_sno %}<th style="width:5%;">SNo</th>{% endif %}
+                        {% if show_seq_id %}<th>Id</th>{% endif %}
+                        {% if show_sno %}<th>SNo</th>{% endif %}
                         <th>Product Name</th>
                         <th>Batch No</th>
                         <th>Exp. Date</th>
-                        <th class="right">Qty</th>
-                        <th class="right">MRP</th>
-                        <th class="right">Total</th>
+                        <th class="text-end">Qty</th>
+                        <th class="text-end">MRP</th>
+                        <th class="text-end">Total</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -397,9 +222,9 @@
                         <td>{{ row.ProductName }}</td>
                         <td>{{ row.BatchNo }}</td>
                         <td>{{ row.ExpDate.strftime('%d/%b/%Y') if row.ExpDate }}</td>
-                        <td class="right">{{ row.Qty }}</td>
-                        <td class="right">{{ "%.2f"|format(row.MRP) }}</td>
-                        <td class="right">{{ "%.2f"|format(row.Total) }}</td>
+                        <td class="text-end">{{ row.Qty }}</td>
+                        <td class="text-end">{{ "%.2f"|format(row.MRP) }}</td>
+                        <td class="text-end">{{ "%.2f"|format(row.Total) }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -408,15 +233,15 @@
                     {% if show_seq_id %}{% set colspan = colspan + 1 %}{% endif %}
                     {% if show_sno %}{% set colspan = colspan + 1 %}{% endif %}
                     <tr>
-                        <td colspan="{{ colspan }}" class="right"><strong>Total Rs.</strong></td>
-                        <td class="right"><strong>{{ "%.2f"|format(grand_total) }}</strong></td>
+                        <td colspan="{{ colspan }}" class="text-end fw-bold">Total Rs.</td>
+                        <td class="text-end fw-bold">{{ "%.2f"|format(grand_total) }}</td>
                     </tr>
                 </tfoot>
             </table>
-            <p style="text-align: center; font-size: 12px; margin-top: 40px;">Please bring this bill for returning products.</p>
+            <div class="muted-note">Please bring this bill for returning products.</div>
         </div>
+        {% endif %}
     </div>
-    {% endif %}
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>

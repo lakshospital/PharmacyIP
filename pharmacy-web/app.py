@@ -39,11 +39,13 @@ def login():
         username = request.form.get('username')
         password = request.form.get('password')
         role = request.form.get('role')
+        print(f"[DEBUG] Received role from login form: {role}", flush=True)
         user = authenticate_user(username, password, role)
         if user:
             session['user_id'] = username  # Use username as ID for now
             session['username'] = username
             session['usertype'] = role
+            session['role'] = role
             return redirect(url_for('dashboard'))
         else:
             error = 'Invalid username, password, or role.'
@@ -299,6 +301,7 @@ def dashboard():
         credit_balance=credit_balance,
         from_date=from_date,
         to_date=to_date,
+        current_date=current_date_str,
         recent_sales=recent_sales,
         recent_purchases=recent_purchases,
         sales_return_rows=sales_return_rows,

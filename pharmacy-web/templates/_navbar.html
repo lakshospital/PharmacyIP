@@ -17,6 +17,22 @@
         z-index: 100;
         box-shadow: 0 2px 12px rgba(0,123,255,0.08);
     }
+    .user-info {
+        position: fixed;
+        top: 24px;
+        right: 32px;
+        z-index: 200;
+        background: #fff;
+        color: #007bff;
+        font-weight: 600;
+        font-size: 1.08em;
+        padding: 8px 18px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,123,255,0.08);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
     .sidebar .logo {
         font-size: 1.3em;
         font-weight: 600;
@@ -63,6 +79,12 @@
     <a href="{{ url_for('index') }}" {% if request.endpoint == 'index' %}class="active"{% endif %}><i class="fa-solid fa-file-invoice"></i>Bill Details</a>
     <a href="{{ url_for('report1') }}" {% if request.endpoint == 'report1' %}class="active"{% endif %}><i class="fa-solid fa-chart-bar"></i>Stock Report</a>
     <a href="{{ url_for('logout') }}"><i class="fa-solid fa-sign-out"></i>Logout</a>
+{% if session.get('username') %}
+<div class="user-info">
+    <i class="fa-solid fa-user"></i>
+    {{ session['username'] }}
+</div>
+{% endif %}
 </nav>
 <div class="container">
     {% block content %}{% endblock %}

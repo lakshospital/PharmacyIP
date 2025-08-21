@@ -76,24 +76,26 @@
             </form>
         </div>
     </div>
-    <table id="reportTable">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Product Name</th>
-                <th>Opening Stock</th>
-                <th>Purchase</th>
-                <th>Sales</th>
-                <th>Sales Return</th>
-                <th>Excess</th>
-                <th>Shortage</th>
-                <th>Closing Stock</th>
-                <th>Stock Value (Rs)</th>
-            </tr>
-        </thead>
-        <tbody id="reportBody">
-        </tbody>
-    </table>
+    <div style="max-height:700px; overflow-y:auto; overflow-x:auto; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.07); margin-bottom:24px; background:#fff;">
+        <table id="reportTable" style="width:100%; border-collapse:collapse;">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Product Name</th>
+                    <th>Opening Stock</th>
+                    <th>Purchase</th>
+                    <th>Sales</th>
+                    <th>Sales Return</th>
+                    <th>Excess</th>
+                    <th>Shortage</th>
+                    <th>Closing Stock</th>
+                    <th>Stock Value (Rs)</th>
+                </tr>
+            </thead>
+            <tbody id="reportBody">
+            </tbody>
+        </table>
+    </div>
     <div id="loadMore" style="text-align:center; margin: 20px 0; display:none;">
         <button id="loadMoreBtn">Load More</button>
     </div>
@@ -110,13 +112,15 @@
         </form>
     </div>
     {% endif %}
-<div id="spinner" style="display:none; text-align:center; margin-top:20px;">
-    <svg width="50" height="50" viewBox="0 0 50 50">
-        <circle cx="25" cy="25" r="20" stroke="#007bff" stroke-width="5" fill="none" stroke-linecap="round">
-            <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="1s" repeatCount="indefinite"/>
-        </circle>
-    </svg>
-    <div style="color:#007bff; font-weight:bold;">Loading...</div>
+<div id="spinner" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:9999; background:rgba(255,255,255,0.5); justify-content:center; align-items:center;">
+    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh;">
+        <svg width="50" height="50" viewBox="0 0 50 50">
+            <circle cx="25" cy="25" r="20" stroke="#007bff" stroke-width="5" fill="none" stroke-linecap="round">
+                <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="1s" repeatCount="indefinite"/>
+            </circle>
+        </svg>
+        <div style="color:#007bff; font-weight:bold; margin-top:12px; font-size:1.2em;">Loading...</div>
+    </div>
 </div>
 <script>
 let offset = 0;

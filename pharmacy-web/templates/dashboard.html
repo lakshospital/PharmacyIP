@@ -241,15 +241,17 @@
             <div class="loading-spinner" id="loadingSpinner">
                 <i class="fa-solid fa-spinner"></i>
             </div>
-            <label for="from_date" style="font-weight: bold; color: #333;">From Date:</label>
-            <input type="date" id="from_date" name="from_date" value="{{ from_date }}"
-                style="padding: 6px 12px; border-radius: 4px; border: 1px solid #ccc;">
-            <label for="to_date" style="font-weight: bold; color: #333;">To Date:</label>
-            <input type="date" id="to_date" name="to_date" value="{{ to_date }}"
-                style="padding: 6px 12px; border-radius: 4px; border: 1px solid #ccc;">
-            <script src="/static/dashboard.js"></script>
-            <button type="submit"
-                style="background: #007bff; color: #fff; border: none; border-radius: 4px; padding: 8px 18px; font-weight: bold; cursor: pointer;">Filter</button>
+            {% if session['role'] == 'admin' %}
+                <label for="from_date" style="font-weight: bold; color: #333;">From Date:</label>
+                <input type="date" id="from_date" name="from_date" value="{{ current_date }}"
+                    style="padding: 6px 12px; border-radius: 4px; border: 1px solid #ccc;">
+                <label for="to_date" style="font-weight: bold; color: #333;">To Date:</label>
+                <input type="date" id="to_date" name="to_date" value="{{ current_date }}"
+                    style="padding: 6px 12px; border-radius: 4px; border: 1px solid #ccc;">
+                <!-- Removed local storage date logic -->
+                <button type="submit"
+                    style="background: #007bff; color: #fff; border: none; border-radius: 4px; padding: 8px 18px; font-weight: bold; cursor: pointer;">Filter</button>
+            {% endif %}
         </form>
         {% include '_dashboard_cards.html' %}
 
