@@ -243,14 +243,16 @@
             </div>
             {% if session['role'] == 'admin' %}
                 <label for="from_date" style="font-weight: bold; color: #333;">From Date:</label>
-                <input type="date" id="from_date" name="from_date" value="{{ current_date }}"
+                <input type="date" id="from_date" name="from_date" value="{{ from_date if from_date else current_date }}"
                     style="padding: 6px 12px; border-radius: 4px; border: 1px solid #ccc;">
                 <label for="to_date" style="font-weight: bold; color: #333;">To Date:</label>
-                <input type="date" id="to_date" name="to_date" value="{{ current_date }}"
+                <input type="date" id="to_date" name="to_date" value="{{ to_date if to_date else current_date }}"
                     style="padding: 6px 12px; border-radius: 4px; border: 1px solid #ccc;">
-                <!-- Removed local storage date logic -->
                 <button type="submit"
                     style="background: #007bff; color: #fff; border: none; border-radius: 4px; padding: 8px 18px; font-weight: bold; cursor: pointer;">Filter</button>
+            {% else %}
+                <span style="font-weight:bold; color:#333; margin-right:16px;">Date:</span>
+                <span style="background:#f6faff; border-radius:4px; padding:6px 14px; font-size:1.05rem; border:1px solid #eee;">{{ current_date }}</span>
             {% endif %}
         </form>
         {% include '_dashboard_cards.html' %}

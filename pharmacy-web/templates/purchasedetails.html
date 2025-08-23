@@ -17,6 +17,7 @@
 </head>
 <body>
     {% include '_navbar.html' %}
+        <div class="container" style="padding-left:208px;">
     <h1>Purchase Details</h1>
     {% if header_data %}
     <table border="1" cellpadding="8" cellspacing="0" style="width:100%; margin-bottom: 18px;">
@@ -69,5 +70,6 @@
     {% else %}
     <div>No purchase details found.</div>
     {% endif %}
+        </div>
 </body>
 </html>

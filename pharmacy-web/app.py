@@ -11,9 +11,12 @@ from metrics import (
     get_cashless_metrics
 )
 from metrics import get_credit_metrics
+from credit_paid import credit_paid_bp
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'  # Change to a secure random value in production
+app.register_blueprint(credit_paid_bp)
+
 def authenticate_user(username, password, role):
     try:
         conn = get_db_connection()
@@ -403,7 +406,7 @@ def purchasedetails():
                     SELECT TOP 1 i.InvoiceNo, i.InvoiceDateTime, s.SupplierName
                     FROM InvoiceDetails i
                     LEFT JOIN SupplierMaster s ON i.SupplierID = s.SupplierID
-                    WHERE i.InvoiceNo = ? AND CAST(i.InvoiceDateTime AS DATE) = ?
+                    WHERE i.InvoiceNo = ? AND CONVERT(VARCHAR(10), i.InvoiceDateTime, 120) = ?
                 """, (invoice_no, invoice_date))
                 header_row = cursor.fetchone()
                 if header_row:
@@ -415,7 +418,7 @@ def purchasedetails():
                 cursor.execute("""
                     SELECT SNo, ProductName, Qty, BatchNo, ExpDate, VAT, MRP, HSR, Total
                     FROM InvoiceDetails
-                    WHERE InvoiceNo = ? AND CAST(InvoiceDateTime AS DATE) = ?
+                    WHERE InvoiceNo = ? AND CONVERT(VARCHAR(10), InvoiceDateTime, 120) = ?
                 """, (invoice_no, invoice_date))
                 rows = cursor.fetchall()
             else:
