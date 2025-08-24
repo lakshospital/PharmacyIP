@@ -12,10 +12,26 @@ from metrics import (
 )
 from metrics import get_credit_metrics
 from credit_paid import credit_paid_bp
+from consolidated_purchase_report import consolidated_purchase_report_bp
+from consolidated_sales_report import consolidated_sales_report_bp
+from consolidated_cashless_report import consolidated_cashless_report_bp
+from consolidated_credit_report import consolidated_credit_report_bp
+from consolidated_sales_return_report import consolidated_sales_return_report_bp
+
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'  # Change to a secure random value in production
 app.register_blueprint(credit_paid_bp)
+app.register_blueprint(consolidated_purchase_report_bp)
+app.register_blueprint(consolidated_sales_report_bp)
+app.register_blueprint(consolidated_cashless_report_bp)
+app.register_blueprint(consolidated_credit_report_bp)
+app.register_blueprint(consolidated_sales_return_report_bp)
+
+# Inject current datetime as 'now' into all templates for report header
+@app.context_processor
+def inject_now():
+    return {'now': datetime.datetime.now()}
 
 def authenticate_user(username, password, role):
     try:

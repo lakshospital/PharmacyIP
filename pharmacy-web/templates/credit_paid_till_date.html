@@ -35,7 +35,7 @@
                 <tr>
                     <td>{{ row.PatientID }}</td>
                     <td>{{ row.PatientName }}</td>
-                    <td>{{ row.BillNo }}</td>
+                    <td><a href="/creditdetails?bill_no={{ row.BillNo }}&bill_date={{ row.BillDate }}" style="color:#007bff; text-decoration:underline;">{{ row.BillNo }}</a></td>
                     <td>{{ row.BillDate }}</td>
                     <td>{{ row.BillAmount }}</td> <!-- This is the Due Amount value -->
                     <td>{{ row.BalanceAmount }}</td>

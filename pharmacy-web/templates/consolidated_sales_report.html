@@ -1,0 +1,102 @@
+<!-- DataTables CSS & JS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+{% include '_navbar.html' %}
+<div class="container" style="max-width:100vw; margin-left:200px; padding:32px 32px 24px 32px; width:auto; box-sizing:border-box;">
+    {% include 'report_header.html' %}
+    <h2 style="color:#1976d2; margin-bottom:24px;">Consolidated Sales Report</h2>
+    <style>
+    @media print {
+        .no-print { display: none !important; }
+        .print-title { display: block !important; }
+    }
+    .print-title { display: none; text-align:center; color:#1976d2; margin-bottom:24px; font-size:2rem; font-weight:bold; }
+    </style>
+    <div class="print-title">Consolidated Sales Report</div>
+    <form method="get" action="/consolidatedsalesreport" style="margin-bottom:24px;">
+    <div id="report-dates" style="display:flex; align-items:center; gap:18px;">
+        <label for="from_date"><strong>From Date:</strong></label>
+        <input type="date" id="from_date" name="from_date" value="{{ from_date or '' }}" required>
+        <label for="to_date"><strong>To Date:</strong></label>
+        <input type="date" id="to_date" name="to_date" value="{{ to_date or '' }}" required>
+    <button type="submit" class="no-print" style="background:#1976d2; color:#fff; border:none; padding:8px 16px; border-radius:4px;">Fetch Report</button>
+    <button type="button" onclick="printReportTable()" class="no-print" style="background:#388e3c; color:#fff; border:none; padding:8px 18px; border-radius:6px; font-weight:500; margin-left:8px;">Print</button>
+    </div>
+    </form>
+    <div style="overflow-x:auto;">
+    <div style="max-height:500px; overflow:auto;">
+    <div id="report-table-area">
+    <table style="width:100%; min-width:1200px; border-collapse:collapse; box-shadow:0 2px 8px rgba(0,0,0,0.05); border-radius:8px; overflow:hidden;">
+            <thead style="background:#f5f5f5;">
+                <tr>
+                    <th style="padding:12px; border:1px solid #e0e0e0;">Bill No</th>
+                    <th style="padding:12px; border:1px solid #e0e0e0;">Bill Date</th>
+                    <th style="padding:12px; border:1px solid #e0e0e0;">Patient Name</th>
+                    <th style="padding:12px; border:1px solid #e0e0e0;">Product Name</th>
+                    <th style="padding:12px; border:1px solid #e0e0e0;">Batch No</th>
+                    <th style="padding:12px; border:1px solid #e0e0e0;">Exp Date</th>
+                    <th style="padding:12px; border:1px solid #e0e0e0;">Qty</th>
+                    <th style="padding:12px; border:1px solid #e0e0e0;">MRP</th>
+                    <th style="padding:12px; border:1px solid #e0e0e0;">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if rows %}
+                    {% for row in rows %}
+                        {% if loop.index0 % 2 == 0 %}
+                        <tr style="background:#fff;">
+                        {% else %}
+                        <tr style="background:#f9f9f9;">
+                        {% endif %}
+                            <td style="padding:10px; border:1px solid #e0e0e0;">{{ row.BillNo }}</td>
+                            <td style="padding:10px; border:1px solid #e0e0e0;">{{ row.BillDate.strftime('%d/%b/%Y') if row.BillDate }}</td>
+                            <td style="padding:10px; border:1px solid #e0e0e0;">{{ row.PatientName }}</td>
+                            <td style="padding:10px; border:1px solid #e0e0e0;">{{ row.ProductName }}</td>
+                            <td style="padding:10px; border:1px solid #e0e0e0;">{{ row.BatchNo }}</td>
+                            <td style="padding:10px; border:1px solid #e0e0e0;">{{ row.ExpDate.strftime('%d/%b/%Y') if row.ExpDate }}</td>
+                            <td style="padding:10px; border:1px solid #e0e0e0; text-align:right;">{{ row.Qty }}</td>
+                            <td style="padding:10px; border:1px solid #e0e0e0; text-align:right;">{{ row.MRP }}</td>
+                            <td style="padding:10px; border:1px solid #e0e0e0; text-align:right;">{{ row.Total }}</td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="9" style="text-align:center; padding:24px; color:#888;">No records found for the selected due date.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+<script>
+
+function printReportTable() {
+    // Hide everything except the hospital header, table, and dates
+    const header = document.getElementById('hospital-header').cloneNode(true);
+    const dates = document.getElementById('report-dates').cloneNode(true);
+    const tableArea = document.getElementById('report-table-area').cloneNode(true);
+    const printWindow = window.open('', '', 'width=1200,height=800');
+    printWindow.document.write('<html><head><title>Print Report</title>');
+    printWindow.document.write('<style>body{font-family:sans-serif;} table{width:100%;border-collapse:collapse;} th,td{padding:10px;border:1px solid #e0e0e0;} thead{background:#f5f5f5;} h2{font-weight:bold;} </style>');
+    printWindow.document.write('</head><body>');
+    printWindow.document.write(header.outerHTML);
+    printWindow.document.write('<h2 style="text-align:center; color:#1976d2; margin-bottom:24px;">Consolidated Sales Report</h2>');
+    printWindow.document.write('<div style="margin-bottom:18px;">' + dates.innerHTML + '</div>');
+    printWindow.document.write(tableArea.innerHTML);
+    printWindow.document.write('</body></html>');
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+    // Do NOT close the print window automatically; let the user close it.
+}
+</script>
+    </div>
+    </div>
+</div>

@@ -6,17 +6,39 @@
     <link rel="stylesheet" href="/static/dashboard.css">
 </head>
 <body>
-    <div style="max-width: 800px; margin: 0 auto; padding: 32px;">
-        <h2 style="color: #007bff; margin-bottom: 18px;">Credit Bill Details</h2>
-        {% if header_data %}
-        <div style="margin-bottom: 18px;">
-            <strong>Bill No:</strong> {{ header_data.BillNo }}<br>
-            <strong>Bill Date:</strong> {{ header_data.BillDate.strftime('%d/%b/%Y') if header_data.BillDate else '-' }}<br>
-            <strong>Patient ID:</strong> {{ header_data.PatientID }}<br>
-            <strong>Patient Name:</strong> {{ header_data.PatientName }}<br>
-            <strong>Printed At:</strong> {{ print_time }}
-        </div>
-        {% endif %}
+    {% include '_navbar.html' %}
+    <div class="container" style="max-width: 900px; margin: 0 auto; padding: 32px;">
+        <h1 style="color: #007bff; margin-bottom: 18px;">Credit Bill Details</h1>
+        <table border="1" cellpadding="8" cellspacing="0" style="width:100%; margin-bottom: 18px;">
+            <tr>
+                <th>Bill No</th>
+                <td>{{ header_data.BillNo if header_data else '-' }}</td>
+                <th>Bill Date</th>
+                <td>{{ header_data.BillDate.strftime('%d/%b/%Y') if header_data and header_data.BillDate else '-' }}</td>
+            </tr>
+            <tr>
+                <th>Patient ID</th>
+                <td>{{ header_data.PatientID if header_data else '-' }}</td>
+                <th>Patient Name</th>
+                <td>{{ header_data.PatientName if header_data else '-' }}</td>
+            </tr>
+            <tr>
+                <th>Bill Status</th>
+                <td>{{ header_data.BillStatus if header_data else '-' }}</td>
+                <th></th>
+                <td></td>
+            </tr>
+            <tr>
+                <th>Due Amount</th>
+                <td>{{ header_data.DueAmount if header_data else '-' }}</td>
+                <th>Balance Amount</th>
+                <td>{{ header_data.BalanceAmount if header_data else '-' }}</td>
+            </tr>
+            <tr>
+                <th>Printed At</th>
+                <td colspan="3">{{ print_time }}</td>
+            </tr>
+        </table>
         <table class="neat-table">
             <thead>
                 <tr>
@@ -36,6 +58,8 @@
                     <td>{{ row.BalanceAmount }}</td>
                     <td>{{ row.DueStatus }}</td>
                 </tr>
+                {% else %}
+                <tr><td colspan="5" style="text-align:center; color:#888;">No details found for this bill.</td></tr>
                 {% endfor %}
             </tbody>
         </table>

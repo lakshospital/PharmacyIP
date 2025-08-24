@@ -260,7 +260,13 @@
         <!-- Accordion for Purchases -->
         <div class="accordion">
             <div class="accordion-header" onclick="toggleAccordion(this)"><i class="fa fa-chevron-down"></i> Purchases
-                (Filtered by Date Range)</div>
+                (Filtered by Date Range)
+                <a href="/consolidatedpurchasereport?from_date={{ from_date }}&to_date={{ to_date }}"
+                   target="_blank"
+                   style="background:#1976d2; color:#fff; padding:8px 18px; border-radius:6px; text-decoration:none; font-weight:500; box-shadow:0 2px 6px rgba(25,118,210,0.08); margin-left:16px; float:right;">
+                    Consolidated Purchase Report
+                </a>
+            </div>
             <div class="accordion-content purchases-scroll">
                 {% import '_table_macros.html' as tmacros %}
                 {{ tmacros.neat_table(['Invoice No', 'Invoice Date', 'Supplier Name', 'View'], recent_purchases,
@@ -270,7 +276,13 @@
             <!-- Accordion for Sales -->
             <div class="accordion">
                 <div class="accordion-header" onclick="toggleAccordion(this)"><i class="fa fa-chevron-down"></i> Sales
-                    (Filtered by Date Range)</div>
+                    (Filtered by Date Range)
+                    <a href="/consolidatedsalesreport?from_date={{ from_date }}&to_date={{ to_date }}"
+                       target="_blank"
+                       style="background:#1976d2; color:#fff; padding:8px 18px; border-radius:6px; text-decoration:none; font-weight:500; box-shadow:0 2px 6px rgba(25,118,210,0.08); margin-left:16px; float:right;">
+                        Consolidated Sales Report
+                    </a>
+                </div>
                 <div class="accordion-content sales-scroll">
                     {% import '_table_macros.html' as tmacros %}
                     {{ tmacros.neat_table(['Bill No', 'Bill Date', 'Patient Name', 'View'], recent_sales,
@@ -281,7 +293,13 @@
             <!-- Accordion for Cashless -->
             <div class="accordion">
                 <div class="accordion-header" onclick="toggleAccordion(this)"><i class="fa fa-chevron-down"></i>
-                    Cashless (Filtered by Date Range)</div>
+                    Cashless (Filtered by Date Range)
+                    <a href="/consolidatedcashlessreport?from_date={{ from_date }}&to_date={{ to_date }}"
+                       target="_blank"
+                       style="background:#1976d2; color:#fff; padding:8px 18px; border-radius:6px; text-decoration:none; font-weight:500; box-shadow:0 2px 6px rgba(25,118,210,0.08); margin-left:16px; float:right;">
+                        Consolidated Cashless Report
+                    </a>
+                </div>
                 <div class="accordion-content cashless-scroll">
                     {% import '_table_macros.html' as tmacros %}
                     {{ tmacros.neat_table(['Bill No', 'Bill Date', 'Patient Name', 'View'], recent_cashless,
@@ -292,7 +310,13 @@
             <!-- Accordion for Credit To Be Paid -->
             <div class="accordion">
                 <div class="accordion-header" onclick="toggleAccordion(this)"><i class="fa fa-chevron-down"></i> Credit
-                    To Be Paid (Filtered by Date Range)</div>
+                    To Be Paid (Filtered by Date Range)
+                    <a href="/consolidatedcreditreport?from_date={{ from_date }}&to_date={{ to_date }}"
+                       target="_blank"
+                       style="background:#1976d2; color:#fff; padding:8px 18px; border-radius:6px; text-decoration:none; font-weight:500; box-shadow:0 2px 6px rgba(25,118,210,0.08); margin-left:16px; float:right;">
+                        Consolidated Credit Report
+                    </a>
+                </div>
                 <div class="accordion-content cashless-scroll">
                     {% import '_table_macros.html' as tmacros %}
                     {{ tmacros.neat_table(['Patient ID', 'Bill No', 'Bill Date','Patient Name', 'Balance Amount'],
@@ -303,7 +327,13 @@
             <!-- Accordion for Sales Return -->
             <div class="accordion">
                 <div class="accordion-header" onclick="toggleAccordion(this)"><i class="fa fa-chevron-down"></i> Sales
-                    Return (Filtered by Date Range)</div>
+                    Return (Filtered by Date Range)
+                    <a href="/consolidatedsalesreturnreport?from_date={{ from_date }}&to_date={{ to_date }}"
+                       target="_blank"
+                       style="background:#1976d2; color:#fff; padding:8px 18px; border-radius:6px; text-decoration:none; font-weight:500; box-shadow:0 2px 6px rgba(25,118,210,0.08); margin-left:16px; float:right;">
+                        Consolidated Sales Return Report
+                    </a>
+                </div>
                 <div class="accordion-content">
                     {% import '_table_macros.html' as tmacros %}
                     {{ tmacros.neat_table(['Return Bill No', 'Return Date', 'Patient Name', 'View'], sales_return_rows,

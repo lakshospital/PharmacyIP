@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Purchase Details</title>
+    <title>Sales Details</title>
     <style>
         .navbar {background-color: #007bff; padding: 0; margin-bottom: 20px; border-radius: 0 0 8px 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);}
         .navbar-menu {list-style: none; margin: 0; padding: 0 20px; display: flex; align-items: center; height: 48px;}
@@ -17,16 +17,16 @@
 </head>
 <body>
     {% include '_navbar.html' %}
-<div style="text-align:center; margin-top:20px;">
+<div style="text-align:center; margin-top:10px; padding-left:200px;">
     <h2 style="font-weight:bold; margin-bottom:0;">Lakshmi Hospitals - Pharmacy</h2>
     <div>101 A, Madurai Road, Tirunelveli</div>
     <div>Ph: 0462 2334812</div>
     <div style="margin-bottom:10px;">Bill Printed As On: {{ print_time }}</div>
 </div>
-<table style="width:100%; border-collapse:collapse; margin-bottom:10px;">
+<table style="width:calc(100% - 200px); border-collapse:collapse; margin-bottom:10px; margin-left:300px; border:2px solid #007bff; border-radius:8px;">
     <tr>
         <td><strong>Bill No:</strong> {{ header_data.ReturnBillNo }}</td>
-        <td><strong>Bill Date:</strong> {{ header_data.ReturnBillDateTime }}</td>
+        <td><strong>Bill Date</strong> {{ header_data.ReturnBillDateTime }}</td>
     </tr>
     <tr>
         <td><strong>Dr. Name:</strong> {{ header_data.DrName }}</td>
