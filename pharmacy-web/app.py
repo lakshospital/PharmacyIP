@@ -12,14 +12,14 @@ from metrics import (
 )
 from metrics import get_credit_metrics
 from credit_paid import credit_paid_bp
-from consolidated_purchase_report import consolidated_purchase_report_bp
-from consolidated_sales_report import consolidated_sales_report_bp
-from consolidated_cashless_report import consolidated_cashless_report_bp
-from consolidated_credit_report import consolidated_credit_report_bp
+from backend.consolidated_purchase_report import consolidated_purchase_report_bp
+from backend.consolidated_sales_report import consolidated_sales_report_bp
+from backend.consolidated_cashless_report import consolidated_cashless_report_bp
+from backend.consolidated_credit_report import consolidated_credit_report_bp
 
 from product_master import product_master_bp
 from product_group_master import product_group_master_bp
-from consolidated_sales_return_report import consolidated_sales_return_report_bp
+from backend.consolidated_sales_return_report import consolidated_sales_return_report_bp
 
 
 app = Flask(__name__)

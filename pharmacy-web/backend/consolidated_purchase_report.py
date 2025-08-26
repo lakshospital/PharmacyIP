@@ -35,4 +35,4 @@ def consolidated_purchase_report():
     except Exception as e:
         error = f"Error fetching report: {e}"
         logging.error(error)
-    return render_template('consolidated_purchase_report.html', rows=rows, from_date=from_date, to_date=to_date, error=error)
+    return render_template('consolidated/consolidated_purchase_report.html', rows=rows, from_date=from_date, to_date=to_date, error=error)

@@ -26,4 +26,4 @@ def consolidated_credit_report():
             conn.close()
         except Exception as e:
             print(f"[ERROR] Consolidated Credit Report: {e}")
-    return render_template('consolidated_credit_report.html', rows=rows, from_date=from_date, to_date=to_date)
+    return render_template('consolidated/consolidated_credit_report.html', rows=rows, from_date=from_date, to_date=to_date)

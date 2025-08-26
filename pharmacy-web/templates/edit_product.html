@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid" style="max-width:100vw; margin:auto; padding:32px;">
+    <h2 style="color:#1976d2; margin-bottom:24px; text-align:center;">Edit Product</h2>
+    <form method="post" class="card shadow-sm" style="padding:24px; border-radius:16px; background:#fff; max-width:600px; margin:auto;">
+        <div class="row g-3">
+            <div class="col-md-12 mb-3">
+                <label class="form-label">Product Name</label>
+                <input type="text" name="product_name" class="form-control" value="{{ product.ProductName }}" required>
+            </div>
+            <div class="col-md-12 mb-3">
+                <label class="form-label">Product Group</label>
+                <input type="text" name="product_group" class="form-control" value="{{ product.ProductGroup }}">
+            </div>
+            <div class="col-md-12 mb-3">
+                <label class="form-label">Rack No</label>
+                <input type="text" name="rack_no" class="form-control" value="{{ product.RackNo }}">
+            </div>
+            <div class="col-md-12 mb-3">
+                <label class="form-label">Minimum Stock To Maintain</label>
+                <input type="number" name="min_stock" class="form-control" value="{{ product.MinimumStockToMaintain }}">
+            </div>
+            <div class="col-md-12 mb-3">
+                <label class="form-label">Manufacturer</label>
+                <input type="text" name="manufacturer" class="form-control" value="{{ product.Manufacturer }}">
+            </div>
+        </div>
+        <div class="d-flex justify-content-end mt-4">
+            <button type="submit" class="btn btn-primary px-4 py-2">Update Product</button>
+            <a href="{{ url_for('product_master_bp.product_master') }}" class="btn btn-secondary px-4 py-2 ms-2">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
