@@ -78,6 +78,8 @@
     <a href="{{ url_for('dashboard') }}" {% if request.endpoint == 'dashboard' %}class="active"{% endif %}><i class="fa-solid fa-gauge"></i>Dashboard</a>
     <a href="{{ url_for('index') }}" {% if request.endpoint == 'index' %}class="active"{% endif %}><i class="fa-solid fa-file-invoice"></i>Bill Details</a>
     <a href="{{ url_for('report1') }}" {% if request.endpoint == 'report1' %}class="active"{% endif %}><i class="fa-solid fa-chart-bar"></i>Stock Report</a>
+    <a href="{{ url_for('product_master_bp.product_master') }}" {% if request.endpoint == 'product_master_bp.product_master' %}class="active"{% endif %}><i class="fa fa-box"></i>Product Master</a>
+    <a href="{{ url_for('product_group_master_bp.product_group_master') }}" {% if request.endpoint == 'product_group_master_bp.product_group_master' %}class="active"{% endif %}><i class="fa fa-layer-group"></i>Product Group Master</a>
     <a href="{{ url_for('credit_paid_bp.credit_paid_till_date') }}" {% if request.endpoint == 'credit_paid_bp.credit_paid_till_date' %}class="active"{% endif %}><i class="fa-solid fa-money-check-alt"></i>Credits</a>
     <a href="#" id="logoutBtn"><i class="fa-solid fa-sign-out"></i>Logout</a>
 {% if session.get('username') %}
