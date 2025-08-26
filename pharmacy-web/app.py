@@ -17,8 +17,8 @@ from backend.consolidated_sales_report import consolidated_sales_report_bp
 from backend.consolidated_cashless_report import consolidated_cashless_report_bp
 from backend.consolidated_credit_report import consolidated_credit_report_bp
 
-from product_master import product_master_bp
-from product_group_master import product_group_master_bp
+from backend.product_master import product_master_bp
+from backend.product_group_master import product_group_master_bp
 from backend.consolidated_sales_return_report import consolidated_sales_return_report_bp
 
 
