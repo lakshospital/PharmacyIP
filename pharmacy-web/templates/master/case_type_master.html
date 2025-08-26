@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    .ctm-wrapper { display: flex; flex-direction: column; align-items: center; min-height: 80vh; background: #f7faff; padding-top: 32px; }
+    .ctm-card { background: #fff; border-radius: 18px; box-shadow: 0 2px 16px rgba(25, 118, 210, 0.08); padding: 32px 32px 24px 32px; margin-bottom: 32px; max-width: 420px; width: 100%; display: flex; flex-direction: column; align-items: center; }
+    .ctm-card label { font-weight: 500; color: #1976d2; margin-bottom: 8px; }
+    .ctm-card input[type="text"] { border-radius: 8px; border: 1px solid #dbeafe; padding: 10px 14px; font-size: 1.08em; margin-bottom: 12px; width: 100%; background: #f7faff; }
+    .ctm-card .btn-primary { background: #1976d2; border: none; border-radius: 8px; padding: 10px 32px; font-weight: 600; font-size: 1.08em; box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08); }
+    .ctm-table-card { background: #fff; border-radius: 18px; box-shadow: 0 2px 16px rgba(25, 118, 210, 0.08); padding: 24px; max-width: 700px; width: 100%; margin: auto; }
+    .ctm-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 1.05em; background: #fff; }
+    .ctm-table th { background: #e3f2fd; color: #1976d2; font-weight: 600; padding: 12px 8px; border-bottom: 2px solid #dbeafe; position: sticky; top: 0; z-index: 2; }
+    .ctm-table td { padding: 10px 8px; border-bottom: 1px solid #f0f4f8; background: #fff; }
+    .ctm-table tr:nth-child(even) td { background: #f7faff; }
+    .ctm-table tr:hover td { background: #e3f2fd; }
+    .ctm-table .btn-warning { background: #ffb300; color: #fff; border: none; border-radius: 6px; padding: 6px 18px; font-weight: 500; margin-right: 4px; }
+    .ctm-table .btn-danger { background: #e53935; color: #fff; border: none; border-radius: 6px; padding: 6px 18px; font-weight: 500; }
+    @media (max-width: 900px) { .ctm-table-card { max-width: 98vw; padding: 8px; } .ctm-card { max-width: 98vw; padding: 18px; } }
+</style>
+<div class="ctm-wrapper">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div style="max-width:420px; margin:auto; margin-bottom:18px;">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ 'danger' if category == 'danger' else 'success' }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    <h2 style="color:#1976d2; margin-bottom:24px; text-align:center; font-weight:700;">Case Type Master</h2>
+    {% if session['role'] == 'admin' %}
+    <form method="post" class="ctm-card">
+        <div style="width:100%;">
+            <label class="form-label">Case Name</label>
+            <input type="text" name="case_name" class="form-control" required value="{{ case_to_edit.CaseName if case_to_edit else '' }}">
+            {% if case_to_edit %}
+                <input type="hidden" name="case_name_old" value="{{ case_to_edit.CaseName }}">
+            {% endif %}
+        </div>
+        <div class="d-flex justify-content-end mt-4" style="width:100%;">
+            {% if case_to_edit %}
+                <button type="submit" name="action" value="edit" class="btn btn-primary">Update Case Type</button>
+                <a href="{{ url_for('case_type_master_bp.case_type_master') }}" class="btn btn-secondary ms-2" style="border-radius:8px; padding:10px 32px; font-weight:600;">Cancel</a>
+            {% else %}
+                <button type="submit" name="action" value="add" class="btn btn-primary">Add Case Type</button>
+            {% endif %}
+        </div>
+    </form>
+    {% endif %}
+    <div class="ctm-table-card">
+        <div style="overflow-x:auto; overflow-y:auto; max-height:400px;">
+            <table id="caseTypeTable" class="ctm-table">
+                <thead>
+                    <tr>
+                        <th>Case Name</th>
+                        <th style="text-align:center;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for case in cases %}
+                        {% if case.CaseName and case.CaseName.strip() %}
+                        <tr>
+                            <td>{{ case.CaseName }}</td>
+                            <td style="text-align:center;">
+                                {% if session['role'] == 'admin' %}
+                                    <a href="{{ url_for('case_type_master_bp.case_type_master', edit=case.CaseName) }}" class="btn btn-sm btn-warning">Edit</a>
+                                    <form method="post" style="display:inline;">
+                                        <input type="hidden" name="case_name_old" value="{{ case.CaseName }}">
+                                        <input type="hidden" name="case_name" value="{{ case.CaseName }}">
+                                        <button type="submit" name="action" value="delete" class="btn btn-sm btn-danger" onclick="return confirm('Delete this case type?');">Delete</button>
+                                    </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#caseTypeTable').DataTable({
+        scrollX: true,
+        scrollY: 300,
+        paging: true,
+        responsive: true
+    });
+});
+</script>
+{% endblock %}

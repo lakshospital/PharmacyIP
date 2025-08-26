@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    .sm-wrapper { display: flex; flex-direction: column; align-items: center; min-height: 80vh; background: #f7faff; padding-top: 32px; }
+    .sm-card { background: #fff; border-radius: 18px; box-shadow: 0 2px 16px rgba(25, 118, 210, 0.08); padding: 32px 32px 24px 32px; margin-bottom: 32px; max-width: 700px; width: 100%; display: flex; flex-direction: column; align-items: center; }
+    .sm-card label { font-weight: 500; color: #1976d2; margin-bottom: 8px; }
+    .sm-card input[type="text"], .sm-card input[type="email"] { border-radius: 8px; border: 1px solid #dbeafe; padding: 10px 14px; font-size: 1.08em; margin-bottom: 12px; width: 100%; background: #f7faff; }
+    .sm-card .btn-primary { background: #1976d2; border: none; border-radius: 8px; padding: 10px 32px; font-weight: 600; font-size: 1.08em; box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08); }
+    .sm-table-card { background: #fff; border-radius: 18px; box-shadow: 0 2px 16px rgba(25, 118, 210, 0.08); padding: 24px; width: 98vw; max-width: 1800px; margin: 24px auto; box-sizing: border-box; }
+    .sm-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 1.05em; background: #fff; }
+    .sm-table th { background: #e3f2fd; color: #1976d2; font-weight: 600; padding: 12px 8px; border-bottom: 2px solid #dbeafe; position: sticky; top: 0; z-index: 2; }
+    .sm-table td { padding: 10px 8px; border-bottom: 1px solid #f0f4f8; background: #fff; }
+    .sm-table tr:nth-child(even) td { background: #f7faff; }
+    .sm-table tr:hover td { background: #e3f2fd; }
+    .sm-table .btn-warning { background: #ffb300; color: #fff; border: none; border-radius: 6px; padding: 6px 18px; font-weight: 500; margin-right: 4px; }
+    .sm-table .btn-danger { background: #e53935; color: #fff; border: none; border-radius: 6px; padding: 6px 18px; font-weight: 500; }
+    @media (max-width: 900px) { .sm-table-card { max-width: 98vw; padding: 8px; } .sm-card { max-width: 98vw; padding: 18px; } }
+</style>
+<div class="sm-wrapper">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div style="max-width:700px; margin:auto; margin-bottom:18px;">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ 'danger' if category == 'danger' else 'success' }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    <h2 style="color:#1976d2; margin-bottom:24px; text-align:center; font-weight:700;">Supplier Master</h2>
+    {% if session['role'] == 'admin' %}
+    <form method="post" class="sm-card">
+        <input type="hidden" name="supplier_id" value="{{ supplier_to_edit.SupplierID if supplier_to_edit else '' }}">
+        <div style="width:100%; display:grid; grid-template-columns:1fr 1fr; gap:18px;">
+            <div>
+                <label>Supplier Name</label>
+                <input type="text" name="supplier_name" class="form-control" required value="{{ supplier_to_edit.SupplierName if supplier_to_edit else '' }}">
+                <label>Street 1</label>
+                <input type="text" name="street1" class="form-control" value="{{ supplier_to_edit.Street1 if supplier_to_edit else '' }}">
+                <label>Street 2</label>
+                <input type="text" name="street2" class="form-control" value="{{ supplier_to_edit.Street2 if supplier_to_edit else '' }}">
+                <label>City</label>
+                <input type="text" name="city" class="form-control" value="{{ supplier_to_edit.City if supplier_to_edit else '' }}">
+                <label>PIN Code</label>
+                <input type="text" name="pincode" class="form-control" value="{{ supplier_to_edit.PINCode if supplier_to_edit else '' }}">
+            </div>
+            <div>
+                <label>Email</label>
+                <input type="email" name="email" class="form-control" value="{{ supplier_to_edit.eMail if supplier_to_edit else '' }}">
+                <label>Phone</label>
+                <input type="text" name="phone" class="form-control" value="{{ supplier_to_edit.Phone if supplier_to_edit else '' }}">
+                <label>TIN No</label>
+                <input type="text" name="tinno" class="form-control" value="{{ supplier_to_edit.TINNo if supplier_to_edit else '' }}">
+            </div>
+        </div>
+        <div class="d-flex justify-content-end mt-4" style="width:100%;">
+            {% if supplier_to_edit %}
+                <button type="submit" name="action" value="edit" class="btn btn-primary">Update Supplier</button>
+                <a href="{{ url_for('supplier_master_bp.supplier_master') }}" class="btn btn-secondary ms-2" style="border-radius:8px; padding:10px 32px; font-weight:600;">Cancel</a>
+            {% else %}
+                <button type="submit" name="action" value="add" class="btn btn-primary">Add Supplier</button>
+            {% endif %}
+        </div>
+    </form>
+    {% endif %}
+    <div class="sm-table-card">
+        <div style="overflow-x:auto; overflow-y:auto; max-height:600px;">
+            <table id="supplierTable" class="sm-table" style="width:100%;">
+                <thead>
+                    <tr>
+                        <th>Supplier Name</th>
+                        <th>Street 1</th>
+                        <th>Street 2</th>
+                        <th>City</th>
+                        <th>PIN Code</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>TIN No</th>
+                        <th style="text-align:center;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for supplier in suppliers %}
+                        {% if supplier.SupplierName and supplier.SupplierName.strip() %}
+                        <tr>
+                            <td>{{ supplier.SupplierName }}</td>
+                            <td>{{ supplier.Street1 }}</td>
+                            <td>{{ supplier.Street2 }}</td>
+                            <td>{{ supplier.City }}</td>
+                            <td>{{ supplier.PINCode }}</td>
+                            <td>{{ supplier.eMail }}</td>
+                            <td>{{ supplier.Phone }}</td>
+                            <td>{{ supplier.TINNo }}</td>
+                            <td style="text-align:center;">
+                                {% if session['role'] == 'admin' %}
+                                    <a href="{{ url_for('supplier_master_bp.supplier_master', edit=supplier.SupplierID) }}" class="btn btn-sm btn-warning">Edit</a>
+                                    <form method="post" style="display:inline;">
+                                        <input type="hidden" name="supplier_id" value="{{ supplier.SupplierID }}">
+                                        <button type="submit" name="action" value="delete" class="btn btn-sm btn-danger" onclick="return confirm('Delete this supplier?');">Delete</button>
+                                    </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#supplierTable').DataTable({
+        scrollX: true,
+        scrollY: 400,
+        paging: true,
+        responsive: true,
+        searching: true,
+        language: {
+            search: "Search Supplier: "
+        }
+    });
+});
+</script>
+{% endblock %}

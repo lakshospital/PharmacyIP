@@ -30,6 +30,7 @@
       {% endif %}
     {% endwith %}
     <h2 style="color:#1976d2; margin-bottom:24px; text-align:center; font-weight:700;">Doctor Master</h2>
+    {% if session['role'] == 'admin' %}
     <form method="post" class="dr-card">
         <div style="width:100%;">
             <label class="form-label">Doctor Name</label>
@@ -47,6 +48,7 @@
             {% endif %}
         </div>
     </form>
+    {% endif %}
     <div class="dr-table-card">
         <div style="overflow-x:auto; overflow-y:auto; max-height:400px;">
             <table id="drTable" class="dr-table">
@@ -58,19 +60,21 @@
                 </thead>
                 <tbody>
                     {% for dr in doctors %}
-                    <tr>
-                        <td>{{ dr.DoctorName }}</td>
-                        <td style="text-align:center;">
-                            {% if session['role'] == 'admin' %}
-                                <a href="{{ url_for('dr_name_master_bp.dr_name_master', edit=dr.DoctorName) }}" class="btn btn-sm btn-warning">Edit</a>
-                                <form method="post" style="display:inline;">
-                                    <input type="hidden" name="dr_name_old" value="{{ dr.DoctorName }}">
-                                    <input type="hidden" name="dr_name" value="{{ dr.DoctorName }}">
-                                    <button type="submit" name="action" value="delete" class="btn btn-sm btn-danger" onclick="return confirm('Delete this doctor?');">Delete</button>
-                                </form>
-                            {% endif %}
-                        </td>
-                    </tr>
+                        {% if dr.DoctorName and dr.DoctorName.strip() %}
+                        <tr>
+                            <td>{{ dr.DoctorName }}</td>
+                            <td style="text-align:center;">
+                                {% if session['role'] == 'admin' %}
+                                    <a href="{{ url_for('dr_name_master_bp.dr_name_master', edit=dr.DoctorName) }}" class="btn btn-sm btn-warning">Edit</a>
+                                    <form method="post" style="display:inline;">
+                                        <input type="hidden" name="dr_name_old" value="{{ dr.DoctorName }}">
+                                        <input type="hidden" name="dr_name" value="{{ dr.DoctorName }}">
+                                        <button type="submit" name="action" value="delete" class="btn btn-sm btn-danger" onclick="return confirm('Delete this doctor?');">Delete</button>
+                                    </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endif %}
                     {% endfor %}
                 </tbody>
             </table>

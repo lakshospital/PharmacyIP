@@ -119,6 +119,7 @@
       {% endif %}
     {% endwith %}
     <h2 style="color:#1976d2; margin-bottom:24px; text-align:center; font-weight:700;">Product Group Master</h2>
+    {% if session['role'] == 'admin' %}
     <form method="post" class="pgm-card">
         <div style="width:100%;">
             <label class="form-label">Group Name</label>
@@ -136,6 +137,7 @@
             {% endif %}
         </div>
     </form>
+    {% endif %}
     <div class="pgm-table-card">
         <div style="overflow-x:auto; overflow-y:auto; max-height:400px;">
             <table id="groupTable" class="pgm-table">
@@ -147,19 +149,21 @@
                 </thead>
                 <tbody>
                     {% for group in groups %}
-                    <tr>
-                        <td>{{ group.GroupName }}</td>
-                        <td style="text-align:center;">
-                            {% if session['role'] == 'admin' %}
-                                <a href="{{ url_for('product_group_master_bp.product_group_master', edit=group.GroupName) }}" class="btn btn-sm btn-warning">Edit</a>
-                                <form method="post" style="display:inline;">
-                                    <input type="hidden" name="group_name_old" value="{{ group.GroupName }}">
-                                    <input type="hidden" name="group_name" value="{{ group.GroupName }}">
-                                    <button type="submit" name="action" value="delete" class="btn btn-sm btn-danger" onclick="return confirm('Delete this group?');">Delete</button>
-                                </form>
-                            {% endif %}
-                        </td>
-                    </tr>
+                        {% if group.GroupName and group.GroupName.strip() %}
+                        <tr>
+                            <td>{{ group.GroupName }}</td>
+                            <td style="text-align:center;">
+                                {% if session['role'] == 'admin' %}
+                                    <a href="{{ url_for('product_group_master_bp.product_group_master', edit=group.GroupName) }}" class="btn btn-sm btn-warning">Edit</a>
+                                    <form method="post" style="display:inline;">
+                                        <input type="hidden" name="group_name_old" value="{{ group.GroupName }}">
+                                        <input type="hidden" name="group_name" value="{{ group.GroupName }}">
+                                        <button type="submit" name="action" value="delete" class="btn btn-sm btn-danger" onclick="return confirm('Delete this group?');">Delete</button>
+                                    </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endif %}
                     {% endfor %}
                 </tbody>
             </table>
