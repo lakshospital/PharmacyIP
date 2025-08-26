@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    .dr-wrapper { display: flex; flex-direction: column; align-items: center; min-height: 80vh; background: #f7faff; padding-top: 32px; }
+    .dr-card { background: #fff; border-radius: 18px; box-shadow: 0 2px 16px rgba(25, 118, 210, 0.08); padding: 32px 32px 24px 32px; margin-bottom: 32px; max-width: 420px; width: 100%; display: flex; flex-direction: column; align-items: center; }
+    .dr-card label { font-weight: 500; color: #1976d2; margin-bottom: 8px; }
+    .dr-card input[type="text"] { border-radius: 8px; border: 1px solid #dbeafe; padding: 10px 14px; font-size: 1.08em; margin-bottom: 12px; width: 100%; background: #f7faff; }
+    .dr-card .btn-primary { background: #1976d2; border: none; border-radius: 8px; padding: 10px 32px; font-weight: 600; font-size: 1.08em; box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08); }
+    .dr-table-card { background: #fff; border-radius: 18px; box-shadow: 0 2px 16px rgba(25, 118, 210, 0.08); padding: 24px; max-width: 700px; width: 100%; margin: auto; }
+    .dr-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 1.05em; background: #fff; }
+    .dr-table th { background: #e3f2fd; color: #1976d2; font-weight: 600; padding: 12px 8px; border-bottom: 2px solid #dbeafe; position: sticky; top: 0; z-index: 2; }
+    .dr-table td { padding: 10px 8px; border-bottom: 1px solid #f0f4f8; background: #fff; }
+    .dr-table tr:nth-child(even) td { background: #f7faff; }
+    .dr-table tr:hover td { background: #e3f2fd; }
+    .dr-table .btn-warning { background: #ffb300; color: #fff; border: none; border-radius: 6px; padding: 6px 18px; font-weight: 500; margin-right: 4px; }
+    .dr-table .btn-danger { background: #e53935; color: #fff; border: none; border-radius: 6px; padding: 6px 18px; font-weight: 500; }
+    @media (max-width: 900px) { .dr-table-card { max-width: 98vw; padding: 8px; } .dr-card { max-width: 98vw; padding: 18px; } }
+</style>
+<div class="dr-wrapper">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div style="max-width:420px; margin:auto; margin-bottom:18px;">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ 'danger' if category == 'danger' else 'success' }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    <h2 style="color:#1976d2; margin-bottom:24px; text-align:center; font-weight:700;">Doctor Master</h2>
+    <form method="post" class="dr-card">
+        <div style="width:100%;">
+            <label class="form-label">Doctor Name</label>
+            <input type="text" name="dr_name" class="form-control" required value="{{ dr_to_edit.DoctorName if dr_to_edit else '' }}">
+            {% if dr_to_edit %}
+                <input type="hidden" name="dr_name_old" value="{{ dr_to_edit.DoctorName }}">
+            {% endif %}
+        </div>
+        <div class="d-flex justify-content-end mt-4" style="width:100%;">
+            {% if dr_to_edit %}
+                <button type="submit" name="action" value="edit" class="btn btn-primary">Update Doctor</button>
+                <a href="{{ url_for('dr_name_master_bp.dr_name_master') }}" class="btn btn-secondary ms-2" style="border-radius:8px; padding:10px 32px; font-weight:600;">Cancel</a>
+            {% else %}
+                <button type="submit" name="action" value="add" class="btn btn-primary">Add Doctor</button>
+            {% endif %}
+        </div>
+    </form>
+    <div class="dr-table-card">
+        <div style="overflow-x:auto; overflow-y:auto; max-height:400px;">
+            <table id="drTable" class="dr-table">
+                <thead>
+                    <tr>
+                        <th>Doctor Name</th>
+                        <th style="text-align:center;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for dr in doctors %}
+                    <tr>
+                        <td>{{ dr.DoctorName }}</td>
+                        <td style="text-align:center;">
+                            {% if session['role'] == 'admin' %}
+                                <a href="{{ url_for('dr_name_master_bp.dr_name_master', edit=dr.DoctorName) }}" class="btn btn-sm btn-warning">Edit</a>
+                                <form method="post" style="display:inline;">
+                                    <input type="hidden" name="dr_name_old" value="{{ dr.DoctorName }}">
+                                    <input type="hidden" name="dr_name" value="{{ dr.DoctorName }}">
+                                    <button type="submit" name="action" value="delete" class="btn btn-sm btn-danger" onclick="return confirm('Delete this doctor?');">Delete</button>
+                                </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#drTable').DataTable({
+        scrollX: true,
+        scrollY: 300,
+        paging: true,
+        responsive: true
+    });
+});
+</script>
+{% endblock %}

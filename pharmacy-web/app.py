@@ -20,6 +20,7 @@ from backend.consolidated_credit_report import consolidated_credit_report_bp
 from backend.product_master import product_master_bp
 from backend.product_group_master import product_group_master_bp
 from backend.consolidated_sales_return_report import consolidated_sales_return_report_bp
+from backend.dr_name_master import dr_name_master_bp
 
 
 app = Flask(__name__)
@@ -33,6 +34,7 @@ app.register_blueprint(consolidated_credit_report_bp)
 app.register_blueprint(product_master_bp)
 app.register_blueprint(product_group_master_bp)
 app.register_blueprint(consolidated_sales_return_report_bp)
+app.register_blueprint(dr_name_master_bp)
 
 # Inject current datetime as 'now' into all templates for report header
 @app.context_processor

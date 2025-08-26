@@ -150,12 +150,14 @@
                     <tr>
                         <td>{{ group.GroupName }}</td>
                         <td style="text-align:center;">
-                            <a href="{{ url_for('product_group_master_bp.product_group_master', edit=group.GroupName) }}" class="btn btn-sm btn-warning">Edit</a>
-                            <form method="post" style="display:inline;">
-                                <input type="hidden" name="group_name_old" value="{{ group.GroupName }}">
-                                <input type="hidden" name="group_name" value="{{ group.GroupName }}">
-                                <button type="submit" name="action" value="delete" class="btn btn-sm btn-danger" onclick="return confirm('Delete this group?');">Delete</button>
-                            </form>
+                            {% if session['role'] == 'admin' %}
+                                <a href="{{ url_for('product_group_master_bp.product_group_master', edit=group.GroupName) }}" class="btn btn-sm btn-warning">Edit</a>
+                                <form method="post" style="display:inline;">
+                                    <input type="hidden" name="group_name_old" value="{{ group.GroupName }}">
+                                    <input type="hidden" name="group_name" value="{{ group.GroupName }}">
+                                    <button type="submit" name="action" value="delete" class="btn btn-sm btn-danger" onclick="return confirm('Delete this group?');">Delete</button>
+                                </form>
+                            {% endif %}
                         </td>
                     </tr>
                     {% endfor %}

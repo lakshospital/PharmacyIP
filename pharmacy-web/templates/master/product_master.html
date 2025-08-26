@@ -1,44 +1,139 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container-fluid" style="max-width:100vw; margin:auto; padding:32px;">
-    <h2 style="color:#1976d2; margin-bottom:24px; text-align:center;">Product Master</h2>
-    <form method="post" class="card shadow-sm" style="padding:24px; margin-bottom:32px; border-radius:16px; background:#fff;">
-        <div class="row g-3">
-            <div class="col-md-6">
-                <label class="form-label">Product Name</label>
+<style>
+    .pm-wrapper {
+        display: flex;
+        flex-direction: column;
+        min-height: 80vh;
+        background: #f7faff;
+        padding-top: 32px;
+        width: 100vw;
+        box-sizing: border-box;
+        padding-left: 260px; /* left space for sidebar */
+        align-items: flex-start;
+    }
+    .pm-card {
+        background: #fff;
+        border-radius: 18px;
+        box-shadow: 0 2px 16px rgba(25, 118, 210, 0.08);
+        padding: 32px 32px 24px 32px;
+        margin-bottom: 32px;
+        width: 100%;
+        max-width: 1400px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        box-sizing: border-box;
+    }
+    .pm-form-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 32px;
+        width: 100%;
+    }
+    .pm-form-col {
+        flex: 1 1 350px;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+    .pm-card label {
+        font-weight: 500;
+        color: #1976d2;
+        margin-bottom: 8px;
+    }
+    .pm-card input, .pm-card select {
+        border-radius: 8px;
+        border: 1px solid #dbeafe;
+        padding: 10px 14px;
+        font-size: 1.08em;
+        background: #f7faff;
+    }
+    .pm-card .btn-primary {
+        background: #1976d2;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 32px;
+        font-weight: 600;
+        font-size: 1.08em;
+        box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
+        margin-top: 18px;
+    }
+    .pm-table-container {
+        width: 100%;
+        max-width: 1400px;
+        margin-top: 24px;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
+        padding: 32px;
+        box-sizing: border-box;
+    }
+    @media (max-width: 900px) {
+        .pm-wrapper { padding-left: 0; }
+        .pm-card { max-width: 98vw; padding: 18px; }
+        .pm-form-row { flex-direction: column; gap: 0; }
+        .pm-table-container { padding: 8px; }
+    }
+</style>
+<div class="pm-wrapper">
+    <h2 style="color:#b71c1c; margin-bottom:24px; text-align:left; font-weight:700; border:2px solid #b71c1c; display:inline-block; padding:6px 18px; border-radius:8px; background:#fff; margin-left:8px;">Product Master</h2>
+    <form method="post" class="pm-card">
+        <div class="pm-form-row">
+            <div class="pm-form-col">
+                <label>Product Name</label>
                 <input type="text" name="product_name" class="form-control" required>
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Product Group</label>
-                <input type="text" name="product_group" class="form-control">
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Rack No</label>
+                <label>Product Group</label>
+                <select name="product_group" class="form-control">
+                    {% for group in product_groups %}
+                    <option value="{{ group }}">{{ group }}</option>
+                    {% endfor %}
+                </select>
+                <label>Rack No</label>
                 <input type="text" name="rack_no" class="form-control">
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Minimum Stock To Maintain</label>
+                <label>Minimum Stock to Maintain</label>
                 <input type="number" name="min_stock" class="form-control">
             </div>
-            <div class="col-md-6">
-                <label class="form-label">Manufacturer</label>
-                <input type="text" name="manufacturer" class="form-control">
+            <div class="pm-form-col">
+                <label>Doctor Name</label>
+                <select name="doctor_name" class="form-control">
+                    {% for doctor in doctor_names %}
+                    <option value="{{ doctor }}">{{ doctor }}</option>
+                    {% endfor %}
+                </select>
+                <label>Combination</label>
+                <select name="combination" class="form-control">
+                    {% for comb in combinations %}
+                    <option value="{{ comb }}">{{ comb }}</option>
+                    {% endfor %}
+                </select>
+                <label>Manufacturer</label>
+            <input type="text" name="manufacturer" class="form-control">
+                <label>ScheduleH</label>
+                <select name="schedule_h" class="form-control">
+                    <option value="">Select</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                </select>
             </div>
         </div>
-        <div class="d-flex justify-content-end mt-4">
-            <button type="submit" class="btn btn-primary px-4 py-2">Add Product</button>
+        <div style="display: flex; justify-content: center; margin-top: 32px;">
+            <button type="submit" class="btn btn-primary" style="width: 180px; font-weight: bold;">Add Product</button>
         </div>
     </form>
-    <div class="card shadow-sm" style="border-radius:16px; background:#fff;">
-    <div style="overflow-x:auto; overflow-y:auto; max-height:700px;">
-            <table id="productTable" class="table table-striped table-bordered align-middle" style="min-width:900px;">
+    <div class="pm-table-container">
+        <div style="overflow-x:auto; overflow-y:auto; max-height:700px;">
+            <table id="productTable" class="table table-striped table-bordered align-middle" style="min-width:900px; width:100%;">
                 <thead class="table-light">
                     <tr>
                         <th>Product Name</th>
                         <th>Product Group</th>
                         <th>Rack No</th>
                         <th style="text-align:right;">Min Stock</th>
+                        <th>Doctor Name</th>
+                        <th>Combination</th>
                         <th>Manufacturer</th>
+                        <th>ScheduleH</th>
                         <th style="text-align:center;">Actions</th>
                     </tr>
                 </thead>
@@ -49,7 +144,16 @@
                         <td>{{ product.ProductGroup }}</td>
                         <td>{{ product.RackNo }}</td>
                         <td style="text-align:right;">{{ product.MinimumStockToMaintain }}</td>
+                        <td>{{ product.DoctorName }}</td>
+                        <td>{{ product.Combination }}</td>
                         <td>{{ product.Manufacturer }}</td>
+                        <td>{{ product.ScheduleH }}</td>
+                        <td style="text-align:center;">
+                            {% if session['role'] == 'admin' %}
+                                <a href="/productmaster/edit/{{ product.ProductName }}" class="btn btn-sm btn-warning">Edit</a>
+                                <a href="/productmaster/delete/{{ product.ProductName }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this product?');">Delete</a>
+                            {% endif %}
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
