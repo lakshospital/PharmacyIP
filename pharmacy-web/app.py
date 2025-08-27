@@ -234,6 +234,7 @@ def get_purchases():
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
+    import datetime
     today = datetime.datetime.now()
     current_date_str = today.strftime('%Y-%m-%d')
     if request.method == 'POST':
@@ -251,7 +252,7 @@ def dashboard():
     cashless_count, cashless_value = get_cashless_metrics(from_date, to_date)
     credit_count, credit_balance = get_credit_metrics(from_date, to_date)
 
-    # Recent Sales grouped by BillNo and BillDate (filtered by date)
+    # Recent Sales grouped by BillNo and BillDate (filtered by date), ordered by BillNo DESC
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("""
@@ -259,22 +260,22 @@ def dashboard():
         FROM DrugSlipDetails
         WHERE BillNo IS NOT NULL AND BillDate >= ? AND BillDate <= ?
         GROUP BY BillNo, BillDate
-        ORDER BY BillDate DESC
+        ORDER BY BillNo DESC
     """, (from_date + ' 00:00:00', to_date + ' 23:59:59'))
     recent_sales = [dict(zip([column[0] for column in cursor.description], row)) for row in cursor.fetchall()]
 
-    # Recent Purchases grouped by InvoiceNo and InvoiceDateTime (filtered by date)
+    # Recent Purchases grouped by InvoiceNo and InvoiceDateTime (filtered by date), ordered by InvoiceNo DESC
     cursor.execute("""
         SELECT i.InvoiceNo, i.InvoiceDateTime, MAX(s.SupplierName) AS SupplierName
         FROM InvoiceDetails i
         LEFT JOIN SupplierMaster s ON i.SupplierID = s.SupplierID
         WHERE i.InvoiceNo IS NOT NULL AND i.InvoiceDateTime >= ? AND i.InvoiceDateTime <= ?
         GROUP BY i.InvoiceNo, i.InvoiceDateTime
-        ORDER BY i.InvoiceDateTime DESC
+        ORDER BY i.InvoiceNo DESC
     """, (from_date + ' 00:00:00', to_date + ' 23:59:59'))
     recent_purchases = [dict(zip([column[0] for column in cursor.description], row)) for row in cursor.fetchall()]
 
-    # Recent Sales Returns grouped by ReturnBillNo and ReturnDate (filtered by date)
+    # Recent Sales Returns grouped by ReturnBillNo and ReturnDate (filtered by date), ordered by ReturnBillNo DESC
     cursor.execute("""
         SELECT ReturnBillNo, ReturnDate, MAX(PatientName) AS PatientName
         FROM (
@@ -283,21 +284,21 @@ def dashboard():
             WHERE ReturnBillNo IS NOT NULL AND ReturnBillDateTime >= ? AND ReturnBillDateTime <= ?
         ) AS sub
         GROUP BY ReturnBillNo, ReturnDate
-        ORDER BY ReturnDate DESC
+        ORDER BY ReturnBillNo DESC
     """, (from_date + ' 00:00:00', to_date + ' 23:59:59'))
     sales_return_rows = [dict(zip([column[0] for column in cursor.description], row)) for row in cursor.fetchall()]
 
-    # Recent Cashless Bills grouped by BillNo and BillDate (filtered by date)
+    # Recent Cashless Bills grouped by BillNo and BillDate (filtered by date), ordered by BillNo DESC
     cursor.execute("""
         SELECT BillNo, BillDate, MAX(PatientName) AS PatientName
         FROM DrugSlipDetails
         WHERE BillNo IS NOT NULL AND BillDate >= ? AND BillDate <= ? AND cash = 'Y'
         GROUP BY BillNo, BillDate
-        ORDER BY BillDate DESC
+        ORDER BY BillNo DESC
     """, (from_date + ' 00:00:00', to_date + ' 23:59:59'))
     recent_cashless = [dict(zip([column[0] for column in cursor.description], row)) for row in cursor.fetchall()]
 
-    # Recent Credit Bills grouped by BillNo and BillDate (filtered by date)
+    # Recent Credit Bills grouped by BillNo and BillDate (filtered by date), ordered by BillNo DESC
     cursor.execute("""
         SELECT d.PatientID, d.PatientName, p.BillNo, p.BillDate, SUM(p.BalanceAmount) AS BalanceAmount
         FROM PaymentDue p
@@ -305,7 +306,7 @@ def dashboard():
         WHERE p.DueStatus = 'CT' AND p.BillStatus = 'P' AND p.BalanceAmount > 0
             AND p.DueDate BETWEEN ? AND ?
         GROUP BY d.PatientID, d.PatientName, p.BillNo, p.BillDate
-        ORDER BY p.BillDate DESC
+        ORDER BY p.BillNo DESC
     """, (from_date + ' 00:00:00', to_date + ' 23:59:59'))
     recent_credit = []
     for row in cursor.fetchall():
@@ -334,7 +335,8 @@ def dashboard():
         credit_balance=credit_balance,
         from_date=from_date,
         to_date=to_date,
-        current_date=current_date_str,
+        current_date=today,
+        timedelta=datetime.timedelta,
         recent_sales=recent_sales,
         recent_purchases=recent_purchases,
         sales_return_rows=sales_return_rows,

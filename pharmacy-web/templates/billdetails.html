@@ -1,6 +1,113 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <script>
+        window.onload = function() {
+            window.print();
+        };
+    </script>
+    <style>
+        @media print {
+            body * {
+                visibility: hidden !important;
+            }
+            .print-area, .print-area * {
+                visibility: visible !important;
+            }
+            .print-area {
+                position: absolute !important;
+                left: 0;
+                top: 0;
+                width: 100vw !important;
+                box-shadow: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                border: none !important;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #f6f8fa; font-family: 'Inter', Arial, sans-serif; }
+        .print-area {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            margin: 32px auto;
+            max-width: 650px;
+            padding: 24px 24px 18px 24px;
+            border: 1px solid #e0e0e0;
+        }
+        .bill-header {
+            text-align: center;
+            margin-bottom: 0;
+        }
+        .bill-header h2 {
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .bill-header .sub {
+            color: #555;
+            font-size: 1.05rem;
+        }
+        .bill-header .print-time {
+            margin: 8px 0 12px 0;
+            font-weight: 500;
+            color: #222;
+        }
+        .bill-info-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-bottom: 12px;
+        }
+        .bill-info-table td {
+            padding: 8px 10px;
+            font-size: 1.05rem;
+            font-weight: 500;
+            color: #222;
+            background: #f8f8f8;
+        }
+        .bill-info-table tr:not(:last-child) td {
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .bill-info-table td.fw-semibold {
+            color: #222;
+            font-weight: 600;
+        }
+        .bill-products-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 0;
+        }
+        .bill-products-table th, .bill-products-table td {
+            border: none;
+            border-bottom: 1px solid #e0e0e0;
+            padding: 8px 8px;
+            font-size: 1rem;
+            text-align: left;
+        }
+        .bill-products-table th {
+            background: #f8f8f8;
+            font-weight: 600;
+            color: #222;
+        }
+        .bill-products-table td.text-end {
+            text-align: right;
+        }
+        .bill-products-table tfoot td {
+            background: #fff;
+            font-weight: 700;
+            font-size: 1.08rem;
+            border-bottom: none;
+        }
+        .muted-note {
+            color: #888;
+            font-size: 0.98rem;
+            margin-top: 8px;
+            text-align: center;
+        }
+    </style>
     <title>Bill Details</title>
     <style>
         .navbar {background-color: #007bff; padding: 0; margin-bottom: 20px; border-radius: 0 0 8px 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);}
@@ -17,68 +124,64 @@
 </head>
 <body>
     {% include '_navbar.html' %}
-    <div class="container" style="max-width:100vw; margin-left:240px; padding:32px 32px 24px 32px; width:auto; box-sizing:border-box;">
-        <h1>Bill Details</h1>
-    {% if header_data %}
-    <table border="1" cellpadding="8" cellspacing="0" style="width:100%; margin-bottom: 18px;">
-        <tr>
-            <th>Bill No</th>
-            <td>{{ header_data.BillNo }}</td>
-            <th>Bill Date</th>
-            <td>{{ header_data.BillDate }}</td>
-        </tr>
-        <tr>
-            <th>Doctor Name</th>
-            <td>{{ header_data.DrName }}</td>
-            <th>Patient ID</th>
-            <td>{{ header_data.PatientID }}</td>
-        </tr>
-        <tr>
-            <th>Patient Name</th>
-            <td>{{ header_data.PatientName }}</td>
-            <th>Case Type</th>
-            <td>{{ header_data.Case }}</td>
-        </tr>
-        <tr>
-            <th>Print Time</th>
-            <td colspan="3">{{ print_time }}</td>
-        </tr>
-    </table>
-    {% endif %}
-    {% if rows %}
-    <table border="1" cellpadding="8" cellspacing="0" style="width:100%; margin-bottom: 18px;">
-        <thead>
+    <div class="print-area">
+        {% if header_data %}
+       {% include 'report_header.html' %}
+        <table class="bill-info-table">
             <tr>
-                <th>SNo</th>
-                <th>Product Name</th>
-                <th>Qty</th>
-                <th>Batch No</th>
-                <th>Exp Date</th>
-                <th>VAT</th>
-                <th>MRP</th>
-                <th>Invoice No</th>
-                <th>Total</th>
+                <td class="fw-semibold">Bill No:</td>
+                <td>{{ header_data.BillNo }}</td>
+                <td class="fw-semibold">Bill Date:</td>
+                <td>{{ header_data.BillDate.strftime('%d/%b/%Y') if header_data.BillDate }}</td>
             </tr>
-        </thead>
-        <tbody>
-            {% for row in rows %}
             <tr>
-                <td>{{ row.SNo }}</td>
-                <td>{{ row.ProductName }}</td>
-                <td>{{ row.Qty }}</td>
-                <td>{{ row.BatchNo }}</td>
-                <td>{{ row.ExpDate }}</td>
-                <td>{{ row.VAT }}</td>
-                <td>{{ row.MRP }}</td>
-                <td>{{ row.InvoiceNo }}</td>
-                <td>₹{{ row.Total }}</td>
+                <td class="fw-semibold">Dr. Name:</td>
+                <td>{{ header_data.DrName }}</td>
+                <td class="fw-semibold">Case:</td>
+                <td>{{ header_data.Case }}</td>
             </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <div style="font-weight: bold; font-size: 1.2rem;">Grand Total: ₹{{ grand_total }}</div>
-    {% else %}
-    <div>No bill details found.</div>
-    {% endif %}
+            <tr>
+                <td class="fw-semibold">Patient ID:</td>
+                <td>{{ header_data.PatientID }}</td>
+                <td class="fw-semibold">Patient Name:</td>
+                <td>{{ header_data.PatientName }}</td>
+            </tr>
+        </table>
+        <table class="bill-products-table">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Product Name</th>
+                    <th>Batch No</th>
+                    <th>Exp. Date</th>
+                    <th class="text-end">Qty</th>
+                    <th class="text-end">MRP</th>
+                    <th class="text-end">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ row.ProductName }}</td>
+                    <td>{{ row.BatchNo }}</td>
+                    <td>{{ row.ExpDate.strftime('%d/%b/%Y') if row.ExpDate }}</td>
+                    <td class="text-end">{{ row.Qty }}</td>
+                    <td class="text-end">{{ "%.2f"|format(row.MRP) }}</td>
+                    <td class="text-end">{{ "%.2f"|format(row.Total) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="6" class="text-end fw-bold">Total Rs.</td>
+                    <td class="text-end fw-bold">{{ "%.2f"|format(grand_total) }}</td>
+                </tr>
+            </tfoot>
+        </table>
+        <div class="muted-note">Please bring this bill for returning products.</div>
+        {% else %}
+        <div>No bill details found.</div>
+        {% endif %}
 </body>
 </html>
