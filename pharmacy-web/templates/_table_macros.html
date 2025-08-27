@@ -4,7 +4,10 @@
     <thead>
         <tr>
         {% for header in headers %}
-            <th>{{ header }}</th>
+            {# Skip 'View' column header #}
+            {% if header != 'View' %}
+                <th>{{ header }}</th>
+            {% endif %}
         {% endfor %}
         </tr>
     </thead>
@@ -12,7 +15,12 @@
         {% for row in rows %}
             <tr>
                 {% if view_type == 'sales' %}
-                    <td>{{ row['BillNo'] }}</td>
+                    <td>
+                        {{ row['BillNo'] }}
+                        <a href="/billdetails?bill_no={{ row['BillNo'] }}&bill_date={{ row['BillDate'].strftime('%Y-%m-%d') if row['BillDate'] else '' }}" target="_blank" class="neat-btn neat-btn-view" title="View Details" style="margin-left:8px;">
+                            <i class="fa-solid fa-eye"></i>
+                        </a>
+                    </td>
                     <td>
                         {% if row['BillDate'] %}
                             {{ row['BillDate'].strftime('%d/%b/%Y')|upper }}
@@ -21,13 +29,13 @@
                         {% endif %}
                     </td>
                     <td>{{ row['PatientName'] }}</td>
+                {% elif view_type == 'purchase' %}
                     <td>
-                        <a href="/billdetails?bill_no={{ row['BillNo'] }}&bill_date={{ row['BillDate'].strftime('%Y-%m-%d') if row['BillDate'] else '' }}" target="_blank" class="neat-btn neat-btn-view">
-                            <i class="fa-solid fa-eye"></i> View Details
+                        {{ row['InvoiceNo'] }}
+                        <a href="/purchasedetails?invoice_no={{ row['InvoiceNo'] }}&invoice_date={{ row['InvoiceDateTime'].strftime('%Y-%m-%d') if row['InvoiceDateTime'] else '' }}" target="_blank" class="neat-btn neat-btn-view" style="background: #ffb347; margin-left:8px;" title="View Details">
+                            <i class="fa-solid fa-eye"></i>
                         </a>
                     </td>
-                {% elif view_type == 'purchase' %}
-                    <td>{{ row['InvoiceNo'] }}</td>
                     <td>
                         {% if row['InvoiceDateTime'] %}
                             {{ row['InvoiceDateTime'].strftime('%d/%b/%Y')|upper }}
@@ -36,13 +44,13 @@
                         {% endif %}
                     </td>
                     <td>{{ row['SupplierName'] }}</td>
+                {% elif view_type == 'salesreturn' %}
                     <td>
-                        <a href="/purchasedetails?invoice_no={{ row['InvoiceNo'] }}&invoice_date={{ row['InvoiceDateTime'].strftime('%Y-%m-%d') if row['InvoiceDateTime'] else '' }}" target="_blank" class="neat-btn neat-btn-view" style="background: #ffb347;">
-                            <i class="fa-solid fa-eye"></i> View Details
+                        {{ row['ReturnBillNo'] }}
+                        <a href="/salesreturnview?return_bill_no={{ row['ReturnBillNo'] }}&return_date={{ row['ReturnDate'].strftime('%Y-%m-%d') if row['ReturnDate'] else '' }}" target="_blank" class="neat-btn neat-btn-view" style="background: #ffc371; color: #333; margin-left:8px;" title="View Details">
+                            <i class="fa-solid fa-eye"></i>
                         </a>
                     </td>
-                {% elif view_type == 'salesreturn' %}
-                    <td>{{ row['ReturnBillNo'] }}</td>
                     <td>
                         {% if row['ReturnDate'] %}
                             {{ row['ReturnDate'].strftime('%d/%b/%Y')|upper }}
@@ -51,13 +59,13 @@
                         {% endif %}
                     </td>
                     <td>{{ row['PatientName'] }}</td>
+                {% elif view_type == 'cashless' %}
                     <td>
-                        <a href="/salesreturnview?return_bill_no={{ row['ReturnBillNo'] }}&return_date={{ row['ReturnDate'].strftime('%Y-%m-%d') if row['ReturnDate'] else '' }}" target="_blank" class="neat-btn neat-btn-view" style="background: #ffc371; color: #333;">
-                            <i class="fa-solid fa-eye"></i> View Details
+                        {{ row['BillNo'] }}
+                        <a href="/billdetails?bill_no={{ row['BillNo'] }}&bill_date={{ row['BillDate'].strftime('%Y-%m-%d') if row['BillDate'] else '' }}" target="_blank" class="neat-btn neat-btn-view" title="View Details" style="margin-left:8px;">
+                            <i class="fa-solid fa-eye"></i>
                         </a>
                     </td>
-                {% elif view_type == 'cashless' %}
-                    <td>{{ row['BillNo'] }}</td>
                     <td>
                         {% if row['BillDate'] %}
                             {{ row['BillDate'].strftime('%d/%b/%Y')|upper }}
@@ -66,14 +74,13 @@
                         {% endif %}
                     </td>
                     <td>{{ row['PatientName'] }}</td>
+                {% elif view_type == 'credit' %}
                     <td>
-                        <a href="/billdetails?bill_no={{ row['BillNo'] }}&bill_date={{ row['BillDate'].strftime('%Y-%m-%d') if row['BillDate'] else '' }}" target="_blank" class="neat-btn neat-btn-view">
-                            <i class="fa-solid fa-eye"></i> View Details
+                        {{ row['BillNo'] }}
+                        <a href="/creditdetails?bill_no={{ row['BillNo'] }}&bill_date={{ row['BillDate'].strftime('%Y-%m-%d') if row['BillDate'] else '' }}" target="_blank" class="neat-btn neat-btn-view" style="background: #b2dfdb; color: #333; margin-left:8px;" title="View Details">
+                            <i class="fa-solid fa-eye"></i>
                         </a>
                     </td>
-                {% elif view_type == 'credit' %}
-                    <td>{{ row['PatientID'] }}</td>
-                    <td>{{ row['BillNo'] }}</td>
                     <td>
                         {% if row['BillDate'] %}
                             {{ row['BillDate'].strftime('%d/%b/%Y')|upper }}
@@ -88,11 +95,6 @@
                         {% else %}
                             -
                         {% endif %}
-                    </td>
-                    <td>
-                        <a href="/creditdetails?bill_no={{ row['BillNo'] }}&bill_date={{ row['BillDate'].strftime('%Y-%m-%d') if row['BillDate'] else '' }}" target="_blank" class="neat-btn neat-btn-view" style="background: #b2dfdb; color: #333;">
-                            <i class="fa-solid fa-eye"></i> View Details
-                        </a>
                     </td>
                 {% else %}
                     {% for cell in row.values() %}

@@ -1,10 +1,138 @@
 {% import '_card_macros.html' as macros %}
-<div style="display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 32px;">
+<style>
+    .dashboard-cards-row {
+        display: flex;
+        gap: 24px;
+        flex-wrap: wrap;
+        margin-bottom: 32px;
+        align-items: stretch;
+    }
+    .card-metric {
+        min-width: 200px;
+        max-width: 220px;
+        width: 220px;
+        height: 170px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+        padding: 18px 0 12px 0;
+        margin: 0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        border-radius: 10px;
+    }
+    .card-metric h2 {
+        font-size: 1.15rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+        text-align: center;
+    }
+    .card-metric .fa-solid {
+        font-size: 2.2rem;
+        margin-bottom: 8px;
+        display: block;
+        text-align: center;
+    }
+    .card-metric .card-value {
+        font-size: 2.1rem;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 0;
+    }
+    .card-metric .card-label {
+        font-size: 1rem;
+        color: #fff;
+        text-align: center;
+        margin-bottom: 2px;
+    }
+    .card-metric .card-sub {
+        font-size: 1.05rem;
+        color: #fff;
+        text-align: center;
+        margin-bottom: 2px;
+    }
+    .card-metric .card-details {
+        font-size: 1rem;
+        color: #fff;
+        text-align: center;
+        margin-bottom: 2px;
+    }
+    .dashboard-cards-row a {
+        text-decoration: none;
+    }
+</style>
+<div class="dashboard-cards-row">
     {{ macros.dashboard_card('Total Products', 'fa-capsules', total_products, color_class='card-metric card-products') }}
     {{ macros.dashboard_card('Total Suppliers', 'fa-truck', total_suppliers, color_class='card-metric card-suppliers', extra_html='', subtitle=None) }}
-    <div id="purchaseCard" style="cursor:pointer;">{{ macros.dashboard_combo_card('Total Purchase', 'fa-file-invoice-dollar', total_purchase_bills or 0, '{:,.2f}'.format(total_purchase_value or 0), color_class='card-metric card-purchase-combo', bills_color='#e0e0e0', value_color='#e0e0e0') }}</div>
-    <div id="salesCard" style="cursor:pointer;">{{ macros.dashboard_combo_card('Total Sales', 'fa-receipt', total_sales_bills or 0, '{:,.2f}'.format(total_sales_value or 0), color_class='card-metric card-sales-combo', bills_color='#ffe3e3', value_color='#ffe3e3') }}</div>
-    {{ macros.dashboard_combo_card('Cashless', 'fa-money-bill-wave', cashless_count or 0, '{:,.2f}'.format(cashless_value or 0), color_class='card-metric card-cashless-combo', bills_color='#e0f7fa', value_color='#e0f7fa') }}
-    {{ macros.dashboard_combo_card('Credit To Be Paid', 'fa-credit-card', credit_count or 0, '{:,.2f}'.format(credit_balance or 0), color_class='card-metric card-credit-combo', bills_color='#ffe3e3', value_color='#ffe3e3') }}
-    {{ macros.dashboard_combo_card('Sales Return', 'fa-arrow-rotate-right', sales_return_count or 0, '{:,.2f}'.format(sales_return_value or 0), color_class='card-metric card-sales-return-combo', bills_color='#ffe3e3', value_color='#ffe3e3') }}
+    <a href="/consolidatedpurchasereport?from_date={{ from_date }}&to_date={{ to_date }}" target="_blank">
+        <div id="purchaseCard" class="card-metric card-purchase-combo" style="cursor:pointer; position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+            <span class="bill-badge-top">{{ total_purchase_bills or 0 }}</span>
+            <i class="fa-solid fa-file-invoice-dollar" style="font-size:2.2rem; margin-bottom:8px;"></i>
+            <h2 style="font-size:1.15rem; font-weight:700; margin-bottom:8px; text-align:center;">Total Purchase</h2>
+            <span class="bill-value-bottom">₹ {{ '{:,.2f}'.format(total_purchase_value or 0) }}</span>
+        </div>
+    </a>
+    <a href="/consolidatedsalesreport?from_date={{ from_date }}&to_date={{ to_date }}" target="_blank">
+        <div id="salesCard" class="card-metric card-sales-combo" style="cursor:pointer; position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+            <span class="bill-badge-top">{{ total_sales_bills or 0 }}</span>
+            <i class="fa-solid fa-receipt" style="font-size:2.2rem; margin-bottom:8px;"></i>
+            <h2 style="font-size:1.15rem; font-weight:700; margin-bottom:8px; text-align:center;">Total Sales</h2>
+            <span class="bill-value-bottom">₹ {{ '{:,.2f}'.format(total_sales_value or 0) }}</span>
+        </div>
+    </a>
+    <a href="/consolidatedcashlessreport?from_date={{ from_date }}&to_date={{ to_date }}" target="_blank">
+        <div id="cashlessCard" class="card-metric card-cashless-combo" style="cursor:pointer; position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+            <span class="bill-badge-top">{{ cashless_count or 0 }}</span>
+            <i class="fa-solid fa-money-bill-wave" style="font-size:2.2rem; margin-bottom:8px;"></i>
+            <h2 style="font-size:1.15rem; font-weight:700; margin-bottom:8px; text-align:center;">Cashless</h2>
+            <span class="bill-value-bottom">₹ {{ '{:,.2f}'.format(cashless_value or 0) }}</span>
+        </div>
+    </a>
+    <a href="/consolidatedcreditreport?from_date={{ from_date }}&to_date={{ to_date }}" target="_blank">
+        <div id="creditCard" class="card-metric card-credit-combo" style="cursor:pointer; position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+            <span class="bill-badge-top">{{ credit_count or 0 }}</span>
+            <i class="fa-solid fa-credit-card" style="font-size:2.2rem; margin-bottom:8px;"></i>
+            <h2 style="font-size:1.15rem; font-weight:700; margin-bottom:8px; text-align:center;">Credit To Be Paid</h2>
+            <span class="bill-value-bottom">₹ {{ '{:,.2f}'.format(credit_balance or 0) }}</span>
+        </div>
+    </a>
+    <a href="/consolidatedsalesreturnreport?from_date={{ from_date }}&to_date={{ to_date }}" target="_blank">
+        <div id="salesReturnCard" class="card-metric card-sales-return-combo" style="cursor:pointer; position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+            <span class="bill-badge-top">{{ sales_return_count or 0 }}</span>
+            <i class="fa-solid fa-arrow-rotate-right" style="font-size:2.2rem; margin-bottom:8px;"></i>
+            <h2 style="font-size:1.15rem; font-weight:700; margin-bottom:8px; text-align:center;">Sales Return</h2>
+            <span class="bill-value-bottom">₹ {{ '{:,.2f}'.format(sales_return_value or 0) }}</span>
+        </div>
+    </a>
+<style>
+    .bill-badge-top {
+        position: absolute;
+        top: 12px;
+        right: 18px;
+        background: #fff;
+        color: #1976d2;
+        font-size: 1.2rem;
+        font-weight: bold;
+        border-radius: 50px;
+        padding: 7px 18px;
+        box-shadow: 0 2px 8px rgba(25,118,210,0.12);
+        text-align: center;
+        letter-spacing: 1px;
+        z-index: 2;
+    }
+    .bill-value-bottom {
+        display: block;
+        width: 100%;
+        text-align: center;
+        font-size: 1.15rem;
+        font-weight: 600;
+        color: #1976d2;
+        background: #f3f7ff;
+        border-radius: 0 0 10px 10px;
+        padding: 8px 0 0 0;
+        margin-top: auto;
+        margin-bottom: 0;
+    }
+</style>
 </div>
