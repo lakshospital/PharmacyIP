@@ -23,7 +23,7 @@ def consolidated_purchase_report():
             if from_date and to_date:
                 query = """
                     SELECT i.InvoiceNo, i.InvoiceDateTime, s.SupplierName,
-                           i.ProductName, i.BatchNo, i.ExpDate, i.Qty, i.MRP, i.Total
+                           i.ProductName, i.BatchNo, i.ExpDate, i.Qty,i.HSR, i.MRP, i.Total
                     FROM InvoiceDetails i
                     LEFT JOIN SupplierMaster s ON i.SupplierID = s.SupplierID
                     WHERE i.InvoiceDateTime >= ? AND i.InvoiceDateTime <= ?

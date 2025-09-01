@@ -222,13 +222,29 @@
             background: #ff5f6d;
         }
 
-        .neat-btn-view:hover {
-            background: #e04c4c;
-        }
+    /* Removed incorrect neat-btn-view hover style. Use dashboard-tab.active for tab highlight. */
 
         .neat-btn:hover {
             background: #0056b3;
         }
+
+            .dashboard-tab {
+                list-style: none;
+                cursor: pointer;
+                padding: 8px 18px;
+                border-radius: 6px 6px 0 0;
+                font-weight: 500;
+                color: #1976d2;
+                background: #f8f9fa;
+                transition: background 0.2s, color 0.2s;
+            }
+
+            .dashboard-tab.active {
+                background: #ec0faab4 !important;
+                color: #fff !important;
+                box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
+                font-weight: bold;
+            }
     </style>
 </head>
 
