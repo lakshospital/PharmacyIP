@@ -19,38 +19,50 @@
         .print-title { display: block !important; }
     }
     .print-title { display: none; text-align:center; color:#1976d2; margin-bottom:24px; font-size:2rem; font-weight:bold; }
+    /* Sticky header row for table */
+    .freeze-header {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .freeze-header th, .freeze-header td {
+        border: 1px solid #dee2e6;
+        padding: 8px;
+        text-align: left;
+    }
+    .freeze-header thead th {
+        position: sticky;
+        top: 0;
+        background: #f8f9fa;
+        z-index: 10;
+        box-shadow: 0 2px 2px -1px rgba(0,0,0,0.1);
+    }
+    /* Remove overflow from parent containers */
+    .freeze-parent, .freeze-parent2 {
+        overflow: visible !important;
+    }
     </style>
     <div class="print-title">Consolidated Purchase Report</div>
-    <form method="get" action="/consolidatedpurchasereport" style="margin-bottom:24px;">
-    <div id="report-dates" style="display:flex; align-items:center; gap:18px;">
-        <label for="from_date"><strong>From Date:</strong></label>
-        <input type="date" id="from_date" name="from_date" value="{{ from_date or '' }}" required>
-        <label for="to_date"><strong>To Date:</strong></label>
-        <input type="date" id="to_date" name="to_date" value="{{ to_date or '' }}" required>
-    <button type="submit" class="no-print" style="background:#1976d2; color:#fff; border:none; padding:8px 16px; border-radius:4px;">Fetch Report</button>
-    <button type="button" onclick="printReportTable()" class="no-print" style="background:#388e3c; color:#fff; border:none; padding:8px 18px; border-radius:6px; font-weight:500; margin-left:8px;">Print</button>
-    </div>
-    </form>
-    <div style="overflow-x:auto;">
-    <div style="max-height:500px; overflow:auto;">
+    {% include '_report_dates_form.html' %}
+    <div class="freeze-parent" style="overflow-x:visible;">
+    <div class="freeze-parent2" style="max-height:500px; overflow:visible;">
     <div id="report-table-area">
-    <table style="width:100%; min-width:1200px; border-collapse:collapse; box-shadow:0 2px 8px rgba(0,0,0,0.05); border-radius:8px; overflow:hidden;">
-            <thead style="background:#f5f5f5;">
+    <table class="freeze-header" style="width:100%; min-width:1200px; border-collapse:collapse; box-shadow:0 2px 8px rgba(0,0,0,0.05); border-radius:8px; overflow:hidden;">
+            <thead>
                 <tr>
-                    <th style="padding:12px; border:1px solid #e0e0e0;">Invoice No</th>
-                    <th style="padding:12px; border:1px solid #e0e0e0;">Invoice Date</th>
-                    <th style="padding:12px; border:1px solid #e0e0e0;">Supplier Name</th>
-                    <th style="padding:12px; border:1px solid #e0e0e0;">Product Name</th>
-                    <th style="padding:12px; border:1px solid #e0e0e0;">Batch No</th>
-                    <th style="padding:12px; border:1px solid #e0e0e0;">Exp Date</th>
-                    <th style="padding:12px; border:1px solid #e0e0e0;">Qty</th>
-                    <th style="padding:12px; border:1px solid #e0e0e0;">HSR</th>    
-                    <th style="padding:12px; border:1px solid #e0e0e0;">MRP</th>
+                    <th style="background:#f8f9fa; padding:12px; border:1px solid #e0e0e0;">Invoice No</th>
+                    <th style="background:#f8f9fa; padding:12px; border:1px solid #e0e0e0;">Invoice Date</th>
+                    <th style="background:#f8f9fa; padding:12px; border:1px solid #e0e0e0;">Supplier Name</th>
+                    <th style="background:#f8f9fa; padding:12px; border:1px solid #e0e0e0;">Product Name</th>
+                    <th style="background:#f8f9fa; padding:12px; border:1px solid #e0e0e0;">Batch No</th>
+                    <th style="background:#f8f9fa; padding:12px; border:1px solid #e0e0e0;">Exp Date</th>
+                    <th style="background:#f8f9fa; padding:12px; border:1px solid #e0e0e0;">Qty</th>
+                    <th style="background:#f8f9fa; padding:12px; border:1px solid #e0e0e0;">HSR</th>    
+                    <th style="background:#f8f9fa; padding:12px; border:1px solid #e0e0e0;">MRP</th>
                     {% if session['role'] == 'admin' %}
-                        <th style="padding:12px; border:1px solid #e0e0e0;">Profit %</th>
-                        <th style="padding:12px; border:1px solid #e0e0e0;">Profit Value</th>
+                        <th style="background:#f8f9fa; padding:12px; border:1px solid #e0e0e0;">Profit %</th>
+                        <th style="background:#f8f9fa; padding:12px; border:1px solid #e0e0e0;">Profit Value</th>
                     {% endif %}
-                    <th style="padding:12px; border:1px solid #e0e0e0;">Total</th>
+                    <th style="background:#f8f9fa; padding:12px; border:1px solid #e0e0e0;">Total</th>
                 </tr>
             </thead>
             <tbody>

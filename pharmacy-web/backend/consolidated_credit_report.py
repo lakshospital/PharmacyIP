@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, session
 from db import get_db_connection
 
 consolidated_credit_report_bp = Blueprint('consolidated_credit_report_bp', __name__)
@@ -26,4 +26,12 @@ def consolidated_credit_report():
             conn.close()
         except Exception as e:
             print(f"[ERROR] Consolidated Credit Report: {e}")
-    return render_template('consolidated/consolidated_credit_report.html', rows=rows, from_date=from_date, to_date=to_date)
+    from datetime import datetime, timedelta
+    return render_template('consolidated/consolidated_credit_report.html',
+        rows=rows,
+        from_date=from_date,
+        to_date=to_date,
+        session=session,
+        current_date=datetime.today(),
+        timedelta=timedelta
+    )

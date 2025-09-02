@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, current_app
+from flask import Blueprint, render_template, request, current_app, session
 import logging
 from db import get_db_connection
 
@@ -35,4 +35,13 @@ def consolidated_purchase_report():
     except Exception as e:
         error = f"Error fetching report: {e}"
         logging.error(error)
-    return render_template('consolidated/consolidated_purchase_report.html', rows=rows, from_date=from_date, to_date=to_date, error=error)
+    from datetime import datetime, timedelta
+    return render_template('consolidated/consolidated_purchase_report.html',
+        rows=rows,
+        from_date=from_date,
+        to_date=to_date,
+        error=error,
+        session=session,
+        current_date=datetime.today(),
+        timedelta=timedelta
+    )
