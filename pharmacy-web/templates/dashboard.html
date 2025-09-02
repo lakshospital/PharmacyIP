@@ -286,7 +286,7 @@
         {% include '_dashboard_cards.html' %}
 
         <!-- Horizontal Navbar Tabs for Dashboard Sections -->
-        <ul class="dashboard-tabs" style="display:flex; gap:18px; border-bottom:1px solid #e0e0e0; margin-bottom:18px; padding-left:0;">
+        <ul class="dashboard-tabs" style="display:flex; gap:18px; border-bottom:1px solid #e0e0e0; margin-bottom:18px; padding-left:0; display: none;">
             <li class="dashboard-tab active" data-tab="purchases" style="list-style:none; cursor:pointer; padding:8px 18px; border-radius:6px 6px 0 0; font-weight:500; color:#1976d2; background:#f8f9fa;">
                 <i class="fa fa-file-invoice-dollar"></i> Purchases
             </li>
@@ -305,7 +305,7 @@
         </ul>
 
         <!-- Tab Content Sections -->
-        <div id="tab-purchases" class="dashboard-tab-content" style="display:block;">
+        <div id="tab-purchases" class="dashboard-tab-content" style="display:none;">
             {% import '_table_macros.html' as tmacros %}
             {{ tmacros.neat_table(['Invoice No', 'Invoice Date', 'Supplier Name', 'View'], recent_purchases, view_type='purchase') }}
         </div>

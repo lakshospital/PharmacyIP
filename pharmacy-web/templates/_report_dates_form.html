@@ -10,7 +10,6 @@
             value="{{ to_date if to_date else current_date }}"
             style="padding: 6px 12px; border-radius: 4px; border: 1px solid #ccc;">
         <button type="submit" class="no-print" style="background:#1976d2; color:#fff; border:none; padding:8px 16px; border-radius:4px;">Fetch Report</button>
-        <button type="button" onclick="printReportTable()" class="no-print" style="background:#388e3c; color:#fff; border:none; padding:8px 18px; border-radius:6px; font-weight:500; margin-left:8px;">Print</button>
     {% else %}
         <label for="from_date" style="font-weight: bold; color: #333;">From Date:</label>
         <input type="date" id="from_date" name="from_date"
@@ -25,7 +24,6 @@
             max="{{ current_date.strftime('%Y-%m-%d') if current_date else '' }}"
             style="padding: 6px 12px; border-radius: 4px; border: 1px solid #ccc;">
         <button type="submit" class="no-print" style="background:#007bff; color:#fff; border:none; border-radius:4px; padding:8px 18px; font-weight:bold; cursor:pointer;">Filter</button>
-        <button type="button" onclick="printReportTable()" class="no-print" style="background:#388e3c; color:#fff; border:none; padding:8px 18px; border-radius:6px; font-weight:500; margin-left:8px;">Print</button>
     {% endif %}
 </div>
 </form>

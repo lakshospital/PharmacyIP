@@ -92,7 +92,8 @@
             <a href="{{ url_for('supplier_master_bp.supplier_master') }}" {% if request.endpoint == 'supplier_master_bp.supplier_master' %}class="active"{% endif %}><i class="fa fa-truck"></i>Supplier</a>
         </div>
     </div>
-    <a href="{{ url_for('credit_paid_bp.credit_paid_till_date') }}" {% if request.endpoint == 'credit_paid_bp.credit_paid_till_date' %}class="active"{% endif %}><i class="fa-solid fa-money-check-alt"></i>Credits</a>
+    <!-- <a href="{{ url_for('credit_paid_bp.credit_paid_till_date') }}" {% if request.endpoint == 'credit_paid_bp.credit_paid_till_date' %}class="active"{% endif %}><i class="fa-solid fa-money-check-alt"></i>Credits</a>
+    !-->
     <a href="#" id="logoutBtn"><i class="fa-solid fa-sign-out"></i>Logout</a>
     {% if session.get('username') %}
     <div class="user-info">

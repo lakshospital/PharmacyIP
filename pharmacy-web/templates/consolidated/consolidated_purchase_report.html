@@ -1,4 +1,4 @@
-    <!-- DataTables CSS & JS -->
+<!-- DataTables CSS & JS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
@@ -80,8 +80,8 @@
                             <td style="padding:10px; border:1px solid #e0e0e0;">{{ row.BatchNo }}</td>
                             <td style="padding:10px; border:1px solid #e0e0e0;">{{ row.ExpDate.strftime('%d/%b/%Y') if row.ExpDate }}</td>
                             <td style="padding:10px; border:1px solid #e0e0e0; text-align:right;">{{ row.Qty }}</td>
-                            <td style="padding:10px; border:1px solid #e0e0e0; text-align:right;">{{ row.HSR }}</td>
-                            <td style="padding:10px; border:1px solid #e0e0e0; text-align:right;">{{ row.MRP }}</td>
+                            <td style="padding:10px; border:1px solid #e0e0e0; text-align:right;">{{ '%.2f'|format(row.HSR) if row.HSR is not none else '' }}</td>
+                            <td style="padding:10px; border:1px solid #e0e0e0; text-align:right;">{{ '%.2f'|format(row.MRP) if row.MRP is not none else '' }}</td>
                             {% if session['role'] == 'admin' %}
                                 <td style="padding:10px; border:1px solid #e0e0e0; text-align:right;">
                                     {% if row.HSR and row.MRP and row.HSR > 0 %}
@@ -98,7 +98,7 @@
                                     {% endif %}
                                 </td>
                             {% endif %}
-                            <td style="padding:10px; border:1px solid #e0e0e0; text-align:right;">{{ row.Total }}</td>
+                            <td style="padding:10px; border:1px solid #e0e0e0; text-align:right;">{{ '%.2f'|format(row.Total) if row.Total is not none else '' }}</td>
                         </tr>
                     {% endfor %}
                 {% else %}
@@ -140,6 +140,62 @@ function printReportTable() {
     printWindow.print();
     // Do NOT close the print window automatically; let the user close it.
 }
+
+$(document).ready(function() {
+    var reportHeaderHtml = document.getElementById('hospital-header') ? document.getElementById('hospital-header').outerHTML : '';
+    var table = $('#report-table-area table');
+    var totalColIndex = table.find('thead th').length - 1;
+    $('#report-table-area table').DataTable({
+        dom: 'Bfrtip',
+        buttons: [
+            'copy', 'csv', 'excel', 'pdf', {
+                extend: 'print',
+                customize: function ( win ) {
+                    $(win.document.body).find('h1').remove();
+                    $(win.document.body).prepend(reportHeaderHtml);
+                    $(win.document.body).prepend('<h2 style="text-align:center; color:#1976d2; margin-bottom:24px; font-size:2rem; font-weight:bold;">Consolidated Purchase Report</h2>');
+                    $(win.document.body).find('table').find('th:last-child, td:last-child').css('text-align', 'right');
+                    // Remove grand total from table footer in print view
+                    $(win.document.body).find('tfoot').hide();
+                    // Calculate grand total
+                    var table = $(win.document.body).find('table');
+                    var total = 0;
+                    table.find('tbody tr').each(function() {
+                        var val = parseFloat($(this).find('td:last-child').text().replace(/[^0-9.\-]+/g, ''));
+                        if (!isNaN(val)) total += val;
+                    });
+                    // Add grand total summary below the table
+                    var grandTotalDiv = $('<div style="margin-top:24px; font-size:1.2em; font-weight:bold; text-align:right;">Grand Total: <span style="border:1px solid #e0e0e0; padding:8px 24px; background:#fff;">' + total.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}) + '</span></div>');
+                    $(win.document.body).append(grandTotalDiv);
+                }
+            }
+        ],
+        pageLength: 25,
+        lengthMenu: [ [25, 50, 100, -1], [25, 50, 100, 'All'] ],
+        order: [],
+        responsive: true,
+        scrollY: '60vh',
+        scrollCollapse: true,
+        paging: true,
+        fixedHeader: false,
+        footerCallback: function ( row, data, start, end, display ) {
+            var api = this.api();
+            var intVal = function ( i ) {
+                return typeof i === 'string' ?
+                    parseFloat(i.replace(/[^0-9.\-]+/g, '')) :
+                    typeof i === 'number' ?
+                        i : 0;
+            };
+            var total = api
+                .column(totalColIndex, { search: 'applied' })
+                .data()
+                .reduce( function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0 );
+            $(api.column(totalColIndex).footer()).html(total.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}));
+        }
+    });
+});
 </script>
     </div>
     </div>
