@@ -238,7 +238,44 @@
                     </tr>
                 </tfoot>
             </table>
-            <div class="muted-note">Please bring this bill for returning products.</div>
+
+            <!-- Print-only total summary, shown only on last page -->
+            <div class="print-bill-summary-wrapper">
+                <div class="print-bill-total">
+                    <span class="fw-bold">Total Amount:</span>
+                    <span class="fw-bold">{{ "%.2f"|format(grand_total) }}</span>
+                </div>
+                <div class="muted-note print-bill-note">Please bring this bill for returning products.</div>
+            </div>
+    <style>
+    @media print {
+        tfoot { display: none !important; }
+        .print-bill-summary-wrapper {
+            margin: 0;
+            padding: 0;
+            page-break-inside: avoid;
+        }
+        .print-bill-total {
+            display: block;
+            page-break-before: avoid;
+            /* page-break-after: always; removed */
+            font-size: 1.2em;
+            font-weight: bold;
+            text-align: right;
+            margin-top: 8px;
+            margin-right: 0;
+            background: white;
+            border-top: 2px solid #222;
+            padding: 8px 8px 0 0;
+        }
+        .print-bill-note {
+            margin-top: 12px;
+        }
+    }
+    @media screen {
+        .print-bill-summary-wrapper { display: none; }
+    }
+    </style>
         </div>
         {% endif %}
     </div>
