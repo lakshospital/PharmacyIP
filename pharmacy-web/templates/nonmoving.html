@@ -1,0 +1,330 @@
+{% extends "base.html" %}
+{% block title %}Non-Moving Items Report{% endblock %}
+
+{% block content %}
+<style>
+    @media screen {
+        .print-only {
+            display: none !important;
+        }
+    }
+    
+    @media print {
+        /* Hide everything by default */
+        body * {
+            visibility: hidden;
+        }
+        
+        /* Only show print content */
+        .print-content, .print-content * {
+            visibility: visible !important;
+        }
+        
+        /* Reset margins and padding */
+        body, html {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        
+        /* Hide non-print elements */
+        nav, .navbar, .form-section, footer, form, .btn:not(.print-content *) {
+            display: none !important;
+        }
+        
+        /* Position print content at the top */
+        .print-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px;
+        }
+        
+        /* Table styles */
+        .table {
+            width: 100% !important;
+            margin-bottom: 1rem;
+            border-collapse: collapse !important;
+            font-size: 12px;
+            page-break-inside: auto;
+        }
+        
+        .table th {
+            background-color: #f8f9fa !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        
+        .table th, 
+        .table td {
+            padding: 8px !important;
+            border: 1px solid #dee2e6 !important;
+        }
+        
+        /* Report header styles */
+        .report-header {
+            margin-bottom: 20px !important;
+            background-color: transparent !important;
+            border: none !important;
+            padding: 15px !important;
+        }
+        
+        .report-header table {
+            width: auto !important;
+            margin: 0 auto;
+        }
+        
+        h3 {
+            margin-bottom: 20px !important;
+        }
+        
+        /* Page settings */
+        @page {
+            margin: 2cm 1cm;
+            size: A4 portrait;
+        }
+    }
+    
+    .report-header th {
+        font-weight: 600;
+        color: #495057;
+    }
+
+    /* Form styles */
+    .form-section {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-select, .form-control {
+        max-width: 100%;
+    }
+
+    @media (max-width: 768px) {
+        .form-section .btn {
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+        
+        .form-section .d-flex.gap-2 {
+            flex-direction: column;
+        }
+    }
+</style>
+<div class="container-fluid">
+    <h2 class="mb-4">Non-Moving Items Report</h2>
+    
+    <div class="form-section">
+        <form method="POST" class="mb-4">
+            <div class="row g-3 align-items-end">
+                <div class="col-sm-6 col-md-4 col-lg-2">
+                    <div class="d-flex flex-column">
+                        <label for="product_group" class="form-label">Product Group:</label>
+                        <select name="product_group" id="product_group" class="form-select">
+                            {% for group in groups %}
+                            <option value="{{ group }}" {% if group == selected_group %}selected{% endif %}>{{ group }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-md-4 col-lg-2">
+                    <div class="d-flex flex-column">
+                        <label for="product_name" class="form-label">Product Name:</label>
+                        <select name="product_name" id="product_name" class="form-select">
+                            {% for product in products %}
+                            <option value="{{ product }}" {% if product == selected_product %}selected{% endif %}>{{ product }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-md-4 col-lg-2">
+                    <div class="d-flex flex-column">
+                        <label for="from_date" class="form-label">From Date:</label>
+                        <input type="date" name="from_date" id="from_date" class="form-control" value="{{ from_date }}">
+                    </div>
+                </div>
+                <div class="col-sm-6 col-md-4 col-lg-2">
+                    <div class="d-flex flex-column">
+                        <label for="to_date" class="form-label">To Date:</label>
+                        <input type="date" name="to_date" id="to_date" class="form-control" value="{{ to_date }}">
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-8 col-lg-4 d-flex gap-2 justify-content-start">
+                    <button type="submit" class="btn btn-primary">Generate Report</button>
+                    <button type="button" class="btn btn-secondary" onclick="window.print()">Print Report</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Print Content -->
+    <div class="print-content">
+            {% include 'report_header.html' %}
+
+        <!-- Report Header -->
+        <div class="report-header">
+            <div class="text-center mb-4">
+                <h3>Non-Moving Items Report</h3>
+                <div class="report-info">
+                    <table class="table table-sm table-borderless">
+                        <tr>
+                            <th style="width: 150px">From Date:</th>
+                            <td id="header-from-date">{% if from_date %}{{ format_date(from_date) }}{% endif %}</td>
+                            <th style="width: 150px">To Date:</th>
+                            <td id="header-to-date">{% if to_date %}{{ format_date(to_date) }}{% endif %}</td>
+                        </tr>
+                        <tr>
+                            <th>Product Group:</th>
+                            <td id="header-product-group">{{ selected_group }}</td>
+                            <th>Product Name:</th>
+                            <td id="header-product-name">{{ selected_product }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+  
+
+    <div class="table-responsive mt-4">
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th class="text-end">Opening Stock</th>
+                    <th class="text-end">Sales</th>
+                </tr>
+            </thead>
+            <tbody id="results-tbody">
+            </tbody>
+        </table>
+        <div id="spinner" style="text-align:center; display:none;">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+        <div id="loadMore" style="text-align:center; margin: 20px 0; display:none;">
+            <button id="loadMoreBtn" class="btn btn-primary">Load More</button>
+        </div>
+    </div>
+  </div>
+    <script>
+        let offset = 0;
+        const limit = 5;
+        let loading = false;
+        let hasMore = true;
+
+        function fetchRecords() {
+            if (loading || !hasMore) return;
+            loading = true;
+            document.getElementById('spinner').style.display = 'block';
+            
+            const form = document.querySelector('form');
+            const formData = new FormData(form);
+            formData.append('offset', offset);
+            formData.append('limit', limit);
+
+            fetch('/nonmoving_data', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                const tbody = document.getElementById('results-tbody');
+                data.results.forEach(row => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td data-label="Product Name">${row.ProductName}</td>
+                        <td data-label="Opening Stock" class="text-end">${row.OpeningStock}</td>
+                        <td data-label="Sales" class="text-end">${row.Sales}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                offset += limit;
+                hasMore = data.has_more;
+                loading = false;
+                if (hasMore) {
+                    fetchRecords(); // Automatically fetch next batch
+                } else {
+                    document.getElementById('spinner').style.display = 'none';
+                    document.getElementById('loadMore').style.display = 'none';
+                }
+            })
+            .catch(() => {
+                document.getElementById('spinner').style.display = 'none';
+                loading = false;
+            });
+        }
+
+        document.querySelector('form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Update report header
+            function formatDate(dateStr) {
+                if (!dateStr) return '';
+                const date = new Date(dateStr);
+                const day = date.getDate().toString().padStart(2, '0');
+                const month = date.toLocaleString('en', { month: 'short' });
+                const year = date.getFullYear();
+                return `${day}/${month}/${year}`;
+            }
+
+            const fromDate = document.getElementById('from_date').value;
+            const toDate = document.getElementById('to_date').value;
+            const headerFromDate = document.getElementById('header-from-date');
+            const headerToDate = document.getElementById('header-to-date');
+            const headerProductGroup = document.getElementById('header-product-group');
+            const headerProductName = document.getElementById('header-product-name');
+            const productGroup = document.getElementById('product_group');
+            const productName = document.getElementById('product_name');
+
+            if (headerFromDate) headerFromDate.textContent = formatDate(fromDate);
+            if (headerToDate) headerToDate.textContent = formatDate(toDate);
+            if (headerProductGroup && productGroup) headerProductGroup.textContent = productGroup.options[productGroup.selectedIndex].text;
+            if (headerProductName && productName) headerProductName.textContent = productName.options[productName.selectedIndex].text;
+            
+            // Reset and fetch records
+            document.getElementById('results-tbody').innerHTML = '';
+            offset = 0;
+            hasMore = true;
+            fetchRecords();
+        });
+
+        document.getElementById('loadMoreBtn').addEventListener('click', function() {
+            if (!loading) {
+                fetchRecords();
+            }
+        });
+    </script>
+</div>
+
+<script>
+document.getElementById('product_group').addEventListener('change', function() {
+    var group = this.value;
+    fetch('/get_products', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({group: group})
+    })
+    .then(response => response.json())
+    .then(data => {
+        var productSelect = document.getElementById('product_name');
+        productSelect.innerHTML = '<option value="All">All</option>';
+        data.products.forEach(function(product) {
+            var option = document.createElement('option');
+            option.value = product;
+            option.textContent = product;
+            productSelect.appendChild(option);
+        });
+    });
+});
+</script>
+{% endblock %}

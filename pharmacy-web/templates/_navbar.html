@@ -78,19 +78,14 @@
     <a href="{{ url_for('dashboard') }}" {% if request.endpoint == 'dashboard' %}class="active"{% endif %}><i class="fa-solid fa-gauge"></i>Dashboard</a>
     <a href="{{ url_for('index') }}" {% if request.endpoint == 'index' %}class="active"{% endif %}><i class="fa-solid fa-file-invoice"></i>Bill Details</a>
     <a href="{{ url_for('report1') }}" {% if request.endpoint == 'report1' %}class="active"{% endif %}><i class="fa-solid fa-chart-bar"></i>Stock Report</a>
+    <a href="{{ url_for('nonmoving.nonmoving') }}" {% if request.endpoint == 'nonmoving.nonmoving' %}class="active"{% endif %}><i class="fa-solid fa-box-archive"></i>Non-Moving</a>
     <!-- Masters Collapsible Group -->
     <div class="menu-group">
         <a href="#" class="menu-group-toggle" onclick="toggleMenuGroup(event, 'masters-group')">
             <i class="fa fa-layer-group"></i>Masters
             <i class="fa fa-chevron-down arrow" id="masters-arrow"></i>
         </a>
-        <div class="menu-group-items" id="masters-group" style="display:none; flex-direction:column; gap:2px; margin-left:18px;">
-            <a href="{{ url_for('product_master_bp.product_master') }}" {% if request.endpoint == 'product_master_bp.product_master' %}class="active"{% endif %}><i class="fa fa-box"></i>Product</a>
-            <a href="{{ url_for('product_group_master_bp.product_group_master') }}" {% if request.endpoint == 'product_group_master_bp.product_group_master' %}class="active"{% endif %}><i class="fa fa-layer-group"></i>Product Group</a>
-            <a href="{{ url_for('dr_name_master_bp.dr_name_master') }}" {% if request.endpoint == 'dr_name_master_bp.dr_name_master' %}class="active"{% endif %}><i class="fa fa-user-md"></i>Doctor</a>
-            <a href="{{ url_for('case_type_master_bp.case_type_master') }}" {% if request.endpoint == 'case_type_master_bp.case_type_master' %}class="active"{% endif %}><i class="fa fa-briefcase"></i>Case Type</a>
-            <a href="{{ url_for('supplier_master_bp.supplier_master') }}" {% if request.endpoint == 'supplier_master_bp.supplier_master' %}class="active"{% endif %}><i class="fa fa-truck"></i>Supplier</a>
-        </div>
+        
     </div>
     <!-- <a href="{{ url_for('credit_paid_bp.credit_paid_till_date') }}" {% if request.endpoint == 'credit_paid_bp.credit_paid_till_date' %}class="active"{% endif %}><i class="fa-solid fa-money-check-alt"></i>Credits</a>
     !-->

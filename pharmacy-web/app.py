@@ -24,6 +24,7 @@ from backend.consolidated_sales_return_report import consolidated_sales_return_r
 from backend.supplier_master import supplier_master_bp
 from backend.case_type_master import case_type_master_bp
 from backend.dr_name_master import dr_name_master_bp
+from backend.nonmoving import nonmoving_bp
 
 
 app = Flask(__name__)
@@ -41,6 +42,7 @@ app.register_blueprint(consolidated_sales_return_report_bp)
 app.register_blueprint(dr_name_master_bp)
 app.register_blueprint(case_type_master_bp)
 app.register_blueprint(supplier_master_bp)
+app.register_blueprint(nonmoving_bp)
 
 # Inject current datetime as 'now' into all templates for report header
 @app.context_processor
