@@ -434,7 +434,7 @@ Public Class DrugSlip
                     txtBillNo.ReadOnly = False
                     'DrugPrint.Show()
                     'CrystalBillPrint.Show()
-                    NewPrint()
+                    'NewPrint()
                 Catch ex As Exception
                     tranc.Rollback()
                     MsgBox(ex.Message, MsgBoxStyle.Critical)

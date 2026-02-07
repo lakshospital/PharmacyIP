@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 import pyodbc
 import datetime
 
@@ -97,6 +97,22 @@ def index():
                 print(f"Database error: {e}")
                 
     return render_template('index.html', rows=rows, years=years, header_data=header_data, print_time=print_time, grand_total=grand_total, show_sno=show_sno, show_seq_id=show_seq_id, last_10_bills=last_10_bills)
+
+@app.route('/bill/<billno>')
+def get_bill(billno):
+    try:
+        conn = pyodbc.connect('DRIVER={SQL Server};SERVER=DESKTOP-A674QQN\SQLEXPRESS01;DATABASE=InPatient_PharmcyDB;UID=lhs2;PWD=lhs2')
+        cursor = conn.cursor()
+        cursor.execute("SELECT TOP 1 * FROM DrugSlipDetails WHERE BillNo=?", billno)
+        row = cursor.fetchone()
+        if row:
+            columns = [column[0] for column in cursor.description]
+            bill = dict(zip(columns, row))
+            return jsonify(success=True, bill=bill)
+        else:
+            return jsonify(success=False, message="Bill not found.")
+    except Exception as e:
+        return jsonify(success=False, message=str(e))
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

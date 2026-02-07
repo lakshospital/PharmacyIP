@@ -630,7 +630,7 @@ Partial Class Main
         Me.MainMenuStrip = Me.MenuStrip1
         Me.Name = "Main"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "Pharmacy:  9/AUG/2025"
+        Me.Text = "Pharmacy:  10/AUG/2025"
         Me.WindowState = System.Windows.Forms.FormWindowState.Maximized
         Me.MenuStrip1.ResumeLayout(False)
         Me.MenuStrip1.PerformLayout()
