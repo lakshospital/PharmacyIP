@@ -157,4 +157,15 @@ Public Class frmLogin
             e.SuppressKeyPress = True
         End If
     End Sub
+
+    Private Sub GlassButton1_Click(sender As Object, e As EventArgs) Handles GlassButton1.Click
+        Dim cmd As New SqlClient.SqlCommand
+
+        cmd.Connection = con
+        CheckConnection()
+        cmd.CommandText = "delete from LastLogin"
+        cmd.ExecuteNonQuery()
+        con.Close()
+        MsgBox("Lock released")
+    End Sub
 End Class

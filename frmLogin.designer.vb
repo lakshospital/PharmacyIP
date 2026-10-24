@@ -32,6 +32,7 @@ Partial Class frmLogin
         Me.cmdLogin = New Glass.GlassButton()
         Me.Pharmacy = New System.Windows.Forms.RadioButton()
         Me.Label4 = New System.Windows.Forms.Label()
+        Me.GlassButton1 = New Glass.GlassButton()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -164,9 +165,23 @@ Partial Class frmLogin
         Me.Label4.ForeColor = System.Drawing.Color.Blue
         Me.Label4.Location = New System.Drawing.Point(402, 201)
         Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(171, 26)
+        Me.Label4.Size = New System.Drawing.Size(168, 26)
         Me.Label4.TabIndex = 9
-        Me.Label4.Text = "V: 10/AUG/2025"
+        Me.Label4.Text = "V: 24/OCT/2026"
+        '
+        'GlassButton1
+        '
+        Me.GlassButton1.BackColor = System.Drawing.Color.SteelBlue
+        Me.GlassButton1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.GlassButton1.ForeColor = System.Drawing.Color.Black
+        Me.GlassButton1.GlowColor = System.Drawing.Color.Yellow
+        Me.GlassButton1.Image = Global.Pharmacy.My.Resources.Resource1.Ok
+        Me.GlassButton1.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.GlassButton1.Location = New System.Drawing.Point(438, 108)
+        Me.GlassButton1.Name = "GlassButton1"
+        Me.GlassButton1.Size = New System.Drawing.Size(212, 60)
+        Me.GlassButton1.TabIndex = 10
+        Me.GlassButton1.Text = "& Release Lock"
         '
         'frmLogin
         '
@@ -175,6 +190,7 @@ Partial Class frmLogin
         Me.AutoSize = True
         Me.BackColor = System.Drawing.Color.LightGray
         Me.ClientSize = New System.Drawing.Size(696, 262)
+        Me.Controls.Add(Me.GlassButton1)
         Me.Controls.Add(Me.Label4)
         Me.Controls.Add(Me.Pharmacy)
         Me.Controls.Add(Me.PictureBox1)
@@ -210,4 +226,5 @@ Partial Class frmLogin
     Friend WithEvents PictureBox1 As System.Windows.Forms.PictureBox
     Friend WithEvents Pharmacy As System.Windows.Forms.RadioButton
     Friend WithEvents Label4 As System.Windows.Forms.Label
+    Friend WithEvents GlassButton1 As Glass.GlassButton
 End Class

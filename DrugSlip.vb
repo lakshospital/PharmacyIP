@@ -210,6 +210,27 @@ Public Class DrugSlip
                            dt.Rows(i).Item("CaseType") = "SABEACIANCYST" Or
                            dt.Rows(i).Item("CaseType") = "UMB. HERNIA" Or
                            dt.Rows(i).Item("CaseType") = "MTP" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - LSCS" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - LSCS-POW" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - AH" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - AH-POW" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - VH" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - VH-POW" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - Normal delivery" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - Normal delivery Labour ward" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - Painless labour" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - Painless labour-Labour ward" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless ortho" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - Hernia" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - Hernia-POW" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - Appendicectomy" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - Appendicectomy pow" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - Lap.choly" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - Lap.choly POW" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - Lap.Hystrectomy" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - Lap.Hystrectomy Pow" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - Lap.Ovarian cyst" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - Lap.Ovarian cyst Pow" Or
                            dt.Rows(i).Item("CaseType") = "VAGINAL HYSTRECTOMY" Then
                             MsgBox("A Bill Saved for this patient Already in this case Old Bill No is: " & dt.Rows(0).Item("BillNo"))
                             Return False
@@ -266,6 +287,28 @@ Public Class DrugSlip
                            dt.Rows(i).Item("CaseType") = "SABEACIANCYST" Or
                            dt.Rows(i).Item("CaseType") = "UMB. HERNIA" Or
                            dt.Rows(i).Item("CaseType") = "MTP" Or
+                           dt.Rows(i).Item("CaseType") = "MTP" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - LSCS" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - LSCS-POW" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - AH" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - AH-POW" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - VH" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - VH-POW" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - Normal delivery" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - Normal delivery Labour ward" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - Painless labour" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - Painless labour-Labour ward" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless ortho" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - Hernia" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - Hernia-POW" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - Appendicectomy" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - Appendicectomy pow" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - Lap.choly" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - Lap.choly POW" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - Lap.Hystrectomy" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - Lap.Hystrectomy Pow" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - Lap.Ovarian cyst" Or
+                           dt.Rows(i).Item("CaseType") = "Cashless - Lap.Ovarian cyst Pow" Or
                            dt.Rows(i).Item("CaseType") = "VAGINAL HYSTRECTOMY" Then
                             MsgBox("A Bill Saved for this patient Already in this case Old Bill No is: " & dt.Rows(0).Item("BillNo"))
                             Return False

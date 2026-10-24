@@ -1,4 +1,33 @@
 _______________________________________________________________________
+Changes As on 7/FEB/2026
+
+OT Template Report changes
+
+OTReportsBetweenDatewise.vb -> dsTypeWiseReport.xsd -> Fillby3 Added below codes
+
+OR CaseType='Cashless - LSCS'
+OR CaseType='Cashless - LSCS-POW'
+OR CaseType='Cashless - AH'
+OR CaseType='Cashless - AH-POW'
+OR CaseType='Cashless - VH'
+OR CaseType='Cashless - VH-POW'
+OR CaseType='Cashless - Normal delivery'
+OR CaseType='Cashless - Normal delivery Labour ward'
+OR CaseType='Cashless - Painless labour'
+OR CaseType='Cashless - Painless labour-Labour ward'
+OR CaseType='Cashless ortho'
+OR CaseType='Cashless - Hernia'
+OR CaseType='Cashless - Hernia-POW'
+OR CaseType='Cashless - Appendicectomy'
+OR CaseType='Cashless - Appendicectomy pow'
+OR CaseType='Cashless - Lap.choly'
+OR CaseType='Cashless - Lap.choly POW'
+OR CaseType='Cashless - Lap.Hystrectomy'
+OR CaseType='Cashless - Lap.Hystrectomy Pow'
+OR CaseType='Cashless - Lap.Ovarian cyst'
+OR CaseType='Cashless - Lap.Ovarian cyst Pow'
+
+_______________________________________________________________________
 Changes As on 25/Apr/ 2022
 Dr.Parimlam Cases Updated Reception and OT Template Report
 

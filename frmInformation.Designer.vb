@@ -19,12 +19,11 @@ Partial Class frmInformation
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.RichTextBox1 = New System.Windows.Forms.RichTextBox
+        Me.RichTextBox1 = New System.Windows.Forms.RichTextBox()
         Me.SuspendLayout()
         '
         'RichTextBox1
         '
-        Me.RichTextBox1.Enabled = False
         Me.RichTextBox1.Location = New System.Drawing.Point(31, 12)
         Me.RichTextBox1.Name = "RichTextBox1"
         Me.RichTextBox1.Size = New System.Drawing.Size(1013, 545)
@@ -35,7 +34,7 @@ Partial Class frmInformation
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1005, 469)
+        Me.ClientSize = New System.Drawing.Size(1107, 727)
         Me.Controls.Add(Me.RichTextBox1)
         Me.Name = "frmInformation"
         Me.Text = "INFORMATION"

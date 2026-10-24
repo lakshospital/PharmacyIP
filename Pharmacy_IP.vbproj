@@ -238,6 +238,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>dsExcessShortage.xsd</DependentUpon>
     </Compile>
+    <Compile Include="dsProducts.vb">
+      <DependentUpon>dsProducts.xsd</DependentUpon>
+    </Compile>
     <Compile Include="dsQuotationProfit.Designer.vb">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
